@@ -103,6 +103,7 @@ namespace BankApplication.Services
             return response;
         }
 
+
         public Response<string> TransferFunds(AccountHolder sourceAccount, AccountHolder destinationAccount, decimal amount, TransferOptions transferType)
         {
             Response<string> response = new Response<string>();
@@ -138,8 +139,8 @@ namespace BankApplication.Services
                 return response;
             }
 
-            sourceAccount.Balance -= transferAmount; 
-            destinationAccount.Balance += amount; 
+            sourceAccount.Balance -= transferAmount;
+            destinationAccount.Balance += amount;
 
             // Create and store source transaction
             Transaction sourceTransaction = new Transaction
@@ -148,7 +149,7 @@ namespace BankApplication.Services
                 SrcAccount = sourceAccount.AccountNumber,
                 DstAccount = destinationAccount.AccountNumber,
                 Type = Constants.TransferFunds,
-                Amount = -transferAmount, 
+                Amount = -transferAmount,
                 CreatedBy = sourceAccount.Name,
                 CreatedOn = DateTime.Now
             };
@@ -160,7 +161,7 @@ namespace BankApplication.Services
                 SrcAccount = sourceAccount.AccountNumber,
                 DstAccount = destinationAccount.AccountNumber,
                 Type = Constants.TransferFunds,
-                Amount = amount, 
+                Amount = amount,
                 CreatedBy = destinationAccount.Name,
                 CreatedOn = DateTime.Now
             };
@@ -172,8 +173,6 @@ namespace BankApplication.Services
             response.Message = Constants.TransferFundsSuccess;
             return response;
         }
-    
-
 
         public Response<string> CheckBalance(AccountHolder account)
         {
@@ -194,7 +193,8 @@ namespace BankApplication.Services
             {
                 Utility.PrintTransactionDetails(transactions);
                 response.IsSuccess = true;
-                response.Message = Constants.TransactionnSuccess;
+                response.Message = Constants.TransactionSuccess;
+              
             }
             else
             {

@@ -3,19 +3,15 @@ using BankApplication.Models;
 using BankApplication.Services;
 using System;
 using System.Collections.Generic;
-using System.Linq;using static BankApplication.Common.Enums;
+using System.Linq;
+using static BankApplication.Common.Enums;
 
 namespace BankApplication.Views
 {
     internal class AccountHolderView
     {
         static AccountHolderService AccountHolderService = new AccountHolderService();
-        private Action<string> WriteLineDelegate;
-
-        public AccountHolderView(Action<string> writeLineDelegate)
-        {
-            WriteLineDelegate = writeLineDelegate;
-        }
+    
         public static void BankStaffMenu()
         {
             BankStaffOption option;
@@ -41,7 +37,6 @@ namespace BankApplication.Views
                         {
                             Console.WriteLine("Employee not found.");
                         }
-
                         break;
 
                     case BankStaffOption.UpdateAccountHolder:

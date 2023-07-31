@@ -11,7 +11,7 @@ namespace BankApplication.Views
     internal class UserView
     {  
         BankService BankService = new BankService();
-        public void UserAccountMenu(AccountHolder account)
+        public void UserAccountMenu(AccountHolder loggedInAccount)
         {
             UserAccountOption option;
             do
@@ -25,14 +25,14 @@ namespace BankApplication.Views
                     case UserAccountOption.Deposit:
                         Console.Write("Enter the amount to deposit: ");
                         decimal depositAmount = Convert.ToDecimal(Console.ReadLine());
-                        Response<string> depositResponse = BankService.Deposit(account, depositAmount);
+                        Response<string> depositResponse = BankService.Deposit(loggedInAccount, depositAmount);
                         Console.WriteLine(depositResponse.Message);
                         break;
 
                     case UserAccountOption.Withdraw:
                         Console.Write("Enter the amount to withdraw: ");
                         decimal withdrawAmount = Convert.ToDecimal(Console.ReadLine());
-                        Response<string> WithdrawResponse = BankService.Withdraw(account, withdrawAmount);
+                        Response<string> WithdrawResponse = BankService.Withdraw(loggedInAccount, withdrawAmount);
                         Console.WriteLine(WithdrawResponse.Message);
                         break;
 
@@ -78,12 +78,12 @@ namespace BankApplication.Views
                         Console.Write("Enter the amount to transfer: ");
                         decimal transferAmount = Convert.ToDecimal(Console.ReadLine());
 
-                        Response<string> transferResponse = BankService.TransferFunds(account, destinationAccount, transferAmount, transferType);
+                        Response<string> transferResponse = BankService.TransferFunds(loggedInAccount, destinationAccount, transferAmount, transferType);
 
                         if (transferResponse.IsSuccess)
                         {
                             Console.WriteLine(transferResponse.Message);
-                            Console.WriteLine($"New balance: {account.Balance}");
+                            Console.WriteLine($"New balance: {loggedInAccount.Balance}");
                         }
                         else
                         {
@@ -91,13 +91,14 @@ namespace BankApplication.Views
                         }
                         break;
 
+
                     case UserAccountOption.CheckBalance:
-                        Response<string> BalanceResponse = BankService.CheckBalance(account);
+                        Response<string> BalanceResponse = BankService.CheckBalance(loggedInAccount);
                         Console.WriteLine($"Your account balance: {BalanceResponse.Data}");
                         break;
 
                     case UserAccountOption.Transactions:
-                        Response<string> TransactionHistoryResponse = BankService.ViewTransactionHistory(account);
+                        Response<string> TransactionHistoryResponse = BankService.ViewTransactionHistory(loggedInAccount);
                         Console.WriteLine(TransactionHistoryResponse.Message);
                         Console.WriteLine(TransactionHistoryResponse.Data);
                         break;

@@ -16,8 +16,7 @@ namespace BankApplication.Views
         UserView UserView = new UserView();
       
         public void Initialize()
-        {
-            
+        {          
             try
             {
                 MainMenuOption option;
@@ -37,21 +36,19 @@ namespace BankApplication.Views
                             if (loggedInAccountHolder != null)
                             {
                                 Console.WriteLine($"Welcome, {loggedInAccountHolder.Name}!");
-                                UserAccountOption selectedOption;
-                                AccountHolder Account = new AccountHolder();
-                                UserView.UserAccountMenu(Account);
+                                UserView.UserAccountMenu(loggedInAccountHolder); // Pass the logged-in account holder here
                             }
                             else
                             {
                                 Console.WriteLine("Account not found");
                             }
-                            break;                         
+                            break;
+                                                
                         case MainMenuOption.LoginAsBankStaff:
                             Employee loggedInEmployee = VerifyEmployeeCredentials();
                             if (loggedInEmployee != null)
                             {
                                 Console.WriteLine($"Welcome, {loggedInEmployee.Name}!");
-                                BankStaffOption selectedOption;
                                 AccountHolderView.BankStaffMenu();
                             }
                             else
@@ -168,27 +165,38 @@ namespace BankApplication.Views
                 Type = Enums.UserType.AccountHolder
             };
 
-            Console.Write("Enter BankID: ");
-            string bankId = Console.ReadLine();
-            Bank selectedBank = DataStorage.Banks.FirstOrDefault(b => b.Id == bankId);
+            try
+            {
+                Console.Write("Enter BankID: ");
+                string bankId = Console.ReadLine();
+                Bank selectedBank = DataStorage.Banks.FirstOrDefault(b => b.Id == bankId);
 
-            accountHolder.Id = bankId;
-            accountHolder.AccountNumber = Utility.GenerateAccountNumber(accountHolder.Name);
+                if (selectedBank == null)
+                {
+                    throw new Exception("Bank not found. Account holder not added.");
+                }
 
-            DataStorage.Accounts.Add(accountHolder);
+                accountHolder.Id = Utility.GenerateAccountId(accountHolder.Name);
+                accountHolder.AccountNumber = Utility.GenerateAccountNumber(accountHolder.Name);
 
-            Console.WriteLine("Account holder added successfully.");
-            Console.WriteLine($"Account holder ID: {accountHolder.Id}");
-            Console.WriteLine($"Account holder Name: {accountHolder.Name}");
-            Console.WriteLine($"Account holder Username: {accountHolder.UserName}");
-            Console.WriteLine($"Account holder's Password: {accountHolder.Password}");
-            Console.WriteLine($"Account holder's Account Number: {accountHolder.AccountNumber}");
-            Console.WriteLine($"Account holder's Acc type: {accountHolder.AccountType}");
-            Console.WriteLine($"Created by: {accountHolder.CreatedBy}");
-            Console.WriteLine($"Created on: {accountHolder.CreatedOn}");
-            Console.WriteLine("----------------------------------------");
+                DataStorage.Accounts.Add(accountHolder);
+
+                Console.WriteLine("Account holder added successfully.");
+                Console.WriteLine($"Account holder ID: {accountHolder.Id}");
+                Console.WriteLine($"Account holder Name: {accountHolder.Name}");
+                Console.WriteLine($"Account holder Username: {accountHolder.UserName}");
+                Console.WriteLine($"Account holder's Password: {accountHolder.Password}");
+                Console.WriteLine($"Account holder's Account Number: {accountHolder.AccountNumber}");
+                Console.WriteLine($"Account holder's Acc type: {accountHolder.AccountType}");
+                Console.WriteLine($"Created by: {accountHolder.CreatedBy}");
+                Console.WriteLine($"Created on: {accountHolder.CreatedOn}");
+                Console.WriteLine("----------------------------------------");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
-
 
         private Employee VerifyEmployeeCredentials()
         {
@@ -197,7 +205,7 @@ namespace BankApplication.Views
 
             Console.WriteLine("Enter your password: ");
             string password = Console.ReadLine();
-
+           
             Employee employee = DataStorage.Employees.FirstOrDefault(e => e.UserName == username && e.Password == password);
             return employee;
         }
@@ -213,9 +221,6 @@ namespace BankApplication.Views
             AccountHolder accountHolder = DataStorage.Accounts.FirstOrDefault(a => a.UserName == username && a.Password == password);
             return accountHolder;
         }
-
-
-
     }
 }
 

@@ -29,7 +29,7 @@ namespace BankApplication.Common
         public static string TransferFunds = "Funds Transfer";
 
         //Transaction
-        public static string TransactionnSuccess = "Transaction history retrieved successfully";
+        public static string TransactionSuccess = "Transaction history retrieved successfully";
 
         public static string TransactionFailure = "No transaction history found for this account.";
 
