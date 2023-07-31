@@ -11,11 +11,6 @@ namespace BankApplication.Views
     internal class UserView
     {  
         BankService BankService = new BankService();
-        private Action<string> WriteLineDelegate;
-        public UserView()
-        {
-            WriteLineDelegate = Utility.GetConsoleWriteLineDelegate();
-        }
         public void UserAccountMenu(AccountHolder account)
         {
             UserAccountOption option;
@@ -28,41 +23,41 @@ namespace BankApplication.Views
                 switch (option)
                 {
                     case UserAccountOption.Deposit:
-                        WriteLineDelegate("Enter the amount to deposit: ");
+                        Console.Write("Enter the amount to deposit: ");
                         decimal depositAmount = Convert.ToDecimal(Console.ReadLine());
                         Response<string> depositResponse = BankService.Deposit(account, depositAmount);
-                        WriteLineDelegate(depositResponse.Message);
+                        Console.WriteLine(depositResponse.Message);
                         break;
 
                     case UserAccountOption.Withdraw:
-                        WriteLineDelegate("Enter the amount to withdraw: ");
+                        Console.Write("Enter the amount to withdraw: ");
                         decimal withdrawAmount = Convert.ToDecimal(Console.ReadLine());
                         Response<string> WithdrawResponse = BankService.Withdraw(account, withdrawAmount);
-                        WriteLineDelegate(WithdrawResponse.Message);
+                        Console.WriteLine(WithdrawResponse.Message);
                         break;
 
                     case UserAccountOption.Transfer:
-                        WriteLineDelegate("Enter BankID:");
+                        Console.Write("Enter BankID:");
                         string bankId = Console.ReadLine();
                         Bank selectedBank = DataStorage.Banks.FirstOrDefault(b => b.Id == bankId);
 
                         if (selectedBank == null)
                         {
-                            WriteLineDelegate("Bank not found. Transfer failed.");
+                            Console.WriteLine("Bank not found. Transfer failed.");
                             break;
                         }
 
-                        WriteLineDelegate("Enter the destination account number: ");
+                        Console.Write("Enter the destination account number: ");
                         string destinationAccountNumber = Console.ReadLine();
                         AccountHolder destinationAccount = DataStorage.Accounts.FirstOrDefault(a => a.AccountNumber == destinationAccountNumber);
 
                         if (destinationAccount == null)
                         {
-                            WriteLineDelegate("Destination account not found. Transfer failed.");
+                            Console.WriteLine("Destination account not found. Transfer failed.");
                             break;
                         }
 
-                        WriteLineDelegate("Enter the transfer type (0 for IMPS, 1 for RTGS): ");
+                        Console.Write("Enter the transfer type (0 for IMPS, 1 for RTGS): ");
                         int transferTypeInput = Convert.ToInt32(Console.ReadLine());
 
                         TransferOptions transferType;
@@ -76,42 +71,42 @@ namespace BankApplication.Views
                         }
                         else
                         {
-                            WriteLineDelegate("Invalid transfer type. Transfer failed.");
+                            Console.WriteLine("Invalid transfer type. Transfer failed.");
                             break;
                         }
 
-                        WriteLineDelegate("Enter the amount to transfer: ");
+                        Console.Write("Enter the amount to transfer: ");
                         decimal transferAmount = Convert.ToDecimal(Console.ReadLine());
 
                         Response<string> transferResponse = BankService.TransferFunds(account, destinationAccount, transferAmount, transferType);
 
                         if (transferResponse.IsSuccess)
                         {
-                            WriteLineDelegate(transferResponse.Message);
-                            WriteLineDelegate($"New balance: {account.Balance}");
+                            Console.WriteLine(transferResponse.Message);
+                            Console.WriteLine($"New balance: {account.Balance}");
                         }
                         else
                         {
-                            WriteLineDelegate(transferResponse.Message);
+                            Console.WriteLine(transferResponse.Message);
                         }
                         break;
 
                     case UserAccountOption.CheckBalance:
                         Response<string> BalanceResponse = BankService.CheckBalance(account);
-                        WriteLineDelegate($"Your account balance: {BalanceResponse.Data}");
+                        Console.WriteLine($"Your account balance: {BalanceResponse.Data}");
                         break;
 
                     case UserAccountOption.Transactions:
                         Response<string> TransactionHistoryResponse = BankService.ViewTransactionHistory(account);
-                        WriteLineDelegate(TransactionHistoryResponse.Message);
-                        WriteLineDelegate(TransactionHistoryResponse.Data);
+                        Console.WriteLine(TransactionHistoryResponse.Message);
+                        Console.WriteLine(TransactionHistoryResponse.Data);
                         break;
 
                     case UserAccountOption.Logout:
                         break;
 
                     default:
-                        WriteLineDelegate("Please enter a valid input.");
+                        Console.WriteLine("Please enter a valid input.");
                         break;
                 }
             } while (option != UserAccountOption.Logout);

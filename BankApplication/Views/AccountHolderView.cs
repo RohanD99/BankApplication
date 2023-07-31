@@ -12,17 +12,15 @@ namespace BankApplication.Views
         static AccountHolderService AccountHolderService = new AccountHolderService();
         private Action<string> WriteLineDelegate;
 
-        public AccountHolderView() 
+        public AccountHolderView(Action<string> writeLineDelegate)
         {
-            WriteLineDelegate = Utility.GetConsoleWriteLineDelegate();
+            WriteLineDelegate = writeLineDelegate;
         }
-
         public static void BankStaffMenu()
         {
             BankStaffOption option;
             do
             {
-
                 List<string> BankStaffMenuOptions = Enum.GetNames(typeof(BankStaffOption)).ToList();
                 Utility.GenerateOptions(BankStaffMenuOptions);
 
