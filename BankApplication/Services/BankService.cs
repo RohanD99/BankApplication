@@ -52,7 +52,7 @@ namespace BankApplication.Services
                 {
                     Id = transactionId,
                     SrcAccount = account.AccountNumber,
-                    Type = Constants.Deposit,
+                    Type = Constants.Deposited,
                     Amount = amount,
                     CreatedBy = account.CreatedBy,
                     CreatedOn = DateTime.Now

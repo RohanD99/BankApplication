@@ -6,7 +6,7 @@ using System.Text;
 
 namespace BankApplication.Common
 {
-    internal static class Utility
+    internal class Utility
     {
         public static void GenerateOptions(List<string> options)
         {
@@ -123,5 +123,16 @@ namespace BankApplication.Common
 
             return result;
         }
+
+        public static Employee GetEmployeeByUsernameAndPassword(string username, string password)
+        {
+            return DataStorage.Employees.FirstOrDefault(e => e.UserName == username && e.Password == password);
+        }
+
+        public static AccountHolder GetAccountHolderByUsernameAndPassword(string username, string password)
+        {
+            return DataStorage.Accounts.FirstOrDefault(a => a.UserName == username && a.Password == password);
+        }
+
     }
 }

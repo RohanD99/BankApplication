@@ -10,20 +10,20 @@ namespace BankApplication.Views
 {
     public class BankView
     {
-        private Employee currentEmployee;
+        private Employee CurrentEmployee;
         BankService BankService = new BankService();
         EmployeeService EmployeeService = new EmployeeService(); 
-        EmployeeView UserView = new EmployeeView();
+        EmployeeView EmployeeView = new EmployeeView();
       
         public void Initialize()
-        {          
+        {
             try
             {
                 MainMenuOption option;
                 do
                 {
-                    List<string> mainMenuOptions = Enum.GetNames(typeof(MainMenuOption)).ToList();
-                    Utility.GenerateOptions(mainMenuOptions);
+                    Utility.GenerateOptions(Constants.MainMenuOptions);
+
                     option = (MainMenuOption)Convert.ToInt32(Console.ReadLine());
                     switch (option)
                     {
@@ -36,7 +36,7 @@ namespace BankApplication.Views
                             if (loggedInAccountHolder != null)
                             {
                                 Console.WriteLine($"Welcome, {loggedInAccountHolder.Name}!");
-                                UserView.UserAccountMenu(loggedInAccountHolder); // Pass the logged-in account holder here
+                                EmployeeView.UserAccountMenu(loggedInAccountHolder); // Pass the logged-in account holder here
                             }
                             else
                             {
@@ -132,7 +132,7 @@ namespace BankApplication.Views
 
                 EmployeeService.Create(employee);
                 Console.WriteLine("Admin added successfully");
-                currentEmployee = employee;
+                CurrentEmployee = employee;
                 AddEmployee();
                 Console.WriteLine($"Employee's ID : {employee.Id}");
                 Console.WriteLine("----------------------------------------");
@@ -176,7 +176,6 @@ namespace BankApplication.Views
             }
         }
 
-
         public void AddUser(Employee employee)
         {
             AccountHolder accountHolder = new AccountHolder()
@@ -192,7 +191,7 @@ namespace BankApplication.Views
 
             try
             {
-                Console.Write("Enter BankID: ");
+                Utility.GetStringInput("Enter BankID: ",true);
                 string bankId = Console.ReadLine();
                 Bank selectedBank = DataStorage.Banks.FirstOrDefault(b => b.Id == bankId);
                 accountHolder.Id = Utility.GenerateAccountId(accountHolder.Name);
@@ -219,25 +218,19 @@ namespace BankApplication.Views
 
         private Employee VerifyEmployeeCredentials()
         {
-            Console.WriteLine("Enter your username: ");
-            string username = Console.ReadLine();
+            string username = Utility.GetStringInput("Username", true);
+            string password = Utility.GetStringInput("Password", true);
 
-            Console.WriteLine("Enter your password: ");
-            string password = Console.ReadLine();
-           
-            Employee employee = DataStorage.Employees.FirstOrDefault(e => e.UserName == username && e.Password == password);
+            Employee employee = Utility.GetEmployeeByUsernameAndPassword(username, password);
             return employee;
         }
 
         private AccountHolder VerifyAccountHolderCredentials()
         {
-            Console.WriteLine("Enter your username: ");
-            string username = Console.ReadLine();
+            string username = Utility.GetStringInput("Username", true);
+            string password = Utility.GetStringInput("Password", true);
 
-            Console.WriteLine("Enter your password: ");
-            string password = Console.ReadLine();
-
-            AccountHolder accountHolder = DataStorage.Accounts.FirstOrDefault(a => a.UserName == username && a.Password == password);
+            AccountHolder accountHolder = Utility.GetAccountHolderByUsernameAndPassword(username, password);
             return accountHolder;
         }
     }

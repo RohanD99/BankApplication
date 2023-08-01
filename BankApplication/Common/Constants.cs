@@ -14,7 +14,7 @@ namespace BankApplication.Common
         //Deposit
         public static string DepositSuccess = "Deposit successful";
 
-        public static string Deposit = "Deposit";
+        public static string Deposited = "Deposit";
 
         //Withdrawal
         public static string WithdrawalSuccess = "Withdrawal successful";
@@ -86,6 +86,65 @@ namespace BankApplication.Common
         public static string AccountHolderName = "Enter Account holder's name";
 
         public static string AccountType = "Enter Account type";
+
+        // Main Menu Options
+        public static string CreateNewBank = "Create New Bank";
+        public static string LoginAsAccountHolder = "Login as Account Holder";
+        public static string LoginAsBankStaff = "Login as Bank Staff";
+        public static string Exit = "Exit";
+
+        public static readonly List<string> MainMenuOptions = new List<string>
+        {
+            CreateNewBank,
+            LoginAsAccountHolder,
+            LoginAsBankStaff,
+            Exit
+        };
+
+        // Bank Staff Menu Options
+        public static string CreateAccountHolder = "Create Account Holder";
+        public static string UpdateAccountHolder = "Update Account Holder";
+        public static string DeleteAccountHolder = "Delete Account Holder";
+        public static string ShowAllAccountHolders = "Show All Account Holders";
+        public static string AddCurrency = "Add Currency";
+        public static string UpdateServiceChargesForSameBank = "Update Service Charges for Same Bank";
+        public static string UpdateServiceChargesForOtherBank = "Update Service Charges for Other Bank";
+        public static string ShowAccountHolderTransactions = "Show Account Holder Transactions";
+        public static string RevertTransaction = "Revert Transaction";
+        public static string Logout = "Logout";
+
+        public static readonly List<string> BankStaffOption = new List<string>
+        {
+            CreateAccountHolder,
+            UpdateAccountHolder,
+            DeleteAccountHolder,
+            ShowAllAccountHolders,
+            AddCurrency,
+            UpdateServiceChargesForSameBank,
+            UpdateServiceChargesForOtherBank,
+            ShowAccountHolderTransactions,
+            RevertTransaction,
+            Logout
+        };
+
+        // User Account Options
+        public static string Deposit = "Deposit";
+        public static string Withdraw = "Withdraw";
+        public static string Transfer = "Transfer";
+        public static string CheckBalance = "Check Balance";
+        public static string Transactions = "Transactions";
+        public static string UserLogout = "Logout";
+
+        public static readonly List<string> UserAccountOption = new List<string>
+        {
+            Deposit,
+            Withdraw,
+            Transfer,
+            CheckBalance,
+            Transactions,
+            Logout
+        };
+
 
         //Styles
         public static string Style = "-----------------------------";

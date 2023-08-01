@@ -16,28 +16,27 @@ namespace BankApplication.Views
             UserAccountOption option;
             do
             {
-                List<string> UserAccountMenuOptions = Enum.GetNames(typeof(UserAccountOption)).ToList();
-                Utility.GenerateOptions(UserAccountMenuOptions);
+                Utility.GenerateOptions(Constants.UserAccountOption);
 
                 option = (UserAccountOption)Convert.ToInt32(Console.ReadLine());
                 switch (option)
                 {
                     case UserAccountOption.Deposit:
-                        Console.Write("Enter the amount to deposit: ");
+                        Utility.GetStringInput("Enter the amount to deposit: ", true);
                         decimal depositAmount = Convert.ToDecimal(Console.ReadLine());
                         Response<string> depositResponse = BankService.Deposit(loggedInAccount, depositAmount);
                         Console.WriteLine(depositResponse.Message);
                         break;
 
                     case UserAccountOption.Withdraw:
-                        Console.Write("Enter the amount to withdraw: ");
+                        Utility.GetStringInput("Enter the amount to withdraw: ", true);
                         decimal withdrawAmount = Convert.ToDecimal(Console.ReadLine());
                         Response<string> WithdrawResponse = BankService.Withdraw(loggedInAccount, withdrawAmount);
                         Console.WriteLine(WithdrawResponse.Message);
                         break;
 
                     case UserAccountOption.Transfer:
-                        Console.Write("Enter BankID:");
+                        Utility.GetStringInput("Enter BankID:", true);
                         string bankId = Console.ReadLine();
                         Bank selectedBank = DataStorage.Banks.FirstOrDefault(b => b.Id == bankId);
 
@@ -47,7 +46,7 @@ namespace BankApplication.Views
                             break;
                         }
 
-                        Console.Write("Enter the destination account number: ");
+                        Utility.GetStringInput("Enter the destination account number: ", true);
                         string destinationAccountNumber = Console.ReadLine();
                         AccountHolder destinationAccount = DataStorage.Accounts.FirstOrDefault(a => a.AccountNumber == destinationAccountNumber);
 
@@ -57,7 +56,7 @@ namespace BankApplication.Views
                             break;
                         }
 
-                        Console.Write("Enter the transfer type (0 for IMPS, 1 for RTGS): ");
+                        Utility.GetStringInput("Enter the transfer type (0 for IMPS, 1 for RTGS): ", true);
                         int transferTypeInput = Convert.ToInt32(Console.ReadLine());
 
                         TransferOptions transferType;
@@ -75,7 +74,7 @@ namespace BankApplication.Views
                             break;
                         }
 
-                        Console.Write("Enter the amount to transfer: ");
+                        Utility.GetStringInput("Enter the amount to transfer: ", true);
                         decimal transferAmount = Convert.ToDecimal(Console.ReadLine());
 
                         Response<string> transferResponse = BankService.TransferFunds(loggedInAccount, destinationAccount, transferAmount, transferType);

@@ -17,8 +17,7 @@ namespace BankApplication.Views
             BankStaffOption option;
             do
             {
-                List<string> BankStaffMenuOptions = Enum.GetNames(typeof(BankStaffOption)).ToList();
-                Utility.GenerateOptions(BankStaffMenuOptions);
+                Utility.GenerateOptions(Constants.BankStaffOption);
 
                 option = (BankStaffOption)Convert.ToInt32(Console.ReadLine());
                 switch (option)
@@ -40,7 +39,7 @@ namespace BankApplication.Views
                         break;
 
                     case BankStaffOption.UpdateAccountHolder:
-                        Console.Write("Enter Account ID to update account holder: ");
+                        Utility.GetStringInput("Enter Account ID to update account holder: ", true);
                         string accountToUpdate = Console.ReadLine();
                         AccountHolder EmployeeToUpdate = DataStorage.Accounts.FirstOrDefault(e => e.Id == accountToUpdate);
                         if (EmployeeToUpdate != null)
@@ -54,7 +53,7 @@ namespace BankApplication.Views
                         break;
 
                     case BankStaffOption.DeleteAccountHolder:
-                        Console.Write("Enter Account ID to delete account holder: ");
+                        Utility.GetStringInput("Enter Account ID to delete account holder: ", true);
                         string accountToDelete = Console.ReadLine();
                         Response<string> deleteResponse = AccountHolderService.Delete(accountToDelete);
                         Console.WriteLine(deleteResponse.Message);
@@ -67,27 +66,27 @@ namespace BankApplication.Views
                         break;
 
                     case BankStaffOption.AddCurrency:
-                        Console.Write("Enter Bank ID: ");
+                        Utility.GetStringInput("Enter Bank ID: ", true);
                         string bankIDForCurrency = Console.ReadLine();
-                        Console.Write("Enter Currency Code: ");
+                        Utility.GetStringInput("Enter Currency Code: ", true);
                         string currencyCode = Console.ReadLine();
-                        Console.Write("Enter Exchange Rate: ");
+                        Utility.GetStringInput("Enter Exchange Rate: ", true);
                         decimal exchangeRate = Convert.ToDecimal(Console.ReadLine());
                         AccountHolderService.AddAcceptedCurrency(currencyCode, exchangeRate);
                         break;
 
                     case BankStaffOption.UpdateServiceChargesForSameBank:
-                        Console.Write("Enter RTGS Charge for Same Bank: ");
+                        Utility.GetStringInput("Enter RTGS Charge for Same Bank: ", true);
                         float rtgsChargeSameBank = Convert.ToSingle(Console.ReadLine());
-                        Console.Write("Enter IMPS Charge for Same Bank: ");
+                        Utility.GetStringInput("Enter IMPS Charge for Same Bank: ", true);
                         float impsChargeSameBank = Convert.ToSingle(Console.ReadLine());
                         AccountHolderService.AddServiceChargeForSameBankAccount(rtgsChargeSameBank, impsChargeSameBank);
                         break;
 
                     case BankStaffOption.UpdateServiceChargesForOtherBank:
-                        Console.Write("Enter RTGS Charge for Other Bank: ");
+                        Utility.GetStringInput("Enter RTGS Charge for Other Bank: ", true);
                         float rtgsChargeOtherBank = Convert.ToSingle(Console.ReadLine());
-                        Console.Write("Enter IMPS Charge for Other Bank: ");
+                        Utility.GetStringInput("Enter IMPS Charge for Other Bank: ", true);
                         float impsChargeOtherBank = Convert.ToSingle(Console.ReadLine());
                         AccountHolderService.AddServiceChargeForOtherBankAccount(rtgsChargeOtherBank, impsChargeOtherBank);
                         break;
@@ -107,7 +106,7 @@ namespace BankApplication.Views
                         break;
 
                     case BankStaffOption.RevertTransaction:
-                        Console.Write("Enter Transaction ID to revert: ");
+                        Utility.GetStringInput("Enter Transaction ID to revert: ", true);
                         string transactionIDToRevert = Console.ReadLine();
                         Response<string> revertResponse = AccountHolderService.RevertTransaction(transactionIDToRevert);
                         Console.WriteLine(revertResponse.Message);
