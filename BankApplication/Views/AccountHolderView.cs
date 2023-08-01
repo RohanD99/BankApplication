@@ -2,7 +2,6 @@
 using BankApplication.Models;
 using BankApplication.Services;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using static BankApplication.Common.Enums;
 
@@ -11,7 +10,7 @@ namespace BankApplication.Views
     internal class AccountHolderView
     {
         static AccountHolderService AccountHolderService = new AccountHolderService();
-    
+        static EmployeeService EmployeeService = new EmployeeService();
         public static void BankStaffMenu()
         {
             BankStaffOption option;
@@ -23,33 +22,11 @@ namespace BankApplication.Views
                 switch (option)
                 {
                     case BankStaffOption.CreateAccountHolder:
-                        BankView bankView = new BankView();
-                        AccountHolder newAccountHolder = new AccountHolder();
-
-                        Employee employee = DataStorage.Employees.FirstOrDefault(emp => emp.Type == Enums.UserType.Employee);
-
-                        if (employee != null)
-                        {
-                            bankView.AddUser(employee);
-                        }
-                        else
-                        {
-                            Console.WriteLine("Employee not found.");
-                        }
+                        AccountHolderService.CreateNewAccountHolder();
                         break;
 
                     case BankStaffOption.UpdateAccountHolder:
-                        Utility.GetStringInput("Enter Account ID to update account holder: ", true);
-                        string accountToUpdate = Console.ReadLine();
-                        AccountHolder EmployeeToUpdate = DataStorage.Accounts.FirstOrDefault(e => e.Id == accountToUpdate);
-                        if (EmployeeToUpdate != null)
-                        {
-                            AccountHolderService.Update(EmployeeToUpdate);
-                        }
-                        else
-                        {
-                            Console.WriteLine("User Accound not found.");
-                        }
+                        EmployeeService.UpdateAccountHolder();
                         break;
 
                     case BankStaffOption.DeleteAccountHolder:
@@ -94,15 +71,7 @@ namespace BankApplication.Views
                     case BankStaffOption.ShowAccountHolderTransactions:
                         Console.Write("Enter Account Holder's Account Number: ");
                         string accountNumber = Console.ReadLine();
-                        AccountHolder accountToShowTransactions = DataStorage.Accounts.FirstOrDefault(a => a.AccountNumber == accountNumber);
-                        if (accountToShowTransactions != null)
-                        {
-                            AccountHolderService.ViewAccountTransactionHistory(accountToShowTransactions);
-                        }
-                        else
-                        {
-                            Console.WriteLine("Account not found.");
-                        }
+                        EmployeeService.ShowAccountTransactionHistory(accountNumber);
                         break;
 
                     case BankStaffOption.RevertTransaction:

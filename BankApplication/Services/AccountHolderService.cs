@@ -1,5 +1,6 @@
 ﻿using BankApplication.Common;
 using BankApplication.Models;
+using BankApplication.Views;
 using System;
 using System.Linq;
 using System.Text;
@@ -10,6 +11,36 @@ namespace BankApplication.Services
     {
         static Bank Bank = new Bank();
         static Response<string> Response = new Response<string>();
+        static BankView BankView = new BankView();
+        static EmployeeView EmployeeView = new EmployeeView();  
+
+        public Response<string> CreateNewAccountHolder()
+        {
+            Response<string> response = new Response<string>();
+            try
+            {
+                Employee employee = DataStorage.Employees.FirstOrDefault(emp => emp.Type == Enums.UserType.Employee);
+
+                if (employee != null)
+                {
+                    BankView.AddUser(employee);
+                    response.IsSuccess = true;
+                    response.Message = Constants.AccountSuccess;
+                }
+                else
+                {
+                    response.IsSuccess = false;
+                    response.Message = Constants.AccountNotFound;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.IsSuccess = false;
+                response.Message = ex.Message;
+            }
+
+            return response;
+        }
 
         public Response<User> Update(User user)
         {
@@ -27,7 +58,7 @@ namespace BankApplication.Services
                     accountHolder.ModifiedBy = Utility.GetUpdatedValue(employee.Designation, Constants.ModifiedBy);
 
                     response.IsSuccess = true;
-                    response.Message = Constants.UserUpdated;
+                    response.Message = Constants.AccountUpdated;
                     response.Data = accountHolder;
                 }
                 catch (Exception ex)
@@ -39,7 +70,7 @@ namespace BankApplication.Services
             else
             {
                 response.IsSuccess = false;
-                response.Message = Constants.UserUpdateFailure;
+                response.Message = Constants.AccountUpdateFailure;
             }
 
             return response;
@@ -56,12 +87,12 @@ namespace BankApplication.Services
                 {
                     DataStorage.Accounts = DataStorage.Accounts.Where(e => e.Id != userId).ToList();
                     response.IsSuccess = true;
-                    response.Message = Constants.UserDeleted;
+                    response.Message = Constants.AccountDeleted;
                 }
                 else
                 {
                     response.IsSuccess = false;
-                    response.Message = Constants.UserNotFound;
+                    response.Message = Constants.AccountNotFound;
                 }
             }
             catch (Exception ex)
@@ -216,6 +247,23 @@ namespace BankApplication.Services
 
             return response;
         }
+
+        public static void LoginAsAccountHolder()
+        {
+            AccountHolder loggedInAccountHolder = BankView.VerifyAccountHolderCredentials();
+
+            if (loggedInAccountHolder != null)
+            {
+                Console.WriteLine($"Welcome, {loggedInAccountHolder.Name}!");
+                EmployeeView.UserAccountMenu(loggedInAccountHolder);
+            }
+            else
+            {
+                Console.WriteLine("Account not found");
+            }
+        }
+
+        
     }
 }
 

@@ -36,60 +36,8 @@ namespace BankApplication.Views
                         break;
 
                     case UserAccountOption.Transfer:
-                        Utility.GetStringInput("Enter BankID:", true);
-                        string bankId = Console.ReadLine();
-                        Bank selectedBank = DataStorage.Banks.FirstOrDefault(b => b.Id == bankId);
-
-                        if (selectedBank == null)
-                        {
-                            Console.WriteLine("Bank not found. Transfer failed.");
-                            break;
-                        }
-
-                        Utility.GetStringInput("Enter the destination account number: ", true);
-                        string destinationAccountNumber = Console.ReadLine();
-                        AccountHolder destinationAccount = DataStorage.Accounts.FirstOrDefault(a => a.AccountNumber == destinationAccountNumber);
-
-                        if (destinationAccount == null)
-                        {
-                            Console.WriteLine("Destination account not found. Transfer failed.");
-                            break;
-                        }
-
-                        Utility.GetStringInput("Enter the transfer type (0 for IMPS, 1 for RTGS): ", true);
-                        int transferTypeInput = Convert.ToInt32(Console.ReadLine());
-
-                        TransferOptions transferType;
-                        if (transferTypeInput == 0)
-                        {
-                            transferType = TransferOptions.IMPS;
-                        }
-                        else if (transferTypeInput == 1)
-                        {
-                            transferType = TransferOptions.RTGS;
-                        }
-                        else
-                        {
-                            Console.WriteLine("Invalid transfer type. Transfer failed.");
-                            break;
-                        }
-
-                        Utility.GetStringInput("Enter the amount to transfer: ", true);
-                        decimal transferAmount = Convert.ToDecimal(Console.ReadLine());
-
-                        Response<string> transferResponse = BankService.TransferFunds(loggedInAccount, destinationAccount, transferAmount, transferType);
-
-                        if (transferResponse.IsSuccess)
-                        {
-                            Console.WriteLine(transferResponse.Message);
-                            Console.WriteLine($"New balance: {loggedInAccount.Balance}");
-                        }
-                        else
-                        {
-                            Console.WriteLine(transferResponse.Message);
-                        }
+                        EmployeeService.TransferFundsMenu(loggedInAccount);
                         break;
-
 
                     case UserAccountOption.CheckBalance:
                         Response<string> BalanceResponse = BankService.CheckBalance(loggedInAccount);

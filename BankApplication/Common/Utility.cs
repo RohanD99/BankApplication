@@ -1,4 +1,5 @@
 ﻿using BankApplication.Models;
+using BankApplication.Views;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -133,6 +134,8 @@ namespace BankApplication.Common
         {
             return DataStorage.Accounts.FirstOrDefault(a => a.UserName == username && a.Password == password);
         }
+
+      
 
     }
 }

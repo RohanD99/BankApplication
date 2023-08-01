@@ -1,5 +1,6 @@
 ﻿using BankApplication.Common;
 using BankApplication.Models;
+using BankApplication.Views;
 using System;
 using System.Linq;
 using static BankApplication.Common.Enums;
@@ -8,6 +9,7 @@ namespace BankApplication.Services
 {
     internal class BankService
     {
+        static BankView BankView = new BankView();
         public Response<string> CreateBank(Bank bank)
         {
             Response<string> response = new Response<string>();
@@ -249,6 +251,20 @@ namespace BankApplication.Services
             }
 
             return response;
+        }
+
+        public static void LoginAsBankStaff()
+        {
+            Employee loggedInEmployee = BankView.VerifyEmployeeCredentials();
+            if (loggedInEmployee != null)
+            {
+                Console.WriteLine($"Welcome, {loggedInEmployee.Name}!");
+                AccountHolderView.BankStaffMenu();
+            }
+            else
+            {
+                Console.WriteLine("Employee not found");
+            }
         }
     }
 }

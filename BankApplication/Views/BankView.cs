@@ -30,31 +30,13 @@ namespace BankApplication.Views
                         case MainMenuOption.CreateNewBank:
                             CreateNewBank();
                             break;
-                        case MainMenuOption.LoginAsAccountHolder:
-                            AccountHolder loggedInAccountHolder = VerifyAccountHolderCredentials();
 
-                            if (loggedInAccountHolder != null)
-                            {
-                                Console.WriteLine($"Welcome, {loggedInAccountHolder.Name}!");
-                                EmployeeView.UserAccountMenu(loggedInAccountHolder); // Pass the logged-in account holder here
-                            }
-                            else
-                            {
-                                Console.WriteLine("Account not found");
-                            }
+                        case MainMenuOption.LoginAsAccountHolder:
+                            AccountHolderService.LoginAsAccountHolder();
                             break;
                                                 
                         case MainMenuOption.LoginAsBankStaff:
-                            Employee loggedInEmployee = VerifyEmployeeCredentials();
-                            if (loggedInEmployee != null)
-                            {
-                                Console.WriteLine($"Welcome, {loggedInEmployee.Name}!");
-                                AccountHolderView.BankStaffMenu();
-                            }
-                            else
-                            {
-                                Console.WriteLine("Employee not found");
-                            }
+                            BankService.LoginAsBankStaff();
                             break;
                          
                         case MainMenuOption.Exit:
@@ -163,12 +145,6 @@ namespace BankApplication.Views
 
                 Console.WriteLine("Employee added successfully");
 
-                // Display employee details
-                Console.WriteLine("Employee List:");
-                foreach (var emp in DataStorage.Employees.Where(emp => emp.Type == Enums.UserType.Employee))
-                {
-                    Console.WriteLine($"Employee ID: {emp.Id}, Employee Name: {emp.Name}");
-                }
             }
             catch (Exception ex)
             {
@@ -216,7 +192,7 @@ namespace BankApplication.Views
             }
         }
 
-        private Employee VerifyEmployeeCredentials()
+        public Employee VerifyEmployeeCredentials()
         {
             string username = Utility.GetStringInput("Username", true);
             string password = Utility.GetStringInput("Password", true);
@@ -225,7 +201,7 @@ namespace BankApplication.Views
             return employee;
         }
 
-        private AccountHolder VerifyAccountHolderCredentials()
+        public AccountHolder VerifyAccountHolderCredentials()
         {
             string username = Utility.GetStringInput("Username", true);
             string password = Utility.GetStringInput("Password", true);

@@ -42,20 +42,17 @@ namespace BankApplication.Common
 
         public static string EmployeeFailure = "Employee not created";
 
-        //User
-        public static string UserSuccess = "User created successfully";
-
-        public static string UserFailure = "User not created";
-
-        public static string UserDeleted = "User deleted";
-
-        public static string UserNotFound = "User not Found";
-
-        public static string UserUpdated = "User updated successfully";
-
-        public static string UserUpdateFailure = "User not updated.";
-
         //Accounts
+        public static string AccountSuccess = "Account created successfully";
+
+        public static string AccountFailure = "Account not created";
+
+        public static string AccountDeleted = "User deleted";
+
+        public static string AccountUpdated = "User updated successfully";
+
+        public static string AccountUpdateFailure = "User not updated.";
+
         public static string ShowAllAccounts = "List all of accounts";
 
         public static string AccountNotFound = "Acount not found";
