@@ -23,7 +23,6 @@ namespace BankApplication.Views
                 do
                 {
                     Utility.GenerateOptions(Constants.MainMenuOptions);
-
                     option = (MainMenuOption)Convert.ToInt32(Console.ReadLine());
                     switch (option)
                     {

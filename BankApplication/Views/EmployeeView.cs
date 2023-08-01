@@ -15,7 +15,6 @@ namespace BankApplication.Views
             do
             {
                 Utility.GenerateOptions(Constants.UserAccountOption);
-
                 option = (UserAccountOption)Convert.ToInt32(Console.ReadLine());
                 switch (option)
                 {

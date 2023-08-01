@@ -14,7 +14,7 @@ namespace BankApplication.Services
         static BankView BankView = new BankView();
         static EmployeeView EmployeeView = new EmployeeView();  
 
-        public Response<string> CreateNewAccountHolder()
+        public Response<string> Create()
         {
             Response<string> response = new Response<string>();
             try

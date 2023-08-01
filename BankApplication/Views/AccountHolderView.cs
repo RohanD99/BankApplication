@@ -16,12 +16,11 @@ namespace BankApplication.Views
             do
             {
                 Utility.GenerateOptions(Constants.BankStaffOption);
-
                 option = (BankStaffOption)Convert.ToInt32(Console.ReadLine());
                 switch (option)
                 {
                     case BankStaffOption.CreateAccountHolder:
-                        AccountHolderService.CreateNewAccountHolder();
+                        AccountHolderService.Create();
                         break;
 
                     case BankStaffOption.UpdateAccountHolder:
