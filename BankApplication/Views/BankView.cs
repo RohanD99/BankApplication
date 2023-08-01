@@ -144,7 +144,7 @@ namespace BankApplication.Views
 
             Console.WriteLine("Employee added successfully");
 
-            // Display only the employee details
+            // Display employee details
             Console.WriteLine("Employee List:");
             foreach (var emp in DataStorage.Employees.Where(emp => emp.Type == Enums.UserType.Employee))
             {
@@ -170,12 +170,6 @@ namespace BankApplication.Views
                 Console.Write("Enter BankID: ");
                 string bankId = Console.ReadLine();
                 Bank selectedBank = DataStorage.Banks.FirstOrDefault(b => b.Id == bankId);
-
-                if (selectedBank == null)
-                {
-                    throw new Exception("Bank not found. Account holder not added.");
-                }
-
                 accountHolder.Id = Utility.GenerateAccountId(accountHolder.Name);
                 accountHolder.AccountNumber = Utility.GenerateAccountNumber(accountHolder.Name);
 

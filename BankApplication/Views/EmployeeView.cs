@@ -8,7 +8,7 @@ using static BankApplication.Common.Enums;
 
 namespace BankApplication.Views
 {
-    internal class UserView
+    internal class EmployeeView
     {  
         BankService BankService = new BankService();
         public void UserAccountMenu(AccountHolder loggedInAccount)
