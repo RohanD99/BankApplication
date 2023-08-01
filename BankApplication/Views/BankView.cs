@@ -76,81 +76,106 @@ namespace BankApplication.Views
         }
 
         private void CreateNewBank()
-        {           
-            Bank Bank = new Bank()
+        {
+            try
             {
-                Name = Utility.GetStringInput("Enter Bank Name", true),
-                Location = Utility.GetStringInput("Enter Location", true),
-                IFSC = Utility.GetStringInput("Enter IFSC code", true),
-                IMPSforOtherBank = 6,
-                IMPSforSameBank = 5,
-                RTGSforOtherBank = 2,
-                RTGSforSameBank = 0
-            };
+                Bank bank = new Bank()
+                {
+                    Name = Utility.GetStringInput("Enter Bank Name", true),
+                    Location = Utility.GetStringInput("Enter Location", true),
+                    IFSC = Utility.GetStringInput("Enter IFSC code", true),
+                    IMPSforOtherBank = 6,
+                    IMPSforSameBank = 5,
+                    RTGSforOtherBank = 2,
+                    RTGSforSameBank = 0
+                };
 
-            var response = BankService.CreateBank(Bank);
-            Console.WriteLine(response.Message);
-           
-            if (!response.IsSuccess)
+                var response = BankService.CreateBank(bank);
+                Console.WriteLine(response.Message);
+
+                if (!response.IsSuccess)
+                {
+                    CreateNewBank();
+                }
+                else
+                {
+                    Console.WriteLine("Bank Details:");
+                    Console.WriteLine($"Bank ID: {bank.Id.ToUpper()}");
+                    Console.WriteLine($"Bank Name: {bank.Name}");
+                    Console.WriteLine($"Location: {bank.Location}");
+                    Console.WriteLine($"IFSC Code: {bank.IFSC}");
+                    Console.WriteLine($"Created By: {bank.CreatedBy}");
+                    Console.WriteLine($"Created On: {bank.CreatedOn}");
+                }
+
+                var adminName = SetupBankAdmin(bank.Id);
+                bank.CreatedBy = adminName;
+            }
+            catch (Exception ex)
             {
-                CreateNewBank();
+                Console.WriteLine(ex.Message);
             }
-            else
-            {  
-                Console.WriteLine("Bank Details:");
-                Console.WriteLine($"Bank ID: {Bank.Id.ToUpper()}");
-                Console.WriteLine($"Bank Name: {Bank.Name}");
-                Console.WriteLine($"Location: {Bank.Location}");
-                Console.WriteLine($"IFSC Code: {Bank.IFSC}");
-                Console.WriteLine($"Created By: {Bank.CreatedBy}");
-                Console.WriteLine($"Created On: {Bank.CreatedOn}");
-            }
-            var adminName = SetupBankAdmin(Bank.Id);
-            Bank.CreatedBy = adminName;
         }
 
         private string SetupBankAdmin(string bankID)
         {
-            Employee Employee = new Employee()
+            try
             {
-                BankId = bankID,
-                Name = Utility.GetStringInput("Enter Admin Name", true),
-                UserName = Utility.GetStringInput("Enter User Name", true),
-                Password = Utility.GetStringInput("Enter Password", true),
-                Type = Enums.UserType.Admin
-            };
-            this.EmployeeService.Create(Employee);
-            Console.WriteLine("Admin added successfully");
-            currentEmployee = Employee;
-            AddEmployee();            
-            Console.WriteLine($"Employee's ID : {Employee.Id}");            
-            Console.WriteLine("----------------------------------------");
-            return "Director"; 
+                Employee employee = new Employee()
+                {
+                    BankId = bankID,
+                    Name = Utility.GetStringInput("Enter Admin Name", true),
+                    UserName = Utility.GetStringInput("Enter User Name", true),
+                    Password = Utility.GetStringInput("Enter Password", true),
+                    Type = Enums.UserType.Admin
+                };
+
+                EmployeeService.Create(employee);
+                Console.WriteLine("Admin added successfully");
+                currentEmployee = employee;
+                AddEmployee();
+                Console.WriteLine($"Employee's ID : {employee.Id}");
+                Console.WriteLine("----------------------------------------");
+                return "Director";
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return null;
+            }
         }
 
         private void AddEmployee()
         {
-            Employee employee = new Employee()
+            try
             {
-                Name = Utility.GetStringInput("Enter Employee Name", true),
-                UserName = Utility.GetStringInput("Enter UserName", true),
-                Password = Utility.GetStringInput("Enter Password", true),
-                Email = Utility.GetStringInput("Enter Email", true),
-                Designation = Utility.GetStringInput("Enter Designation", true),
-                Type = Enums.UserType.Employee
-            };
+                Employee employee = new Employee()
+                {
+                    Name = Utility.GetStringInput("Enter Employee Name", true),
+                    UserName = Utility.GetStringInput("Enter UserName", true),
+                    Password = Utility.GetStringInput("Enter Password", true),
+                    Email = Utility.GetStringInput("Enter Email", true),
+                    Designation = Utility.GetStringInput("Enter Designation", true),
+                    Type = Enums.UserType.Employee
+                };
 
-            DataStorage.Employees.Add(employee);
+                DataStorage.Employees.Add(employee);
 
-            Console.WriteLine("Employee added successfully");
+                Console.WriteLine("Employee added successfully");
 
-            // Display employee details
-            Console.WriteLine("Employee List:");
-            foreach (var emp in DataStorage.Employees.Where(emp => emp.Type == Enums.UserType.Employee))
+                // Display employee details
+                Console.WriteLine("Employee List:");
+                foreach (var emp in DataStorage.Employees.Where(emp => emp.Type == Enums.UserType.Employee))
+                {
+                    Console.WriteLine($"Employee ID: {emp.Id}, Employee Name: {emp.Name}");
+                }
+            }
+            catch (Exception ex)
             {
-                Console.WriteLine($"Employee ID: {emp.Id}, Employee Name: {emp.Name}");
+                Console.WriteLine(ex.Message);
             }
         }
+
 
         public void AddUser(Employee employee)
         {
