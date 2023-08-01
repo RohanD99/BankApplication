@@ -13,7 +13,7 @@ namespace BankApplication.Views
         private Employee currentEmployee;
         BankService BankService = new BankService();
         EmployeeService EmployeeService = new EmployeeService(); 
-        UserView UserView = new UserView();
+        EmployeeView UserView = new EmployeeView();
       
         public void Initialize()
         {          
@@ -68,7 +68,7 @@ namespace BankApplication.Views
                     }
                 } while (option != MainMenuOption.Exit);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 Console.WriteLine("Please enter valid input.");
                 this.Initialize();
