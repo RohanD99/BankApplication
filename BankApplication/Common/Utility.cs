@@ -1,6 +1,4 @@
-﻿using BankApplication.Models;
-using BankApplication.Views;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -16,28 +14,28 @@ namespace BankApplication.Common
             }
         }
 
-        public static string GetStringInput(string type, bool isRequired)
+        public static string GetStringInput(string type, bool isRequired, string defaultValue = "")
         {
-            string input = string.Empty;
-            do
-            {     
-                Console.Write($"Please enter {type}: ");
-                input = Console.ReadLine();
+            Console.Write($"Please enter {type}");
+            if (!string.IsNullOrEmpty(defaultValue))
+            {
+                Console.Write($" (or press Enter to keep the current value '{defaultValue}')");
+            }
+            Console.Write(": ");
+            string input = Console.ReadLine();
 
-                if (isRequired && string.IsNullOrEmpty(input))
-                {
-                    Console.WriteLine($"Please provide valid {type}.");
-                }
-            } while (isRequired && string.IsNullOrEmpty(input));
+            if (isRequired && string.IsNullOrEmpty(input))
+            {
+                Console.WriteLine($"Please provide a valid {type}.");
+                return GetStringInput(type, isRequired, defaultValue);
+            }
 
-            return input;
+            return string.IsNullOrEmpty(input) ? defaultValue : input;
         }
-
 
         public static string GenerateBankId(string bankName)
         {
-            string currentDate = DateTime.Now.ToString("yyyyMMddHHmmss");
-            return bankName.Substring(0, 3) + currentDate;
+            return string.IsNullOrEmpty(bankName) ? string.Empty : (bankName.Substring(0, Math.Min(3, bankName.Length)) + DateTime.Now.ToString("yyyyMMddHHmmss"));
         }
 
         public static string GenerateEmployeeID()
@@ -52,14 +50,13 @@ namespace BankApplication.Common
         }
 
         public static string GenerateAccountNumber(string name)
-        {       
-            return $"{name.Substring(0, Math.Min(3, name.Length)).ToUpper()}{DateTime.Now:yyMMddHHmmss}";
+        {
+            return string.IsNullOrEmpty(name) ? string.Empty : $"{name.Substring(0, Math.Min(3, name.Length)).ToUpper()}{DateTime.Now:yyMMddHHmmss}";
         }
 
-        public static string GenerateAccountId(string name)
+        public static string GenerateAccountId(string bankName)
         {
-            string namePrefix = name.Substring(0, Math.Min(3, name.Length)).ToUpper();
-            return $"{namePrefix}{DateTime.Now:yyMMddHHmmssfff}";
+           return string.IsNullOrEmpty(bankName) ? string.Empty : (bankName.Substring(0, Math.Min(3, bankName.Length)) + DateTime.Now.ToString("yyyyMMddHHmmss"));
         }
 
         public static string GetUpdatedValue(string currentValue, string field)

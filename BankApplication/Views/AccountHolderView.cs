@@ -20,7 +20,8 @@ namespace BankApplication.Views
                 switch (option)
                 {
                     case BankStaffOption.CreateAccountHolder:
-                        AccountHolderService.Create();
+                        BankView bankView = new BankView();
+                        bankView.AddUser();
                         break;
 
                     case BankStaffOption.UpdateAccountHolder:

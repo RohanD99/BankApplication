@@ -8,36 +8,7 @@ using System.Text;
 namespace BankApplication.Services
 {
     internal class AccountHolderService
-    {     
-        public Response<string> Create()
-        {
-            BankView BankView = new BankView();
-            Response<string> response = new Response<string>();
-            try
-            {
-                Employee employee = DataStorage.Employees.FirstOrDefault(emp => emp.Type == Enums.UserType.Employee);
-
-                if (employee != null)
-                {
-                    BankView.AddUser(employee);
-                    response.IsSuccess = true;
-                    response.Message = Constants.AccountSuccess;
-                }
-                else
-                {
-                    response.IsSuccess = false;
-                    response.Message = Constants.AccountNotFound;
-                }
-            }
-            catch (Exception ex)
-            {
-                response.IsSuccess = false;
-                response.Message = ex.Message;
-            }
-
-            return response;
-        }
-
+    {
         public Response<User> Update(User user)
         {
             Response<User> response = new Response<User>();
@@ -47,11 +18,11 @@ namespace BankApplication.Services
             {
                 try
                 {
-                    accountHolder.UserName = Utility.GetUpdatedValue(accountHolder.UserName, Constants.Username);
-                    accountHolder.Password = Utility.GetUpdatedValue(accountHolder.Password, Constants.Password);
-                    accountHolder.Name = Utility.GetUpdatedValue(accountHolder.Name, Constants.AccountHolderName);
-                    accountHolder.AccountType = Utility.GetUpdatedValue(accountHolder.AccountType, Constants.AccountType);
-                    accountHolder.ModifiedBy = Utility.GetUpdatedValue(employee.Designation, Constants.ModifiedBy);
+                    accountHolder.UserName = Utility.GetStringInput("Enter username", false, accountHolder.UserName);
+                    accountHolder.Password = Utility.GetStringInput("Enter password", false, accountHolder.Password);
+                    accountHolder.Name = Utility.GetStringInput("Enter account holder name", false, accountHolder.Name);
+                    accountHolder.AccountType = Utility.GetStringInput("Enter account type", false, accountHolder.AccountType);
+                    accountHolder.ModifiedBy = Utility.GetStringInput("Enter modified by", false, employee.Designation);
 
                     response.IsSuccess = true;
                     response.Message = Constants.AccountUpdated;
@@ -71,6 +42,7 @@ namespace BankApplication.Services
 
             return response;
         }
+
 
         public Response<string> Delete(string userId)
         {

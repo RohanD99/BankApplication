@@ -33,7 +33,45 @@ namespace BankApplication.Services
             return response;
         }
 
-        public Response<string> Deposit(AccountHolder account, decimal amount)
+        public Employee GetEmployee()
+        {
+            return DataStorage.Employees.FirstOrDefault(emp => emp.Type == Enums.UserType.Employee);
+        }
+
+        public Response<string> CreateAccountHolder(AccountHolder accountHolder)
+        {
+            Response<string> response = new Response<string>();
+            try
+            {
+                string bankId = Utility.GetStringInput("Enter BankID: ", true);
+                Bank selectedBank = DataStorage.Banks.FirstOrDefault(b => b.Id == bankId);
+
+                if (selectedBank == null)
+                {
+                    response.IsSuccess = false;
+                    response.Message = Constants.BankNotFound;
+                    return response;
+                }
+
+                accountHolder.Id = Utility.GenerateAccountId(accountHolder.Name);
+                accountHolder.AccountNumber = Utility.GenerateAccountNumber(accountHolder.Name);
+
+                DataStorage.Accounts.Add(accountHolder);
+
+                response.IsSuccess = true;
+                response.Message = Constants.AccountSuccess;
+            }
+            catch (Exception ex)
+            {
+                response.IsSuccess = false;
+                response.Message = ex.Message;
+            }
+
+            return response;
+        }
+    
+
+    public Response<string> Deposit(AccountHolder account, decimal amount)
         {
             Response<string> response = new Response<string>();
 

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using BankApplication.Common;
 using BankApplication.Models;
 using BankApplication.Services;
@@ -9,8 +8,7 @@ namespace BankApplication.Views
 {
     public class BankView
     {
-        private Employee CurrentEmployee;
-         
+        private Employee CurrentEmployee;       
         public void Initialize()
         {
             try
@@ -115,7 +113,7 @@ namespace BankApplication.Views
                 AddEmployee();
                 Console.WriteLine($"Employee's ID : {employee.Id}");
                 Console.WriteLine("----------------------------------------");
-                return "Director";
+                return employee.Id;
             }
             catch (Exception ex)
             {
@@ -149,8 +147,17 @@ namespace BankApplication.Views
             }
         }
 
-        public void AddUser(Employee employee)
+        public void AddUser()
         {
+            BankService bankService = new BankService();
+            Employee employee = bankService.GetEmployee();
+
+            if (employee == null)
+            {
+                Console.WriteLine("Employee not found");
+                return;
+            }
+
             AccountHolder accountHolder = new AccountHolder()
             {
                 UserName = Utility.GetStringInput("Enter username", true),
@@ -162,16 +169,10 @@ namespace BankApplication.Views
                 Type = Enums.UserType.AccountHolder
             };
 
-            try
+            Response<string> response = bankService.CreateAccountHolder(accountHolder);
+
+            if (response.IsSuccess)
             {
-                Utility.GetStringInput("Enter BankID: ",true);
-                string bankId = Console.ReadLine();
-                Bank selectedBank = DataStorage.Banks.FirstOrDefault(b => b.Id == bankId);
-                accountHolder.Id = Utility.GenerateAccountId(accountHolder.Name);
-                accountHolder.AccountNumber = Utility.GenerateAccountNumber(accountHolder.Name);
-
-                DataStorage.Accounts.Add(accountHolder);
-
                 Console.WriteLine("Account holder added successfully.");
                 Console.WriteLine($"Account holder ID: {accountHolder.Id}");
                 Console.WriteLine($"Account holder Name: {accountHolder.Name}");
@@ -183,16 +184,16 @@ namespace BankApplication.Views
                 Console.WriteLine($"Created on: {accountHolder.CreatedOn}");
                 Console.WriteLine("----------------------------------------");
             }
-            catch (Exception ex)
+            else
             {
-                Console.WriteLine(ex.Message);
+                Console.WriteLine(response.Message);
             }
         }
-
+    
         public Employee VerifyEmployeeCredentials()
         {
-            string username = Utility.GetStringInput("Username", true);
-            string password = Utility.GetStringInput("Password", true);
+        string username = Utility.GetStringInput("Username", true);
+        string password = Utility.GetStringInput("Password", true);
 
             Employee employee = EmployeeService.GetEmployeeByUsernameAndPassword(username, password);
             return employee;
