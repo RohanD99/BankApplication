@@ -2,6 +2,8 @@
 using BankApplication.Models;
 using BankApplication.Services;
 using System;
+using System.Collections.Generic;
+using System.Text;
 using static BankApplication.Common.Enums;
 
 namespace BankApplication.Views
@@ -19,11 +21,18 @@ namespace BankApplication.Views
                 switch (option)
                 {
                     case UserAccountOption.Deposit:
-                        Utility.GetStringInput("Enter the amount to deposit: ", true);
-                        decimal depositAmount = Convert.ToDecimal(Console.ReadLine());
+                        Console.Write("Enter the amount to deposit: ");
+                        string depositAmountInput = Console.ReadLine();
+                        if (!decimal.TryParse(depositAmountInput, out decimal depositAmount))
+                        {
+                            Console.WriteLine("Invalid amount. Please enter a valid decimal value.");
+                            break;
+                        }
+
                         Response<string> depositResponse = BankService.Deposit(loggedInAccount, depositAmount);
                         Console.WriteLine(depositResponse.Message);
                         break;
+
 
                     case UserAccountOption.Withdraw:
                         Utility.GetStringInput("Enter the amount to withdraw: ", true);
@@ -55,6 +64,54 @@ namespace BankApplication.Views
                         break;
                 }
             } while (option != UserAccountOption.Logout);
+        }
+
+        public static void PrintTransactionDetails(List<Transaction> transactions)
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (var transaction in transactions)
+            {
+                sb.AppendLine($"Transaction ID: {transaction.Id}");
+                sb.AppendLine($"Transaction Type: {transaction.Type}");
+                sb.AppendLine($"Transaction Amount: {transaction.Amount}");
+                sb.AppendLine($"Transaction Date: {transaction.CreatedOn}");
+                sb.AppendLine("----------------------------");
+            }
+            Console.WriteLine(sb.ToString());
+        }
+
+        public static void PrintAccountDetails(IEnumerable<AccountHolder> Accounts)
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (var account in Accounts)
+            {
+                sb.AppendLine($"Account Number: {account.AccountNumber}");
+                sb.AppendLine($"Constants.AccountHolderName: {account.Name}");
+                sb.AppendLine($"Balance: {account.Balance}");
+                sb.AppendLine($"Account Type: {account.AccountType}");
+                sb.AppendLine("----------------------------");
+            }
+            Console.WriteLine(sb.ToString());
+        }
+
+        public static string GetTransactionHistoryString(List<Transaction> transactions)
+        {
+            if (transactions == null || transactions.Count == 0)
+            {
+                return "No transaction history found.";
+            }
+
+            string result = string.Empty;
+            foreach (var transaction in transactions)
+            {
+                result += $"Transaction ID: {transaction.Id}\n";
+                result += $"Transaction Type: {transaction.Type}\n";
+                result += $"Transaction Amount: {transaction.Amount}\n";
+                result += $"Transaction Date: {transaction.CreatedOn}\n";
+                result += "----------------------------\n";
+            }
+
+            return result;
         }
     }
 }

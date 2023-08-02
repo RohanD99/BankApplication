@@ -3,16 +3,17 @@ using BankApplication.Models;
 using System.Linq;
 using System;
 using static BankApplication.Common.Enums;
+using System.Text;
 
 namespace BankApplication.Services
 {
     internal class EmployeeService
-    {      
-        static Response<string> Response = new Response<string>();
+    {            
         static AccountHolderService AccountHolderService = new AccountHolderService();
         static BankService BankService = new BankService();
         public Response<string> Create(Employee employee)
         {
+            Response<string> Response = new Response<string>();
             try
             {
                 employee.Id = Utility.GenerateEmployeeID();
@@ -34,7 +35,7 @@ namespace BankApplication.Services
             Response<string> response = new Response<string>();
             try
             {
-                Console.Write("Enter Account ID to update account holder: ");
+                Utility.GetStringInput("Enter Account ID to update account holder: ",true);
                 string accountToUpdate = Console.ReadLine();
                 AccountHolder EmployeeToUpdate = DataStorage.Accounts.FirstOrDefault(e => e.Id == accountToUpdate);
                 if (EmployeeToUpdate != null)
@@ -70,7 +71,7 @@ namespace BankApplication.Services
                     if (historyResponse.IsSuccess)
                     {
                         response.IsSuccess = true;
-                        response.Message = "Transaction history retrieved successfully.";
+                        response.Message = Constants.TransactionSuccess;
                         response.Data = historyResponse.Data;
                     }
                     else
@@ -96,25 +97,14 @@ namespace BankApplication.Services
 
         public static void TransferFundsMenu(AccountHolder loggedInAccount)
         {
+            StringBuilder sb = new StringBuilder();
             Utility.GetStringInput("Enter BankID:", true);
             string bankId = Console.ReadLine();
             Bank selectedBank = DataStorage.Banks.FirstOrDefault(b => b.Id == bankId);
 
-            if (selectedBank == null)
-            {
-                Console.WriteLine("Bank not found. Transfer failed.");
-                return;
-            }
-
             Utility.GetStringInput("Enter the destination account number: ", true);
             string destinationAccountNumber = Console.ReadLine();
             AccountHolder destinationAccount = DataStorage.Accounts.FirstOrDefault(a => a.AccountNumber == destinationAccountNumber);
-
-            if (destinationAccount == null)
-            {
-                Console.WriteLine("Destination account not found. Transfer failed.");
-                return;
-            }
 
             Utility.GetStringInput("Enter the transfer type (0 for IMPS, 1 for RTGS): ", true);
             int transferTypeInput = Convert.ToInt32(Console.ReadLine());
@@ -130,7 +120,7 @@ namespace BankApplication.Services
             }
             else
             {
-                Console.WriteLine("Invalid transfer type. Transfer failed.");
+                sb.AppendLine(Constants.InvalidType);
                 return;
             }
 
@@ -141,13 +131,23 @@ namespace BankApplication.Services
 
             if (transferResponse.IsSuccess)
             {
-                Console.WriteLine(transferResponse.Message);
-                Console.WriteLine($"New balance: {loggedInAccount.Balance}");
+                sb.AppendLine(transferResponse.Message);
+                sb.AppendLine($"New balance: {loggedInAccount.Balance}");
             }
             else
             {
-                Console.WriteLine(transferResponse.Message);
+                sb.AppendLine(transferResponse.Message);
             }
+        }
+
+        public static Employee GetEmployeeByUsernameAndPassword(string username, string password)
+        {
+            return DataStorage.Employees.FirstOrDefault(e => e.UserName == username && e.Password == password);
+        }
+
+        public static AccountHolder GetAccountHolderByUsernameAndPassword(string username, string password)
+        {
+            return DataStorage.Accounts.FirstOrDefault(a => a.UserName == username && a.Password == password);
         }
     }
 }

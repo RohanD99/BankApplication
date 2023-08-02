@@ -8,6 +8,8 @@ namespace BankApplication.Common
         public static string BankCreation = "Bank created successfully.";
 
         public static string BankFailure = "Bank creation failed.";
+
+        public static string BankNotFound = "Bank not Found";
      
         public static string InvalidAmount = "Invalid amount. It should be greater than zero.";
 

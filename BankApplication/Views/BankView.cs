@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using BankApplication.Common;
 using BankApplication.Models;
@@ -196,7 +195,7 @@ namespace BankApplication.Views
             string username = Utility.GetStringInput("Username", true);
             string password = Utility.GetStringInput("Password", true);
 
-            Employee employee = Utility.GetEmployeeByUsernameAndPassword(username, password);
+            Employee employee = EmployeeService.GetEmployeeByUsernameAndPassword(username, password);
             return employee;
         }
 
@@ -205,7 +204,7 @@ namespace BankApplication.Views
             string username = Utility.GetStringInput("Username", true);
             string password = Utility.GetStringInput("Password", true);
 
-            AccountHolder accountHolder = Utility.GetAccountHolderByUsernameAndPassword(username, password);
+            AccountHolder accountHolder = EmployeeService.GetAccountHolderByUsernameAndPassword(username, password);
             return accountHolder;
         }
     }

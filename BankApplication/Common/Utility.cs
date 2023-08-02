@@ -3,7 +3,6 @@ using BankApplication.Views;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace BankApplication.Common
 {
@@ -60,9 +59,7 @@ namespace BankApplication.Common
         public static string GenerateAccountId(string name)
         {
             string namePrefix = name.Substring(0, Math.Min(3, name.Length)).ToUpper();
-            string currentDate = DateTime.Now.ToString("yyMMddHHmmssfff");
-            string accountId = $"{namePrefix}{currentDate}";
-            return accountId;
+            return $"{namePrefix}{DateTime.Now:yyMMddHHmmssfff}";
         }
 
         public static string GetUpdatedValue(string currentValue, string field)
@@ -71,71 +68,5 @@ namespace BankApplication.Common
             string newValue = Utility.GetStringInput($"Enter new {field} (leave empty to keep the current one):", false);
             return string.IsNullOrEmpty(newValue) ? currentValue : newValue;
         }
-
-        public static Action<string> GetConsoleWriteLineDelegate()
-        {
-            return Console.WriteLine;
-        }
-
-        public static void PrintTransactionDetails(List<Transaction> transactions)
-        {
-            StringBuilder sb = new StringBuilder();
-            foreach (var transaction in transactions)
-            {
-                sb.AppendLine($"Transaction ID: {transaction.Id}");
-                sb.AppendLine($"Transaction Type: {transaction.Type}");
-                sb.AppendLine($"Transaction Amount: {transaction.Amount}");
-                sb.AppendLine($"Transaction Date: {transaction.CreatedOn}");
-                sb.AppendLine("----------------------------");
-            }
-            Console.WriteLine(sb.ToString());
-        }
-
-        public static void PrintAccountDetails(IEnumerable<AccountHolder> Accounts)
-        {
-            StringBuilder sb = new StringBuilder();
-            foreach (var account in Accounts)
-            {
-                sb.AppendLine($"Account Number: {account.AccountNumber}");
-                sb.AppendLine($"Constants.AccountHolderName: {account.Name}");
-                sb.AppendLine($"Balance: {account.Balance}");
-                sb.AppendLine($"Account Type: {account.AccountType}");
-                sb.AppendLine("----------------------------");
-            }
-            Console.WriteLine(sb.ToString());
-        }
-
-        public static string GetTransactionHistoryString(List<Transaction> transactions)
-        {
-            if (transactions == null || transactions.Count == 0)
-            {
-                return "No transaction history found.";
-            }
-
-            string result = string.Empty;
-            foreach (var transaction in transactions)
-            {
-                result += $"Transaction ID: {transaction.Id}\n";
-                result += $"Transaction Type: {transaction.Type}\n";
-                result += $"Transaction Amount: {transaction.Amount}\n";
-                result += $"Transaction Date: {transaction.CreatedOn}\n";
-                result += "----------------------------\n";
-            }
-
-            return result;
-        }
-
-        public static Employee GetEmployeeByUsernameAndPassword(string username, string password)
-        {
-            return DataStorage.Employees.FirstOrDefault(e => e.UserName == username && e.Password == password);
-        }
-
-        public static AccountHolder GetAccountHolderByUsernameAndPassword(string username, string password)
-        {
-            return DataStorage.Accounts.FirstOrDefault(a => a.UserName == username && a.Password == password);
-        }
-
-      
-
     }
 }

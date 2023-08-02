@@ -3,6 +3,7 @@ using BankApplication.Models;
 using BankApplication.Views;
 using System;
 using System.Linq;
+using System.Text;
 using static BankApplication.Common.Enums;
 
 namespace BankApplication.Services
@@ -74,6 +75,7 @@ namespace BankApplication.Services
 
             return response;
         }
+
 
         public Response<string> Withdraw(AccountHolder account, decimal amount)
         {
@@ -233,7 +235,7 @@ namespace BankApplication.Services
 
                 if (transactions.Any())
                 {
-                    Utility.PrintTransactionDetails(transactions);
+                    EmployeeView.PrintTransactionDetails(transactions);
                     response.IsSuccess = true;
                     response.Message = Constants.TransactionSuccess;
                 }
@@ -256,15 +258,12 @@ namespace BankApplication.Services
         public static void LoginAsBankStaff()
         {
             Employee loggedInEmployee = BankView.VerifyEmployeeCredentials();
+            StringBuilder sb = new StringBuilder();
             if (loggedInEmployee != null)
             {
-                Console.WriteLine($"Welcome, {loggedInEmployee.Name}!");
+                sb.AppendFormat($"Welcome, {loggedInEmployee.Name}!");
                 AccountHolderView.BankStaffMenu();
-            }
-            else
-            {
-                Console.WriteLine("Employee not found");
-            }
+            }     
         }
     }
 }
