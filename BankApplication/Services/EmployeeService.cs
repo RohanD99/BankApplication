@@ -9,8 +9,6 @@ namespace BankApplication.Services
 {
     internal class EmployeeService
     {            
-        static AccountHolderService AccountHolderService = new AccountHolderService();
-        static BankService BankService = new BankService();
         public Response<string> Create(Employee employee)
         {
             Response<string> Response = new Response<string>();
@@ -32,6 +30,7 @@ namespace BankApplication.Services
 
         public Response<string> UpdateAccountHolder()
         {
+            AccountHolderService AccountHolderService = new AccountHolderService();
             Response<string> response = new Response<string>();
             try
             {
@@ -61,6 +60,7 @@ namespace BankApplication.Services
 
         public Response<string> ShowAccountTransactionHistory(string accountNumber)
         {
+            AccountHolderService AccountHolderService = new AccountHolderService();
             Response<string> response = new Response<string>();
             try
             {
@@ -97,6 +97,7 @@ namespace BankApplication.Services
 
         public static void TransferFundsMenu(AccountHolder loggedInAccount)
         {
+            BankService BankService = new BankService();
             StringBuilder sb = new StringBuilder();
             Utility.GetStringInput("Enter BankID:", true);
             string bankId = Console.ReadLine();

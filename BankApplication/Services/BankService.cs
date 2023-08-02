@@ -10,7 +10,6 @@ namespace BankApplication.Services
 {
     internal class BankService
     {
-        static BankView BankView = new BankView();
         public Response<string> CreateBank(Bank bank)
         {
             Response<string> response = new Response<string>();
@@ -257,6 +256,7 @@ namespace BankApplication.Services
 
         public static void LoginAsBankStaff()
         {
+            BankView BankView = new BankView();
             Employee loggedInEmployee = BankView.VerifyEmployeeCredentials();
             StringBuilder sb = new StringBuilder();
             if (loggedInEmployee != null)

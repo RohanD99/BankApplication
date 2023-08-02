@@ -8,13 +8,10 @@ using System.Text;
 namespace BankApplication.Services
 {
     internal class AccountHolderService
-    {
-        
-        static BankView BankView = new BankView();
-        static EmployeeView EmployeeView = new EmployeeView();  
-
+    {     
         public Response<string> Create()
         {
+            BankView BankView = new BankView();
             Response<string> response = new Response<string>();
             try
             {
@@ -297,6 +294,8 @@ namespace BankApplication.Services
 
         public static void LoginAsAccountHolder()
         {
+            BankView BankView = new BankView();
+            EmployeeView EmployeeView = new EmployeeView();
             AccountHolder loggedInAccountHolder = BankView.VerifyAccountHolderCredentials();
             StringBuilder sb = new StringBuilder();
             if (loggedInAccountHolder != null)

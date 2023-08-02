@@ -10,10 +10,7 @@ namespace BankApplication.Views
     public class BankView
     {
         private Employee CurrentEmployee;
-        BankService BankService = new BankService();
-        EmployeeService EmployeeService = new EmployeeService(); 
-        EmployeeView EmployeeView = new EmployeeView();
-      
+         
         public void Initialize()
         {
             try
@@ -57,6 +54,7 @@ namespace BankApplication.Views
 
         private void CreateNewBank()
         {
+            BankService BankService = new BankService();
             try
             {
                 Bank bank = new Bank()
@@ -99,6 +97,7 @@ namespace BankApplication.Views
 
         private string SetupBankAdmin(string bankID)
         {
+            EmployeeService EmployeeService = new EmployeeService();
             try
             {
                 Employee employee = new Employee()
