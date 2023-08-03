@@ -308,17 +308,7 @@ namespace BankApplication.Services
             return Response;
         }
 
-        public static void LoginAsAccountHolder()
-        {
-            BankView BankView = new BankView();
-            EmployeeView EmployeeView = new EmployeeView();
-            AccountHolder loggedInAccountHolder = BankView.VerifyAccountHolderCredentials();
-            StringBuilder sb = new StringBuilder();
-            if (loggedInAccountHolder != null)
-            {
-                EmployeeView.UserAccountMenu(loggedInAccountHolder);
-            }
-        }
+      
 
         public AccountHolder GetAccountHolderById(string accountId)
         {

@@ -267,15 +267,6 @@ namespace BankApplication.Services
             return DataStorage.Employees.FirstOrDefault(emp => emp.Type == Enums.UserType.Employee);
         }
 
-        public static void LoginAsBankStaff()
-        {
-            BankView BankView = new BankView();
-            Employee loggedInEmployee = BankView.VerifyEmployeeCredentials();
-            StringBuilder sb = new StringBuilder();
-            if (loggedInEmployee != null)
-            {
-                AccountHolderView.BankStaffMenu();
-            }     
-        }
+       
     }
 }

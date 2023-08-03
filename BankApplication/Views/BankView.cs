@@ -26,11 +26,11 @@ namespace BankApplication.Views
                             break;
 
                         case MainMenu.LoginAsAccountHolder:
-                            AccountHolderService.LoginAsAccountHolder();
+                            LoginAsAccountHolder();
                             break;
                                                 
                         case MainMenu.LoginAsBankStaff:
-                            BankService.LoginAsBankStaff();
+                            LoginAsBankStaff();
                             break;
                          
                         case MainMenu.Exit:
@@ -139,9 +139,7 @@ namespace BankApplication.Views
                 };
 
                 DataStorage.Employees.Add(Employee);
-
                 Console.WriteLine("Employee added successfully");
-
             }
             catch (Exception ex)
             {
@@ -297,6 +295,37 @@ namespace BankApplication.Views
             else
             {
                 sb.AppendLine(transferResponse.Message);
+            }
+        }
+
+        public static void LoginAsBankStaff()
+        {
+            BankView BankView = new BankView();
+            Employee loggedInEmployee = BankView.VerifyEmployeeCredentials();
+            StringBuilder sb = new StringBuilder();
+            if (loggedInEmployee != null)
+            {
+                AccountHolderView.BankStaffMenu();
+            }
+            else
+            {
+                Console.WriteLine("Account not found");
+            }
+        }
+
+        public static void LoginAsAccountHolder()
+        {
+            BankView BankView = new BankView();
+            EmployeeView EmployeeView = new EmployeeView();
+            AccountHolder loggedInAccountHolder = BankView.VerifyAccountHolderCredentials();
+            StringBuilder sb = new StringBuilder();
+            if (loggedInAccountHolder != null)
+            {
+                EmployeeView.UserAccountMenu(loggedInAccountHolder);
+            }
+            else
+            {
+                Console.WriteLine("Account not found");
             }
         }
     }
