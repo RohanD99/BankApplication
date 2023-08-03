@@ -9,51 +9,63 @@ namespace BankApplication.Services
 {
     internal class AccountHolderService
     {
-        public Response<User> Update(User user)
+        public Response<string> Create(AccountHolder accountHolder)
         {
-            Response<User> response = new Response<User>();
-            Employee employee = new Employee();
-
-            if (user is AccountHolder accountHolder)
+            Response<string> response = new Response<string>();
+            try
             {
-                try
-                {
-                    accountHolder.UserName = Utility.GetStringInput("Enter username", false, accountHolder.UserName);
-                    accountHolder.Password = Utility.GetStringInput("Enter password", false, accountHolder.Password);
-                    accountHolder.Name = Utility.GetStringInput("Enter account holder name", false, accountHolder.Name);
-                    accountHolder.AccountType = Utility.GetStringInput("Enter account type", false, accountHolder.AccountType);
-                    accountHolder.ModifiedBy = Utility.GetStringInput("Enter modified by", false, employee.Designation);
+                string bankId = Utility.GetStringInput("Enter BankID: ", true);
+                Bank selectedBank = DataStorage.Banks.FirstOrDefault(b => b.Id == bankId);
 
-                    response.IsSuccess = true;
-                    response.Message = Constants.AccountUpdated;
-                    response.Data = accountHolder;
-                }
-                catch (Exception ex)
-                {
-                    response.IsSuccess = false;
-                    response.Message = ex.Message;
-                }
+                accountHolder.Id = Utility.GenerateAccountId(accountHolder.Name);
+                accountHolder.AccountNumber = Utility.GenerateAccountNumber(accountHolder.Name);
+
+                DataStorage.Accounts.Add(accountHolder);
+
+                response.IsSuccess = true;
+                response.Message = Constants.AccountSuccess;
             }
-            else
+            catch (Exception ex)
             {
                 response.IsSuccess = false;
-                response.Message = Constants.AccountUpdateFailure;
+                response.Message = ex.Message;
             }
 
             return response;
         }
 
+        public Response<AccountHolder> Update(AccountHolder accountHolder)
+        {
+            Response<AccountHolder> response = new Response<AccountHolder>();
 
-        public Response<string> Delete(string userId)
+            AccountHolder accountHolderToUpdate = GetAccountHolderById(accountHolder.Id);
+
+            if (accountHolderToUpdate != null)
+            {
+                response.IsSuccess = true;
+                response.Message = Constants.AccountUpdated;
+                response.Data = accountHolderToUpdate;
+            }
+            else
+            {
+                response.IsSuccess = false;
+                response.Message = Constants.AccountNotFound;
+            }
+
+            return response;
+        }
+
+        public Response<string> Delete(string accountId)
         {
             Response<string> response = new Response<string>();
+
             try
             {
-                User userToDelete = DataStorage.Accounts.FirstOrDefault(e => e.Id == userId);
+                AccountHolder accountHolderToDelete = GetAccountHolderById(accountId);
 
-                if (userToDelete != null)
+                if (accountHolderToDelete != null)
                 {
-                    DataStorage.Accounts = DataStorage.Accounts.Where(e => e.Id != userId).ToList();
+                    DataStorage.Accounts.Remove(accountHolderToDelete);
                     response.IsSuccess = true;
                     response.Message = Constants.AccountDeleted;
                 }
@@ -134,7 +146,6 @@ namespace BankApplication.Services
             return response;
         }
 
-
         public Response<string> AddServiceChargeForSameBankAccount(string bankId, float rtgsCharge, float impsCharge)
         {
             Response<string> response = new Response<string>();
@@ -193,6 +204,7 @@ namespace BankApplication.Services
             StringBuilder sb = new StringBuilder();
             try
             {
+                //Using LINQ 
                 var transactions = DataStorage.Transactions
                     .Where(t => t.SrcAccount == account.AccountNumber || t.DstAccount == account.AccountNumber)
                     .ToList();
@@ -275,6 +287,11 @@ namespace BankApplication.Services
                 sb.AppendFormat("Welcome, {0}!", loggedInAccountHolder.Name);
                 EmployeeView.UserAccountMenu(loggedInAccountHolder);
             }
+        }
+
+        public AccountHolder GetAccountHolderById(string accountId)
+        {
+            return DataStorage.Accounts.FirstOrDefault(a => a.Id == accountId);
         }
     }
 }

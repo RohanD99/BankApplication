@@ -2,7 +2,7 @@
 {
     public class Enums
     {
-        public enum MainMenuOption
+        public enum MainMenu
         {
             CreateNewBank,
             LoginAsAccountHolder,

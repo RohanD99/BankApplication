@@ -2,8 +2,6 @@
 using BankApplication.Models;
 using System.Linq;
 using System;
-using static BankApplication.Common.Enums;
-using System.Text;
 
 namespace BankApplication.Services
 {
@@ -27,37 +25,7 @@ namespace BankApplication.Services
             }
             return Response;
         }
-
-        public Response<string> UpdateAccountHolder()
-        {
-            AccountHolderService AccountHolderService = new AccountHolderService();
-            Response<string> response = new Response<string>();
-            try
-            {
-                Utility.GetStringInput("Enter Account ID to update account holder: ",true);
-                string accountToUpdate = Console.ReadLine();
-                AccountHolder EmployeeToUpdate = DataStorage.Accounts.FirstOrDefault(e => e.Id == accountToUpdate);
-                if (EmployeeToUpdate != null)
-                {
-                    Response<User> updateResponse = AccountHolderService.Update(EmployeeToUpdate);
-                    response.IsSuccess = updateResponse.IsSuccess;
-                    response.Message = updateResponse.Message;
-                }
-                else
-                {
-                    response.IsSuccess = false;
-                    response.Message = Constants.AccountNotFound;
-                }
-            }
-            catch (Exception ex)
-            {
-                response.IsSuccess = false;
-                response.Message = ex.Message;
-            }
-
-            return response;
-        }
-
+     
         public Response<string> ShowAccountTransactionHistory(string accountNumber)
         {
             AccountHolderService AccountHolderService = new AccountHolderService();
@@ -93,52 +61,6 @@ namespace BankApplication.Services
             }
 
             return response;
-        }
-
-        public static void TransferFundsMenu(AccountHolder loggedInAccount)
-        {
-            BankService BankService = new BankService();
-            StringBuilder sb = new StringBuilder();
-            Utility.GetStringInput("Enter BankID:", true);
-            string bankId = Console.ReadLine();
-            Bank selectedBank = DataStorage.Banks.FirstOrDefault(b => b.Id == bankId);
-
-            Utility.GetStringInput("Enter the destination account number: ", true);
-            string destinationAccountNumber = Console.ReadLine();
-            AccountHolder destinationAccount = DataStorage.Accounts.FirstOrDefault(a => a.AccountNumber == destinationAccountNumber);
-
-            Utility.GetStringInput("Enter the transfer type (0 for IMPS, 1 for RTGS): ", true);
-            int transferTypeInput = Convert.ToInt32(Console.ReadLine());
-
-            TransferOptions transferType;
-            if (transferTypeInput == 0)
-            {
-                transferType = TransferOptions.IMPS;
-            }
-            else if (transferTypeInput == 1)
-            {
-                transferType = TransferOptions.RTGS;
-            }
-            else
-            {
-                sb.AppendLine(Constants.InvalidType);
-                return;
-            }
-
-            Utility.GetStringInput("Enter the amount to transfer: ", true);
-            decimal transferAmount = Convert.ToDecimal(Console.ReadLine());
-
-            Response<string> transferResponse = BankService.TransferFunds(loggedInAccount, destinationAccount, transferAmount, transferType);
-
-            if (transferResponse.IsSuccess)
-            {
-                sb.AppendLine(transferResponse.Message);
-                sb.AppendLine($"New balance: {loggedInAccount.Balance}");
-            }
-            else
-            {
-                sb.AppendLine(transferResponse.Message);
-            }
         }
 
         public static Employee GetEmployeeByUsernameAndPassword(string username, string password)

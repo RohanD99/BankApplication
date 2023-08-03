@@ -33,7 +33,6 @@ namespace BankApplication.Views
                         Console.WriteLine(depositResponse.Message);
                         break;
 
-
                     case UserAccountOption.Withdraw:
                         Utility.GetStringInput("Enter the amount to withdraw: ", true);
                         decimal withdrawAmount = Convert.ToDecimal(Console.ReadLine());
@@ -42,7 +41,8 @@ namespace BankApplication.Views
                         break;
 
                     case UserAccountOption.Transfer:
-                        EmployeeService.TransferFundsMenu(loggedInAccount);
+                        BankView BankView = new BankView(); 
+                        BankView.TransferFunds(loggedInAccount);
                         break;
 
                     case UserAccountOption.CheckBalance:
@@ -115,4 +115,5 @@ namespace BankApplication.Views
         }
     }
 }
+
 

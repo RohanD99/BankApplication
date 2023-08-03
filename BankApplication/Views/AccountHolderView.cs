@@ -2,6 +2,7 @@
 using BankApplication.Models;
 using BankApplication.Services;
 using System;
+using System.Linq;
 using static BankApplication.Common.Enums;
 
 namespace BankApplication.Views
@@ -9,7 +10,6 @@ namespace BankApplication.Views
     internal class AccountHolderView
     {
         static AccountHolderService AccountHolderService = new AccountHolderService();
-        static EmployeeService EmployeeService = new EmployeeService();
         public static void BankStaffMenu()
         {
             BankStaffOption option;
@@ -17,28 +17,29 @@ namespace BankApplication.Views
             {
                 Utility.GenerateOptions(Constants.BankStaffOption);
                 option = (BankStaffOption)Convert.ToInt32(Console.ReadLine());
+                BankView bankView = new BankView();
                 switch (option)
                 {
-                    case BankStaffOption.CreateAccountHolder:
-                        BankView bankView = new BankView();
-                        bankView.AddUser();
+                    case BankStaffOption.CreateAccountHolder:                      
+                        bankView.AddAccountHolder();
                         break;
 
                     case BankStaffOption.UpdateAccountHolder:
-                        EmployeeService.UpdateAccountHolder();
+                        string accountToUpdate = Utility.GetStringInput("Enter Account ID to update account holder: ", true);
+                        AccountHolderService accountHolderService = new AccountHolderService();
+                        AccountHolder accountHolderToUpdate = accountHolderService.GetAccountHolderById(accountToUpdate);
+                        bankView.UpdateAccountHolder(accountHolderToUpdate);
                         break;
 
+
                     case BankStaffOption.DeleteAccountHolder:
-                        Utility.GetStringInput("Enter Account ID to delete account holder: ", true);
-                        string accountToDelete = Console.ReadLine();
-                        Response<string> deleteResponse = AccountHolderService.Delete(accountToDelete);
-                        Console.WriteLine(deleteResponse.Message);
+                        bankView.DeleteAccountHolder();
                         break;
 
                     case BankStaffOption.ShowAllAccountHolders:
                         Response<string> showAllResponse = AccountHolderService.ShowAllAccounts();
-                        Console.WriteLine(showAllResponse.Message);
                         Console.WriteLine(showAllResponse.Data);
+                        Console.WriteLine(showAllResponse.Message);
                         break;
 
                     case BankStaffOption.AddCurrency:
@@ -83,6 +84,7 @@ namespace BankApplication.Views
                         break;
 
                     case BankStaffOption.ShowAccountHolderTransactions:
+                        EmployeeService EmployeeService = new EmployeeService();
                         Utility.GetStringInput("Enter Account Holder's Account Number: ", true);
                         string accountNumber = Console.ReadLine();
                         EmployeeService.ShowAccountTransactionHistory(accountNumber);

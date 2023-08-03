@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using BankApplication.Common;
 using BankApplication.Models;
 using BankApplication.Services;
@@ -13,26 +14,26 @@ namespace BankApplication.Views
         {
             try
             {
-                MainMenuOption option;
+                MainMenu option;
                 do
                 {
-                    Utility.GenerateOptions(Constants.MainMenuOptions);
-                    option = (MainMenuOption)Convert.ToInt32(Console.ReadLine());
+                    Utility.GenerateOptions(Constants.MainMenu);
+                    option = (MainMenu)Convert.ToInt32(Console.ReadLine());
                     switch (option)
                     {
-                        case MainMenuOption.CreateNewBank:
+                        case MainMenu.CreateNewBank:
                             CreateNewBank();
                             break;
 
-                        case MainMenuOption.LoginAsAccountHolder:
+                        case MainMenu.LoginAsAccountHolder:
                             AccountHolderService.LoginAsAccountHolder();
                             break;
                                                 
-                        case MainMenuOption.LoginAsBankStaff:
+                        case MainMenu.LoginAsBankStaff:
                             BankService.LoginAsBankStaff();
                             break;
                          
-                        case MainMenuOption.Exit:
+                        case MainMenu.Exit:
                             Console.WriteLine("Thank you for Visiting...");
                             Environment.Exit(Environment.ExitCode);
                             break;
@@ -41,7 +42,7 @@ namespace BankApplication.Views
                             this.Initialize();
                             break;
                     }
-                } while (option != MainMenuOption.Exit);
+                } while (option != MainMenu.Exit);
             }
             catch (Exception)
             {
@@ -147,9 +148,10 @@ namespace BankApplication.Views
             }
         }
 
-        public void AddUser()
+        public void AddAccountHolder()
         {
             BankService bankService = new BankService();
+            AccountHolderService accountHolderService = new AccountHolderService();
             Employee employee = bankService.GetEmployee();
 
             if (employee == null)
@@ -169,7 +171,7 @@ namespace BankApplication.Views
                 Type = Enums.UserType.AccountHolder
             };
 
-            Response<string> response = bankService.CreateAccountHolder(accountHolder);
+            Response<string> response = accountHolderService.Create(accountHolder);
 
             if (response.IsSuccess)
             {
@@ -189,7 +191,55 @@ namespace BankApplication.Views
                 Console.WriteLine(response.Message);
             }
         }
-    
+
+        public void UpdateAccountHolder(AccountHolder accountHolder)
+        {
+            AccountHolderService accountHolderService = new AccountHolderService();
+
+            if (accountHolder != null)
+            {
+                Console.WriteLine("Please enter the updated details:");
+                accountHolder.UserName = Utility.GetStringInput(Constants.Username, false, accountHolder.UserName);
+                accountHolder.Password = Utility.GetStringInput(Constants.Password, false, accountHolder.Password);
+                accountHolder.Name = Utility.GetStringInput(Constants.AccountHolderName, false, accountHolder.Name);
+                accountHolder.AccountType = Utility.GetStringInput(Constants.AccountType, false, accountHolder.AccountType);
+
+                Response<AccountHolder> updateResponse = accountHolderService.Update(accountHolder);
+
+                if (updateResponse.IsSuccess)
+                {
+                    Console.WriteLine(updateResponse.Message);
+                }
+                else
+                {
+                    Console.WriteLine(updateResponse.Message);
+                }
+            }
+            else
+            {
+                Console.WriteLine(Constants.AccountUpdateFailure);
+            }
+        }
+
+        public void DeleteAccountHolder()
+        {
+            Console.Write("Enter Account ID to delete account holder: ");
+            string accountToDelete = Console.ReadLine();
+            AccountHolderService accountHolderService = new AccountHolderService();
+
+            // Call the DeleteAccountHolder method from the service to delete the account holder
+            Response<string> deleteResponse = accountHolderService.Delete(accountToDelete);
+
+            if (deleteResponse.IsSuccess)
+            {
+                Console.WriteLine(deleteResponse.Message);
+            }
+            else
+            {
+                Console.WriteLine(deleteResponse.Message);
+            }
+        }
+
         public Employee VerifyEmployeeCredentials()
         {
         string username = Utility.GetStringInput("Username", true);
@@ -206,6 +256,48 @@ namespace BankApplication.Views
 
             AccountHolder accountHolder = EmployeeService.GetAccountHolderByUsernameAndPassword(username, password);
             return accountHolder;
+        }
+
+        public void TransferFunds(AccountHolder loggedInAccount)
+        {
+            BankService BankService = new BankService();
+            StringBuilder sb = new StringBuilder();
+
+            Utility.GetStringInput("Enter the destination account number: ", true);
+            string destinationAccountNumber = Console.ReadLine();
+
+            Utility.GetStringInput("Enter the transfer type (0 for IMPS, 1 for RTGS): ", true);
+            int transferTypeInput = Convert.ToInt32(Console.ReadLine());
+
+            TransferOptions transferType;
+            if (transferTypeInput == 0)
+            {
+                transferType = TransferOptions.IMPS;
+            }
+            else if (transferTypeInput == 1)
+            {
+                transferType = TransferOptions.RTGS;
+            }
+            else
+            {
+                sb.AppendLine(Constants.InvalidType);
+                return;
+            }
+
+            Utility.GetStringInput("Enter the amount to transfer: ", true);
+            decimal transferAmount = Convert.ToDecimal(Console.ReadLine());
+
+            Response<string> transferResponse = BankService.TransferFunds(loggedInAccount, destinationAccountNumber, transferAmount, transferType);
+
+            if (transferResponse.IsSuccess)
+            {
+                sb.AppendLine(transferResponse.Message);
+                sb.AppendLine($"New balance: {loggedInAccount.Balance}");
+            }
+            else
+            {
+                sb.AppendLine(transferResponse.Message);
+            }
         }
     }
 }

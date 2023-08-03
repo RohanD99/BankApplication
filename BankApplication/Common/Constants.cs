@@ -49,11 +49,11 @@ namespace BankApplication.Common
 
         public static string AccountFailure = "Account not created";
 
-        public static string AccountDeleted = "User deleted";
+        public static string AccountDeleted = "Account deleted";
 
-        public static string AccountUpdated = "User updated successfully";
+        public static string AccountUpdated = "Account updated successfully";
 
-        public static string AccountUpdateFailure = "User not updated.";
+        public static string AccountUpdateFailure = "Account not updated.";
 
         public static string ShowAllAccounts = "List all of accounts";
 
@@ -92,7 +92,7 @@ namespace BankApplication.Common
         public static string LoginAsBankStaff = "Login as Bank Staff";
         public static string Exit = "Exit";
 
-        public static readonly List<string> MainMenuOptions = new List<string>
+        public static readonly List<string> MainMenu = new List<string>
         {
             CreateNewBank,
             LoginAsAccountHolder,

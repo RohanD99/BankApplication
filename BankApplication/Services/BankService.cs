@@ -32,46 +32,8 @@ namespace BankApplication.Services
 
             return response;
         }
-
-        public Employee GetEmployee()
-        {
-            return DataStorage.Employees.FirstOrDefault(emp => emp.Type == Enums.UserType.Employee);
-        }
-
-        public Response<string> CreateAccountHolder(AccountHolder accountHolder)
-        {
-            Response<string> response = new Response<string>();
-            try
-            {
-                string bankId = Utility.GetStringInput("Enter BankID: ", true);
-                Bank selectedBank = DataStorage.Banks.FirstOrDefault(b => b.Id == bankId);
-
-                if (selectedBank == null)
-                {
-                    response.IsSuccess = false;
-                    response.Message = Constants.BankNotFound;
-                    return response;
-                }
-
-                accountHolder.Id = Utility.GenerateAccountId(accountHolder.Name);
-                accountHolder.AccountNumber = Utility.GenerateAccountNumber(accountHolder.Name);
-
-                DataStorage.Accounts.Add(accountHolder);
-
-                response.IsSuccess = true;
-                response.Message = Constants.AccountSuccess;
-            }
-            catch (Exception ex)
-            {
-                response.IsSuccess = false;
-                response.Message = ex.Message;
-            }
-
-            return response;
-        }
-    
-
-    public Response<string> Deposit(AccountHolder account, decimal amount)
+      
+        public Response<string> Deposit(AccountHolder account, decimal amount)
         {
             Response<string> response = new Response<string>();
 
@@ -162,12 +124,20 @@ namespace BankApplication.Services
 
             return response;
         }
-        public Response<string> TransferFunds(AccountHolder sourceAccount, AccountHolder destinationAccount, decimal amount, TransferOptions transferType)
+        public Response<string> TransferFunds(AccountHolder sourceAccount, string destinationAccountNumber, decimal amount, TransferOptions transferType)
         {
             Response<string> response = new Response<string>();
 
             try
             {
+                AccountHolder destinationAccount = DataStorage.Accounts.FirstOrDefault(a => a.AccountNumber == destinationAccountNumber);
+                if (destinationAccount == null)
+                {
+                    response.IsSuccess = false;
+                    response.Message = Constants.AccountNotFound;
+                    return response;
+                }
+
                 decimal charge = 0;
 
                 if (transferType == TransferOptions.IMPS)
@@ -208,7 +178,7 @@ namespace BankApplication.Services
                 {
                     Id = Utility.GenerateTransactionId(sourceAccount.Id, sourceAccount.AccountNumber),
                     SrcAccount = sourceAccount.AccountNumber,
-                    DstAccount = destinationAccount.AccountNumber,
+                    DstAccount = destinationAccountNumber,
                     Type = Constants.TransferFunds,
                     Amount = -transferAmount,
                     CreatedBy = sourceAccount.Name,
@@ -218,9 +188,9 @@ namespace BankApplication.Services
                 // Create and store destination transaction
                 Transaction destinationTransaction = new Transaction
                 {
-                    Id = Utility.GenerateTransactionId(destinationAccount.Id, destinationAccount.AccountNumber),
+                    Id = Utility.GenerateTransactionId(destinationAccount.Id, destinationAccountNumber),
                     SrcAccount = sourceAccount.AccountNumber,
-                    DstAccount = destinationAccount.AccountNumber,
+                    DstAccount = destinationAccountNumber,
                     Type = Constants.TransferFunds,
                     Amount = amount,
                     CreatedBy = destinationAccount.Name,
@@ -241,8 +211,9 @@ namespace BankApplication.Services
 
             return response;
         }
+    
 
-        public Response<string> CheckBalance(AccountHolder account)
+    public Response<string> CheckBalance(AccountHolder account)
         {
             Response<string> response = new Response<string>();
 
@@ -290,6 +261,11 @@ namespace BankApplication.Services
             }
 
             return response;
+        }
+
+        public Employee GetEmployee()
+        {
+            return DataStorage.Employees.FirstOrDefault(emp => emp.Type == Enums.UserType.Employee);
         }
 
         public static void LoginAsBankStaff()
