@@ -51,13 +51,12 @@ namespace BankApplication.Common
 
         public static string GenerateAccountNumber(string name)
         {
-            return string.IsNullOrEmpty(name) ? "" : $"{name.Substring(0, Math.Min(3, name.Length)).ToUpper()}{DateTime.Now:yyMMddHHmmss}";
+            return string.IsNullOrEmpty(name) ? "" : $"{DateTime.Now.ToString("yyMMddHHmmss")}";
         }
 
         public static string GenerateAccountId(string name)
         {
             return string.IsNullOrEmpty(name) ? null : $"{name.Substring(0, Math.Min(3, name.Length)).ToUpper()}{DateTime.Now:yyMMddHHmmssfff}";
         }
-
     }
 }

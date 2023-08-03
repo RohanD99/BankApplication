@@ -75,7 +75,6 @@ namespace BankApplication.Services
             return response;
         }
 
-
         public Response<string> Withdraw(AccountHolder account, decimal amount)
         {
             Response<string> response = new Response<string>();
@@ -124,6 +123,7 @@ namespace BankApplication.Services
 
             return response;
         }
+
         public Response<string> TransferFunds(AccountHolder sourceAccount, string destinationAccountNumber, decimal amount, TransferOptions transferType)
         {
             Response<string> response = new Response<string>();
@@ -212,8 +212,7 @@ namespace BankApplication.Services
             return response;
         }
     
-
-    public Response<string> CheckBalance(AccountHolder account)
+        public Response<string> CheckBalance(AccountHolder account)
         {
             Response<string> response = new Response<string>();
 
@@ -275,7 +274,6 @@ namespace BankApplication.Services
             StringBuilder sb = new StringBuilder();
             if (loggedInEmployee != null)
             {
-                sb.AppendFormat($"Welcome, {loggedInEmployee.Name}!");
                 AccountHolderView.BankStaffMenu();
             }     
         }

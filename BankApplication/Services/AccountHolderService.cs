@@ -9,16 +9,14 @@ namespace BankApplication.Services
 {
     internal class AccountHolderService
     {
-        public Response<string> Create(AccountHolder accountHolder)
+        public Response<string> Create(AccountHolder accountHolder, Employee employee)
         {
             Response<string> response = new Response<string>();
             try
             {
-                string bankId = Utility.GetStringInput("Enter BankID: ", true);
-                Bank selectedBank = DataStorage.Banks.FirstOrDefault(b => b.Id == bankId);
-
                 accountHolder.Id = Utility.GenerateAccountId(accountHolder.Name);
                 accountHolder.AccountNumber = Utility.GenerateAccountNumber(accountHolder.Name);
+                accountHolder.BankId = employee.BankId; 
 
                 DataStorage.Accounts.Add(accountHolder);
 
@@ -92,16 +90,24 @@ namespace BankApplication.Services
             return response;
         }
 
-        public Response<string> ShowAllAccounts()
+        public Response<string> ShowAllAccounts(Employee employee)
         {
             Response<string> response = new Response<string>();
             StringBuilder sb = new StringBuilder();
 
             try
             {
-                if (DataStorage.Accounts.Any())
+                if (employee == null)
                 {
-                    EmployeeView.PrintAccountDetails(DataStorage.Accounts);
+                    response.IsSuccess = false;
+                    response.Message = Constants.EmployeeFailure;
+                    return response;
+                }
+
+                var accountsOfSelectedBank = DataStorage.Accounts.Where(a => a.BankId == employee.BankId).ToList();
+                if (accountsOfSelectedBank.Any())
+                {
+                    EmployeeView.PrintAccountDetails(accountsOfSelectedBank);
                     response.IsSuccess = true;
                     response.Message = Constants.ShowAllAccounts;
                 }
@@ -120,88 +126,104 @@ namespace BankApplication.Services
             return response;
         }
 
-        public static Response<string> AddAcceptedCurrency(string bankIDForCurrency, string currencyCode, decimal exchangeRate)
+        public static Response<string> AddAcceptedCurrency(string currencyCode, decimal exchangeRate, Employee loggedInEmployee)
         {
             Response<string> response = new Response<string>();
 
-            Bank selectedBank = DataStorage.Banks.FirstOrDefault(b => b.Id == bankIDForCurrency);
+            try
+            {
+                if (Constants.acceptedCurrencies.ContainsKey(currencyCode))
+                {
+                    response.IsSuccess = false;
+                    response.Message = Constants.CurrencyExists;
+                    return response;
+                }
 
-            if (selectedBank == null)
+                if (exchangeRate <= 0)
+                {
+                    response.IsSuccess = false;
+                    response.Message = Constants.InvalidRate;
+                    return response;
+                }
+
+                Constants.acceptedCurrencies.Add(currencyCode, exchangeRate);
+
+                response.IsSuccess = true;
+                response.Message = Constants.NewCurrency;
+            }
+            catch (Exception ex)
             {
                 response.IsSuccess = false;
-                response.Message = Constants.BankNotFound;
-                return response;
+                response.Message = ex.Message;
             }
-
-            if (Constants.acceptedCurrencies.ContainsKey(currencyCode))
-            {
-                response.IsSuccess = false;
-                response.Message = Constants.CurrencyExists;
-                return response;
-            }
-
-            if (exchangeRate <= 0)
-            {
-                response.IsSuccess = false;
-                response.Message = Constants.InvalidRate;
-                return response;
-            }
-
-            Constants.acceptedCurrencies.Add(currencyCode, exchangeRate);
-
-            response.IsSuccess = true;
-            response.Message = Constants.NewCurrency;
-            return response;
-        }
-
-        public Response<string> AddServiceChargeForSameBankAccount(string bankId, float rtgsCharge, float impsCharge)
-        {
-            Response<string> response = new Response<string>();
-
-            Bank selectedBank = DataStorage.Banks.FirstOrDefault(b => b.Id == bankId);
-
-            if (selectedBank == null)
-            {
-                response.IsSuccess = false;
-                response.Message = Constants.BankNotFound;
-                return response;
-            }
-
-            response.Message = Constants.ServiceChargeForSameAccount;
-            float previousRTGSCharge = selectedBank.RTGSforSameBank;
-            float previousIMPSCharge = selectedBank.IMPSforSameBank;
-
-            selectedBank.RTGSforSameBank = rtgsCharge;
-            selectedBank.IMPSforSameBank = impsCharge;
-
-            response.Message = Constants.ServiceChargesUpdated;
-            response.IsSuccess = true;
 
             return response;
         }
 
-        public Response<string> AddServiceChargeForOtherBankAccount(string bankId, float rtgsCharge, float impsCharge)
+        public Response<string> AddServiceChargeForSameBankAccount(float rtgsCharge, float impsCharge, Employee loggedInEmployee)
         {
             Response<string> response = new Response<string>();
 
-            Bank selectedBank = DataStorage.Banks.FirstOrDefault(b => b.Id == bankId);
+            try
+            {
+                Bank selectedBank = DataStorage.Banks.FirstOrDefault(b => b.Id == loggedInEmployee.BankId);
 
-            if (selectedBank == null)
+                if (selectedBank == null)
+                {
+                    response.IsSuccess = false;
+                    response.Message = Constants.BankNotFound;
+                    return response;
+                }
+
+                response.Message = Constants.ServiceChargeForSameAccount;
+                float previousRTGSCharge = selectedBank.RTGSforSameBank;
+                float previousIMPSCharge = selectedBank.IMPSforSameBank;
+
+                selectedBank.RTGSforSameBank = rtgsCharge;
+                selectedBank.IMPSforSameBank = impsCharge;
+
+                response.IsSuccess = true;
+                response.Message = Constants.ServiceChargesUpdated;
+            }
+            catch (Exception ex)
             {
                 response.IsSuccess = false;
-                response.Message = Constants.BankNotFound;
-                return response;
+                response.Message = ex.Message;
             }
 
-            response.Message = Constants.ServiceChargeForOtherAccount;
-            float previousRTGSCharge = selectedBank.RTGSforOtherBank;
-            float previousIMPSCharge = selectedBank.IMPSforOtherBank;
+            return response;
+        }
 
-            selectedBank.RTGSforOtherBank = rtgsCharge;
-            selectedBank.IMPSforOtherBank = impsCharge;
+        public Response<string> AddServiceChargeForOtherBankAccount(float rtgsCharge, float impsCharge, Employee loggedInEmployee)
+        {
+            Response<string> response = new Response<string>();
 
-            response.Message = Constants.ServiceChargesUpdated;
-            response.IsSuccess = true;
+            try
+            {
+                Bank selectedBank = DataStorage.Banks.FirstOrDefault(b => b.Id == loggedInEmployee.BankId);
+
+                if (selectedBank == null)
+                {
+                    response.IsSuccess = false;
+                    response.Message = Constants.BankNotFound;
+                    return response;
+                }
+
+                response.Message = Constants.ServiceChargeForOtherAccount;
+                float previousRTGSCharge = selectedBank.RTGSforOtherBank;
+                float previousIMPSCharge = selectedBank.IMPSforOtherBank;
+
+                selectedBank.RTGSforOtherBank = rtgsCharge;
+                selectedBank.IMPSforOtherBank = impsCharge;
+
+                response.IsSuccess = true;
+                response.Message = Constants.ServiceChargesUpdated;
+            }
+            catch (Exception ex)
+            {
+                response.IsSuccess = false;
+                response.Message = ex.Message;
+            }
 
             return response;
         }
@@ -247,7 +269,7 @@ namespace BankApplication.Services
 
                     if (account != null)
                     {
-                        if (account.Balance == null || account.Balance < transactionToRevert.Amount)
+                        if (account.Balance < transactionToRevert.Amount)
                         {
                             response.IsSuccess = false;
                             response.Message = Constants.TransactionFailure;
@@ -292,7 +314,6 @@ namespace BankApplication.Services
             StringBuilder sb = new StringBuilder();
             if (loggedInAccountHolder != null)
             {
-                sb.AppendFormat("Welcome, {0}!", loggedInAccountHolder.Name);
                 EmployeeView.UserAccountMenu(loggedInAccountHolder);
             }
         }

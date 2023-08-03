@@ -14,6 +14,8 @@ namespace BankApplication.Views
             BankStaffOption option;
             do
             {
+                BankService BankService = new BankService();
+                Employee loggedInEmployee = BankService.GetEmployee();
                 Utility.GenerateOptions(Constants.BankStaffOption);
                 option = (BankStaffOption)Convert.ToInt32(Console.ReadLine());
                 BankView bankView = new BankView();
@@ -30,56 +32,43 @@ namespace BankApplication.Views
                         bankView.UpdateAccountHolder(accountHolderToUpdate);
                         break;
 
-
                     case BankStaffOption.DeleteAccountHolder:
                         bankView.DeleteAccountHolder();
                         break;
 
                     case BankStaffOption.ShowAllAccountHolders:
-                        Response<string> showAllResponse = AccountHolderService.ShowAllAccounts();
-                        Console.WriteLine(showAllResponse.Data);
+                        Employee employee = BankService.GetEmployee();
+                        Response<string> showAllResponse = AccountHolderService.ShowAllAccounts(employee);
                         Console.WriteLine(showAllResponse.Message);
+                        Console.WriteLine(showAllResponse.Data);
                         break;
 
                     case BankStaffOption.AddCurrency:
-                        Console.Write("Enter Bank ID: ");
-                        string bankIDForCurrency = Console.ReadLine();
-
                         Console.Write("Enter Currency Code: ");
-                        string currencyCode = Console.ReadLine();
-
+                        string currencyCode = Console.ReadLine().ToUpper();
                         Console.Write("Enter Exchange Rate: ");
                         decimal exchangeRate;
                         if (!decimal.TryParse(Console.ReadLine(), out exchangeRate))
                         {
-                            Console.WriteLine("Invalid exchange rate.");
-                            break;
+                            Console.WriteLine("Invalid exchange rate. Please enter a valid decimal number.");
                         }
-
-                        Response<string> addCurrencyResponse = AccountHolderService.AddAcceptedCurrency(bankIDForCurrency, currencyCode, exchangeRate);
-                        Console.WriteLine(addCurrencyResponse.Message);
+                        Response<string> response = AccountHolderService.AddAcceptedCurrency(currencyCode, exchangeRate, loggedInEmployee);
                         break;
 
                     case BankStaffOption.UpdateServiceChargesForSameBank:
-                        Utility.GetStringInput("Enter Bank ID: ",true);
-                        string bankId = Console.ReadLine();
-                        Utility.GetStringInput("Enter RTGS Charge for Same Bank: ", true);
+                        Console.Write("Enter RTGS Charge for Same Bank: ");
                         float rtgsChargeSameBank = Convert.ToSingle(Console.ReadLine());
-                        Utility.GetStringInput("Enter IMPS Charge for Same Bank: ", true);
+                        Console.Write("Enter IMPS Charge for Same Bank: ");
                         float impsChargeSameBank = Convert.ToSingle(Console.ReadLine());
-                        Response<string> updateSameBankChargeResponse = AccountHolderService.AddServiceChargeForSameBankAccount(bankId, rtgsChargeSameBank, impsChargeSameBank);
-                        Console.WriteLine(updateSameBankChargeResponse.Message);
+                        Response<string> updateSameBankChargeResponse = AccountHolderService.AddServiceChargeForSameBankAccount(rtgsChargeSameBank, impsChargeSameBank, loggedInEmployee);
                         break;
 
                     case BankStaffOption.UpdateServiceChargesForOtherBank:
-                        Utility.GetStringInput("Enter Bank ID: ", true);
-                        string bankIdForOtherBank = Console.ReadLine();
-                        Utility.GetStringInput("Enter RTGS Charge for Other Bank: ", true);
+                        Console.Write("Enter RTGS Charge for Other Bank: ");
                         float rtgsChargeOtherBank = Convert.ToSingle(Console.ReadLine());
-                        Utility.GetStringInput("Enter IMPS Charge for Other Bank: ", true);
+                        Console.Write("Enter IMPS Charge for Other Bank: ");
                         float impsChargeOtherBank = Convert.ToSingle(Console.ReadLine());
-                        Response<string> updateOtherBankChargeResponse = AccountHolderService.AddServiceChargeForOtherBankAccount(bankIdForOtherBank, rtgsChargeOtherBank, impsChargeOtherBank);
-                        Console.WriteLine(updateOtherBankChargeResponse.Message);
+                        Response<string> updateOtherBankChargeResponse = AccountHolderService.AddServiceChargeForOtherBankAccount(rtgsChargeOtherBank, impsChargeOtherBank, loggedInEmployee);
                         break;
 
                     case BankStaffOption.ShowAccountHolderTransactions:

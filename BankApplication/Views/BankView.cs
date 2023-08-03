@@ -113,6 +113,7 @@ namespace BankApplication.Views
                 CurrentEmployee = employee;
                 AddEmployee();
                 Console.WriteLine($"Employee's ID : {employee.Id}");
+                Console.WriteLine($"Employee's BankID : {employee.BankId}");
                 Console.WriteLine("----------------------------------------");
                 return employee.Id;
             }
@@ -171,7 +172,7 @@ namespace BankApplication.Views
                 Type = Enums.UserType.AccountHolder
             };
 
-            Response<string> response = accountHolderService.Create(accountHolder);
+            Response<string> response = accountHolderService.Create(accountHolder, employee);
 
             if (response.IsSuccess)
             {
