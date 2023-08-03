@@ -21,7 +21,7 @@ namespace BankApplication.Views
                 switch (option)
                 {
                     case UserAccountOption.Deposit:
-                        Console.Write("Enter the amount to deposit: ");
+                        Utility.GetStringInput("Enter the amount to deposit: ", true);
                         string depositAmountInput = Console.ReadLine();
                         if (!decimal.TryParse(depositAmountInput, out decimal depositAmount))
                         {

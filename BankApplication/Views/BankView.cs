@@ -224,7 +224,7 @@ namespace BankApplication.Views
 
         public void DeleteAccountHolder()
         {
-            Console.Write("Enter Account ID to delete account holder: ");
+            Utility.GetStringInput("Enter Account ID to delete account holder: ",true);
             string accountToDelete = Console.ReadLine();
             AccountHolderService accountHolderService = new AccountHolderService();
 

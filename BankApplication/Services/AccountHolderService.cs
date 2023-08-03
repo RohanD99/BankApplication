@@ -145,11 +145,13 @@ namespace BankApplication.Services
                     response.Message = Constants.InvalidRate;
                     return response;
                 }
+                else
+                {
+                    Constants.acceptedCurrencies.Add(currencyCode, exchangeRate);
 
-                Constants.acceptedCurrencies.Add(currencyCode, exchangeRate);
-
-                response.IsSuccess = true;
-                response.Message = Constants.NewCurrency;
+                    response.IsSuccess = true;
+                    response.Message = Constants.NewCurrency;
+                }
             }
             catch (Exception ex)
             {
