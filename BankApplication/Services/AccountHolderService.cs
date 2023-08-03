@@ -38,18 +38,26 @@ namespace BankApplication.Services
         {
             Response<AccountHolder> response = new Response<AccountHolder>();
 
-            AccountHolder accountHolderToUpdate = GetAccountHolderById(accountHolder.Id);
-
-            if (accountHolderToUpdate != null)
+            try
             {
-                response.IsSuccess = true;
-                response.Message = Constants.AccountUpdated;
-                response.Data = accountHolderToUpdate;
+                AccountHolder accountHolderToUpdate = GetAccountHolderById(accountHolder.Id);
+
+                if (accountHolderToUpdate != null)
+                {
+                    response.IsSuccess = true;
+                    response.Message = Constants.AccountUpdated;
+                    response.Data = accountHolderToUpdate;
+                }
+                else
+                {
+                    response.IsSuccess = false;
+                    response.Message = Constants.AccountNotFound;
+                }
             }
-            else
+            catch (Exception ex)
             {
                 response.IsSuccess = false;
-                response.Message = Constants.AccountNotFound;
+                response.Message = ex.Message;
             }
 
             return response;

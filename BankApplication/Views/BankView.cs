@@ -227,7 +227,6 @@ namespace BankApplication.Views
             string accountToDelete = Console.ReadLine();
             AccountHolderService accountHolderService = new AccountHolderService();
 
-            // Call the DeleteAccountHolder method from the service to delete the account holder
             Response<string> deleteResponse = accountHolderService.Delete(accountToDelete);
 
             if (deleteResponse.IsSuccess)

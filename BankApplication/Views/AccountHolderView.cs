@@ -2,7 +2,6 @@
 using BankApplication.Models;
 using BankApplication.Services;
 using System;
-using System.Linq;
 using static BankApplication.Common.Enums;
 
 namespace BankApplication.Views
@@ -26,8 +25,8 @@ namespace BankApplication.Views
 
                     case BankStaffOption.UpdateAccountHolder:
                         string accountToUpdate = Utility.GetStringInput("Enter Account ID to update account holder: ", true);
-                        AccountHolderService accountHolderService = new AccountHolderService();
-                        AccountHolder accountHolderToUpdate = accountHolderService.GetAccountHolderById(accountToUpdate);
+                        AccountHolderService AccountService = new AccountHolderService();
+                        AccountHolder accountHolderToUpdate = AccountService.GetAccountHolderById(accountToUpdate);
                         bankView.UpdateAccountHolder(accountHolderToUpdate);
                         break;
 
