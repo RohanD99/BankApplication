@@ -29,7 +29,7 @@ namespace BankApplication.Services
         public Response<string> ShowAccountTransactionHistory(string accountNumber)
         {
             AccountHolderService AccountHolderService = new AccountHolderService();
-            Response<string> response = new Response<string>();
+            Response<string> Response = new Response<string>();
             try
             {
                 AccountHolder accountToShowTransactions = DataStorage.Accounts.FirstOrDefault(a => a.AccountNumber == accountNumber);
@@ -38,29 +38,29 @@ namespace BankApplication.Services
                     Response<string> historyResponse = AccountHolderService.ViewAccountTransactionHistory(accountToShowTransactions);
                     if (historyResponse.IsSuccess)
                     {
-                        response.IsSuccess = true;
-                        response.Message = Constants.TransactionSuccess;
-                        response.Data = historyResponse.Data;
+                        Response.IsSuccess = true;
+                        Response.Message = Constants.TransactionSuccess;
+                        Response.Data = historyResponse.Data;
                     }
                     else
                     {
-                        response.IsSuccess = false;
-                        response.Message = historyResponse.Message;
+                        Response.IsSuccess = false;
+                        Response.Message = historyResponse.Message;
                     }
                 }
                 else
                 {
-                    response.IsSuccess = false;
-                    response.Message = Constants.AccountNotFound;
+                    Response.IsSuccess = false;
+                    Response.Message = Constants.AccountNotFound;
                 }
             }
             catch (Exception ex)
             {
-                response.IsSuccess = false;
-                response.Message = ex.Message;
+                Response.IsSuccess = false;
+                Response.Message = ex.Message;
             }
 
-            return response;
+            return Response;
         }
 
         public static Employee GetEmployeeByUsernameAndPassword(string username, string password)

@@ -56,7 +56,7 @@ namespace BankApplication.Views
             BankService BankService = new BankService();
             try
             {
-                Bank bank = new Bank()
+                Bank Bank = new Bank()
                 {
                     Name = Utility.GetStringInput("Enter Bank Name", true),
                     Location = Utility.GetStringInput("Enter Location", true),
@@ -67,7 +67,7 @@ namespace BankApplication.Views
                     RTGSforSameBank = 0
                 };
 
-                var response = BankService.CreateBank(bank);
+                var response = BankService.CreateBank(Bank);
                 Console.WriteLine(response.Message);
 
                 if (!response.IsSuccess)
@@ -77,16 +77,16 @@ namespace BankApplication.Views
                 else
                 {
                     Console.WriteLine("Bank Details:");
-                    Console.WriteLine($"Bank ID: {bank.Id.ToUpper()}");
-                    Console.WriteLine($"Bank Name: {bank.Name}");
-                    Console.WriteLine($"Location: {bank.Location}");
-                    Console.WriteLine($"IFSC Code: {bank.IFSC}");
-                    Console.WriteLine($"Created By: {bank.CreatedBy}");
-                    Console.WriteLine($"Created On: {bank.CreatedOn}");
+                    Console.WriteLine($"Bank ID: {Bank.Id.ToUpper()}");
+                    Console.WriteLine($"Bank Name: {Bank.Name}");
+                    Console.WriteLine($"Location: {Bank.Location}");
+                    Console.WriteLine($"IFSC Code: {Bank.IFSC}");
+                    Console.WriteLine($"Created By: {Bank.CreatedBy}");
+                    Console.WriteLine($"Created On: {Bank.CreatedOn}");
                 }
 
-                var adminName = SetupBankAdmin(bank.Id);
-                bank.CreatedBy = adminName;
+                var adminName = SetupBankAdmin(Bank.Id);
+                Bank.CreatedBy = adminName;
             }
             catch (Exception ex)
             {
@@ -99,7 +99,7 @@ namespace BankApplication.Views
             EmployeeService EmployeeService = new EmployeeService();
             try
             {
-                Employee employee = new Employee()
+                Employee Employee = new Employee()
                 {
                     BankId = bankID,
                     Name = Utility.GetStringInput("Enter Admin Name", true),
@@ -108,14 +108,14 @@ namespace BankApplication.Views
                     Type = Enums.UserType.Admin
                 };
 
-                EmployeeService.Create(employee);
+                EmployeeService.Create(Employee);
                 Console.WriteLine("Admin added successfully");
-                CurrentEmployee = employee;
+                CurrentEmployee = Employee;
                 AddEmployee();
-                Console.WriteLine($"Employee's ID : {employee.Id}");
-                Console.WriteLine($"Employee's BankID : {employee.BankId}");
+                Console.WriteLine($"Employee's ID : {Employee.Id}");
+                Console.WriteLine($"Employee's BankID : {Employee.BankId}");
                 Console.WriteLine("----------------------------------------");
-                return employee.Id;
+                return Employee.Id;
             }
             catch (Exception ex)
             {
@@ -128,7 +128,7 @@ namespace BankApplication.Views
         {
             try
             {
-                Employee employee = new Employee()
+                Employee Employee = new Employee()
                 {
                     Name = Utility.GetStringInput("Enter Employee Name", true),
                     UserName = Utility.GetStringInput("Enter UserName", true),
@@ -138,7 +138,7 @@ namespace BankApplication.Views
                     Type = Enums.UserType.Employee
                 };
 
-                DataStorage.Employees.Add(employee);
+                DataStorage.Employees.Add(Employee);
 
                 Console.WriteLine("Employee added successfully");
 
@@ -151,11 +151,11 @@ namespace BankApplication.Views
 
         public void AddAccountHolder()
         {
-            BankService bankService = new BankService();
-            AccountHolderService accountHolderService = new AccountHolderService();
-            Employee employee = bankService.GetEmployee();
+            BankService BankService = new BankService();
+            AccountHolderService AccountHolderService = new AccountHolderService();
+            Employee Employee = BankService.GetEmployee();
 
-            if (employee == null)
+            if (Employee == null)
             {
                 Console.WriteLine("Employee not found");
                 return;
@@ -167,14 +167,14 @@ namespace BankApplication.Views
                 Password = Utility.GetStringInput("Enter password", true),
                 Name = Utility.GetStringInput("Enter account holder name", true),
                 AccountType = Utility.GetStringInput("Enter account type", true),
-                CreatedBy = employee.Designation,
+                CreatedBy = Employee.Designation,
                 CreatedOn = DateTime.Now,
                 Type = Enums.UserType.AccountHolder
             };
 
-            Response<string> response = accountHolderService.Create(accountHolder, employee);
+            Response<string> Response = AccountHolderService.Create(accountHolder, Employee);
 
-            if (response.IsSuccess)
+            if (Response.IsSuccess)
             {
                 Console.WriteLine("Account holder added successfully.");
                 Console.WriteLine($"Account holder ID: {accountHolder.Id}");
@@ -189,13 +189,13 @@ namespace BankApplication.Views
             }
             else
             {
-                Console.WriteLine(response.Message);
+                Console.WriteLine(Response.Message);
             }
         }
 
         public void UpdateAccountHolder(AccountHolder accountHolder)
         {
-            AccountHolderService accountHolderService = new AccountHolderService();
+            AccountHolderService AccountHolderService = new AccountHolderService();
 
             if (accountHolder != null)
             {
@@ -205,7 +205,7 @@ namespace BankApplication.Views
                 accountHolder.Name = Utility.GetStringInput(Constants.AccountHolderName, false, accountHolder.Name);
                 accountHolder.AccountType = Utility.GetStringInput(Constants.AccountType, false, accountHolder.AccountType);
 
-                Response<AccountHolder> updateResponse = accountHolderService.Update(accountHolder);
+                Response<AccountHolder> updateResponse = AccountHolderService.Update(accountHolder);
 
                 if (updateResponse.IsSuccess)
                 {
@@ -226,17 +226,17 @@ namespace BankApplication.Views
         {
             Utility.GetStringInput("Enter Account ID to delete account holder: ",true);
             string accountToDelete = Console.ReadLine();
-            AccountHolderService accountHolderService = new AccountHolderService();
+            AccountHolderService AccountHolderService = new AccountHolderService();
 
-            Response<string> deleteResponse = accountHolderService.Delete(accountToDelete);
+            Response<string> DeleteResponse = AccountHolderService.Delete(accountToDelete);
 
-            if (deleteResponse.IsSuccess)
+            if (DeleteResponse.IsSuccess)
             {
-                Console.WriteLine(deleteResponse.Message);
+                Console.WriteLine(DeleteResponse.Message);
             }
             else
             {
-                Console.WriteLine(deleteResponse.Message);
+                Console.WriteLine(DeleteResponse.Message);
             }
         }
 
@@ -245,8 +245,8 @@ namespace BankApplication.Views
         string username = Utility.GetStringInput("Username", true);
         string password = Utility.GetStringInput("Password", true);
 
-            Employee employee = EmployeeService.GetEmployeeByUsernameAndPassword(username, password);
-            return employee;
+            Employee Employee = EmployeeService.GetEmployeeByUsernameAndPassword(username, password);
+            return Employee;
         }
 
         public AccountHolder VerifyAccountHolderCredentials()
@@ -254,8 +254,8 @@ namespace BankApplication.Views
             string username = Utility.GetStringInput("Username", true);
             string password = Utility.GetStringInput("Password", true);
 
-            AccountHolder accountHolder = EmployeeService.GetAccountHolderByUsernameAndPassword(username, password);
-            return accountHolder;
+            AccountHolder AccountHolder = EmployeeService.GetAccountHolderByUsernameAndPassword(username, password);
+            return AccountHolder;
         }
 
         public void TransferFunds(AccountHolder loggedInAccount)

@@ -33,7 +33,6 @@ namespace BankApplication.Common
             return string.IsNullOrEmpty(input) ? defaultValue : input;
         }
 
-
         public static string GenerateBankId(string bankName)
         {
             return string.IsNullOrEmpty(bankName) ? "" : $"{bankName.Substring(0, Math.Min(3, bankName.Length))}{DateTime.Now:yyyyMMddHHmmss}";

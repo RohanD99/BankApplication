@@ -18,22 +18,22 @@ namespace BankApplication.Views
                 Employee loggedInEmployee = BankService.GetEmployee();
                 Utility.GenerateOptions(Constants.BankStaffOption);
                 option = (BankStaffOption)Convert.ToInt32(Console.ReadLine());
-                BankView bankView = new BankView();
+                BankView BankView = new BankView();
                 switch (option)
                 {
-                    case BankStaffOption.CreateAccountHolder:                      
-                        bankView.AddAccountHolder();
+                    case BankStaffOption.CreateAccountHolder:
+                        BankView.AddAccountHolder();
                         break;
 
                     case BankStaffOption.UpdateAccountHolder:
                         string accountToUpdate = Utility.GetStringInput("Enter Account ID to update account holder: ", true);
                         AccountHolderService AccountService = new AccountHolderService();
                         AccountHolder accountHolderToUpdate = AccountService.GetAccountHolderById(accountToUpdate);
-                        bankView.UpdateAccountHolder(accountHolderToUpdate);
+                        BankView.UpdateAccountHolder(accountHolderToUpdate);
                         break;
 
                     case BankStaffOption.DeleteAccountHolder:
-                        bankView.DeleteAccountHolder();
+                        BankView.DeleteAccountHolder();
                         break;
 
                     case BankStaffOption.ShowAllAccountHolders:

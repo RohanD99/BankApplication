@@ -11,30 +11,30 @@ namespace BankApplication.Services
     {
         public Response<string> Create(AccountHolder accountHolder, Employee employee)
         {
-            Response<string> response = new Response<string>();
+            Response<string> Response = new Response<string>();
             try
             {
                 accountHolder.Id = Utility.GenerateAccountId(accountHolder.Name);
                 accountHolder.AccountNumber = Utility.GenerateAccountNumber(accountHolder.Name);
-                accountHolder.BankId = employee.BankId; 
+                accountHolder.BankId = employee.BankId;
 
                 DataStorage.Accounts.Add(accountHolder);
 
-                response.IsSuccess = true;
-                response.Message = Constants.AccountSuccess;
+                Response.IsSuccess = true;
+                Response.Message = Constants.AccountSuccess;
             }
             catch (Exception ex)
             {
-                response.IsSuccess = false;
-                response.Message = ex.Message;
+                Response.IsSuccess = false;
+                Response.Message = ex.Message;
             }
 
-            return response;
+            return Response;
         }
 
         public Response<AccountHolder> Update(AccountHolder accountHolder)
         {
-            Response<AccountHolder> response = new Response<AccountHolder>();
+            Response<AccountHolder> Response = new Response<AccountHolder>();
 
             try
             {
@@ -42,28 +42,28 @@ namespace BankApplication.Services
 
                 if (accountHolderToUpdate != null)
                 {
-                    response.IsSuccess = true;
-                    response.Message = Constants.AccountUpdated;
-                    response.Data = accountHolderToUpdate;
+                    Response.IsSuccess = true;
+                    Response.Message = Constants.AccountUpdated;
+                    Response.Data = accountHolderToUpdate;
                 }
                 else
                 {
-                    response.IsSuccess = false;
-                    response.Message = Constants.AccountNotFound;
+                    Response.IsSuccess = false;
+                    Response.Message = Constants.AccountNotFound;
                 }
             }
             catch (Exception ex)
             {
-                response.IsSuccess = false;
-                response.Message = ex.Message;
+                Response.IsSuccess = false;
+                Response.Message = ex.Message;
             }
 
-            return response;
+            return Response;
         }
 
         public Response<string> Delete(string accountId)
         {
-            Response<string> response = new Response<string>();
+            Response<string> Response = new Response<string>();
 
             try
             {
@@ -72,99 +72,99 @@ namespace BankApplication.Services
                 if (accountHolderToDelete != null)
                 {
                     DataStorage.Accounts.Remove(accountHolderToDelete);
-                    response.IsSuccess = true;
-                    response.Message = Constants.AccountDeleted;
+                    Response.IsSuccess = true;
+                    Response.Message = Constants.AccountDeleted;
                 }
                 else
                 {
-                    response.IsSuccess = false;
-                    response.Message = Constants.AccountNotFound;
+                    Response.IsSuccess = false;
+                    Response.Message = Constants.AccountNotFound;
                 }
             }
             catch (Exception ex)
             {
-                response.IsSuccess = false;
-                response.Message = ex.Message;
+                Response.IsSuccess = false;
+                Response.Message = ex.Message;
             }
 
-            return response;
+            return Response;
         }
 
         public Response<string> ShowAllAccounts(Employee employee)
         {
-            Response<string> response = new Response<string>();
+            Response<string> Response = new Response<string>();
             StringBuilder sb = new StringBuilder();
 
             try
             {
                 if (employee == null)
                 {
-                    response.IsSuccess = false;
-                    response.Message = Constants.EmployeeFailure;
-                    return response;
+                    Response.IsSuccess = false;
+                    Response.Message = Constants.EmployeeFailure;
+                    return Response;
                 }
 
                 var accountsOfSelectedBank = DataStorage.Accounts.Where(a => a.BankId == employee.BankId).ToList();
                 if (accountsOfSelectedBank.Any())
                 {
                     EmployeeView.PrintAccountDetails(accountsOfSelectedBank);
-                    response.IsSuccess = true;
-                    response.Message = Constants.ShowAllAccounts;
+                    Response.IsSuccess = true;
+                    Response.Message = Constants.ShowAllAccounts;
                 }
                 else
                 {
-                    response.IsSuccess = false;
-                    response.Message = Constants.AccountNotFound;
+                    Response.IsSuccess = false;
+                    Response.Message = Constants.AccountNotFound;
                 }
             }
             catch (Exception ex)
             {
-                response.IsSuccess = false;
-                response.Message = ex.Message;
+                Response.IsSuccess = false;
+                Response.Message = ex.Message;
             }
 
-            return response;
+            return Response;
         }
 
         public static Response<string> AddAcceptedCurrency(string currencyCode, decimal exchangeRate, Employee loggedInEmployee)
         {
-            Response<string> response = new Response<string>();
+            Response<string> Response = new Response<string>();
 
             try
             {
                 if (Constants.acceptedCurrencies.ContainsKey(currencyCode))
                 {
-                    response.IsSuccess = false;
-                    response.Message = Constants.CurrencyExists;
-                    return response;
+                    Response.IsSuccess = false;
+                    Response.Message = Constants.CurrencyExists;
+                    return Response;
                 }
 
                 if (exchangeRate <= 0)
                 {
-                    response.IsSuccess = false;
-                    response.Message = Constants.InvalidRate;
-                    return response;
+                    Response.IsSuccess = false;
+                    Response.Message = Constants.InvalidRate;
+                    return Response;
                 }
                 else
                 {
                     Constants.acceptedCurrencies.Add(currencyCode, exchangeRate);
 
-                    response.IsSuccess = true;
-                    response.Message = Constants.NewCurrency;
+                    Response.IsSuccess = true;
+                    Response.Message = Constants.NewCurrency;
                 }
             }
             catch (Exception ex)
             {
-                response.IsSuccess = false;
-                response.Message = ex.Message;
+                Response.IsSuccess = false;
+                Response.Message = ex.Message;
             }
 
-            return response;
+            return Response;
         }
 
         public Response<string> AddServiceChargeForSameBankAccount(float rtgsCharge, float impsCharge, Employee loggedInEmployee)
         {
-            Response<string> response = new Response<string>();
+            Response<string> Response = new Response<string>();
 
             try
             {
@@ -172,33 +172,33 @@ namespace BankApplication.Services
 
                 if (selectedBank == null)
                 {
-                    response.IsSuccess = false;
-                    response.Message = Constants.BankNotFound;
-                    return response;
+                    Response.IsSuccess = false;
+                    Response.Message = Constants.BankNotFound;
+                    return Response;
                 }
 
-                response.Message = Constants.ServiceChargeForSameAccount;
+                Response.Message = Constants.ServiceChargeForSameAccount;
                 float previousRTGSCharge = selectedBank.RTGSforSameBank;
                 float previousIMPSCharge = selectedBank.IMPSforSameBank;
 
                 selectedBank.RTGSforSameBank = rtgsCharge;
                 selectedBank.IMPSforSameBank = impsCharge;
 
-                response.IsSuccess = true;
-                response.Message = Constants.ServiceChargesUpdated;
+                Response.IsSuccess = true;
+                Response.Message = Constants.ServiceChargesUpdated;
             }
             catch (Exception ex)
             {
-                response.IsSuccess = false;
-                response.Message = ex.Message;
+                Response.IsSuccess = false;
+                Response.Message = ex.Message;
             }
 
-            return response;
+            return Response;
         }
 
         public Response<string> AddServiceChargeForOtherBankAccount(float rtgsCharge, float impsCharge, Employee loggedInEmployee)
         {
-            Response<string> response = new Response<string>();
+            Response<string> Response = new Response<string>();
 
             try
             {
@@ -206,33 +206,33 @@ namespace BankApplication.Services
 
                 if (selectedBank == null)
                 {
-                    response.IsSuccess = false;
-                    response.Message = Constants.BankNotFound;
-                    return response;
+                    Response.IsSuccess = false;
+                    Response.Message = Constants.BankNotFound;
+                    return Response;
                 }
 
-                response.Message = Constants.ServiceChargeForOtherAccount;
+                Response.Message = Constants.ServiceChargeForOtherAccount;
                 float previousRTGSCharge = selectedBank.RTGSforOtherBank;
                 float previousIMPSCharge = selectedBank.IMPSforOtherBank;
 
                 selectedBank.RTGSforOtherBank = rtgsCharge;
                 selectedBank.IMPSforOtherBank = impsCharge;
 
-                response.IsSuccess = true;
-                response.Message = Constants.ServiceChargesUpdated;
+                Response.IsSuccess = true;
+                Response.Message = Constants.ServiceChargesUpdated;
             }
             catch (Exception ex)
             {
-                response.IsSuccess = false;
-                response.Message = ex.Message;
+                Response.IsSuccess = false;
+                Response.Message = ex.Message;
             }
 
-            return response;
+            return Response;
         }
 
         public Response<string> ViewAccountTransactionHistory(AccountHolder account)
         {
-            Response<string> response = new Response<string>();
+            Response<string> Response = new Response<string>();
             StringBuilder sb = new StringBuilder();
             try
             {
@@ -241,25 +241,25 @@ namespace BankApplication.Services
                     .Where(t => t.SrcAccount == account.AccountNumber || t.DstAccount == account.AccountNumber)
                     .ToList();
 
-                response.Message = string.Format(Constants.ViewTransactionHistory, account.AccountNumber);
-                response.Data = EmployeeView.GetTransactionHistoryString(transactions);
-                response.IsSuccess = true;
+                Response.Message = string.Format(Constants.ViewTransactionHistory, account.AccountNumber);
+                Response.Data = EmployeeView.GetTransactionHistoryString(transactions);
+                Response.IsSuccess = true;
 
-                sb.AppendLine(response.Data);
+                sb.AppendLine(Response.Data);
             }
             catch (Exception ex)
             {
-                response.IsSuccess = false;
-                response.Message = ex.Message;
-                response.Data = string.Empty;
+                Response.IsSuccess = false;
+                Response.Message = ex.Message;
+                Response.Data = string.Empty;
             }
 
-            return response;
+            return Response;
         }
 
         public Response<string> RevertTransaction(string transactionId)
         {
-            Response<string> response = new Response<string>();
+            Response<string> Response = new Response<string>();
 
             try
             {
@@ -273,39 +273,39 @@ namespace BankApplication.Services
                     {
                         if (account.Balance < transactionToRevert.Amount)
                         {
-                            response.IsSuccess = false;
-                            response.Message = Constants.TransactionFailure;
+                            Response.IsSuccess = false;
+                            Response.Message = Constants.TransactionFailure;
                         }
                         else
                         {
                             // Revert the transaction by adding the transaction amount back to the account balance
                             account.Balance += transactionToRevert.Amount;
-                            response.IsSuccess = true;
-                            response.Message = Constants.TransactionRevert;
+                            Response.IsSuccess = true;
+                            Response.Message = Constants.TransactionRevert;
                         }
                     }
                     else
                     {
                         // account was not found
-                        response.IsSuccess = false;
-                        response.Message = Constants.AccountNotFound;
+                        Response.IsSuccess = false;
+                        Response.Message = Constants.AccountNotFound;
                     }
                 }
                 else
                 {
                     // The transaction with the given ID was not found
-                    response.IsSuccess = false;
-                    response.Message = Constants.TransactionFailure;
+                    Response.IsSuccess = false;
+                    Response.Message = Constants.TransactionFailure;
                 }
             }
             catch (Exception ex)
             {
                 // An error occurred during the process
-                response.IsSuccess = false;
-                response.Message = ex.Message;
+                Response.IsSuccess = false;
+                Response.Message = ex.Message;
             }
 
-            return response;
+            return Response;
         }
 
         public static void LoginAsAccountHolder()
