@@ -96,50 +96,43 @@ namespace BankApplication.Views
 
         public static void AddAccountHolder()
         {
-            BankService BankService = new BankService();
-            AccountHolderService AccountHolderService = new AccountHolderService();
-            Console.Write("Enter Employee ID: ");
-            string employeeId = Console.ReadLine();
-            Employee Employee = BankService.GetEmployee(employeeId);
-
-            if (Employee == null)
+            BankService bankService = new BankService();
+            AccountHolderService accountHolderService = new AccountHolderService();
+            Employee employee = bankService.GetEmployee();
+            if (employee == null)
             {
                 Console.WriteLine("Employee not found");
                 return;
             }
-
             AccountHolder accountHolder = new AccountHolder()
             {
                 UserName = Utility.GetStringInput("Enter username", true),
                 Password = Utility.GetStringInput("Enter password", true),
                 Name = Utility.GetStringInput("Enter account holder name", true),
                 AccountType = Utility.GetStringInput("Enter account type", true),
-                CreatedBy = Employee.Designation,
+                CreatedBy = employee.Designation,
                 CreatedOn = DateTime.Now,
                 Type = Enums.UserType.AccountHolder
             };
-
-            Response<string> Response = AccountHolderService.Create(accountHolder, Employee);
-
-            if (Response.IsSuccess)
+            Response<string> response = accountHolderService.Create(accountHolder,employee);
+            if (response.IsSuccess)
             {
                 Console.WriteLine("Account holder added successfully.");
-                Console.WriteLine($"Account holder ID: {accountHolder.Id}\n" +
-                  $"Account holder Name: {accountHolder.Name}\n" +
-                  $"Account holder Username: {accountHolder.UserName}\n" +
-                  $"Account holder's Password: {accountHolder.Password}\n" +
-                  $"Account holder's Account Number: {accountHolder.AccountNumber}\n" +
-                  $"Account holder's Acc type: {accountHolder.AccountType}\n" +
-                  $"Created by: {accountHolder.CreatedBy}\n" +
-                  $"Created on: {accountHolder.CreatedOn}\n" +
-                  "----------------------------------------");
+                Console.WriteLine($"Account holder ID: {accountHolder.Id}");
+                Console.WriteLine($"Account holder Name: {accountHolder.Name}");
+                Console.WriteLine($"Account holder Username: {accountHolder.UserName}");
+                Console.WriteLine($"Account holder's Password: {accountHolder.Password}");
+                Console.WriteLine($"Account holder's Account Number: {accountHolder.AccountNumber}");
+                Console.WriteLine($"Account holder's Acc type: {accountHolder.AccountType}");
+                Console.WriteLine($"Created by: {accountHolder.CreatedBy}");
+                Console.WriteLine($"Created on: {accountHolder.CreatedOn}");
+                Console.WriteLine("----------------------------------------");
             }
             else
             {
-                Console.WriteLine(Response.Message);
+                Console.WriteLine(response.Message);
             }
         }
-
         public static void UpdateAccountHolder(AccountHolder accountHolder)
         {
             AccountHolderService AccountHolderService = new AccountHolderService();
