@@ -15,7 +15,9 @@ namespace BankApplication.Views
             do
             {
                 BankService BankService = new BankService();
+                // you already have it outside
                 Employee loggedInEmployee = BankService.GetEmployee();
+
                 Utility.GenerateOptions(Constants.BankStaffOption);
                 option = (BankStaffOption)Convert.ToInt32(Console.ReadLine());
                 BankView BankView = new BankView();
@@ -52,7 +54,7 @@ namespace BankApplication.Views
                         {
                             Console.WriteLine("Invalid exchange rate. Please enter a valid decimal number.");
                         }
-                        Response<string> response = AccountHolderService.AddAcceptedCurrency(currencyCode, exchangeRate, loggedInEmployee);
+                        Response<string> response = AccountHolderService.AddAcceptedCurrency(currencyCode, exchangeRate);
                         break;
 
                     case BankStaffOption.UpdateServiceChargesForSameBank:

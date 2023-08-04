@@ -3,7 +3,6 @@ using BankApplication.Models;
 using BankApplication.Views;
 using System;
 using System.Linq;
-using System.Text;
 using static BankApplication.Common.Enums;
 
 namespace BankApplication.Services
@@ -262,11 +261,9 @@ namespace BankApplication.Services
             return Response;
         }
 
-        public Employee GetEmployee()
+        public Employee GetEmployee(string employeeId = "")
         {
-            return DataStorage.Employees.FirstOrDefault(emp => emp.Type == Enums.UserType.Employee);
+            return DataStorage.Employees.FirstOrDefault(emp => emp.Type == Enums.UserType.Employee && emp.Id == employeeId);
         }
-
-       
     }
 }

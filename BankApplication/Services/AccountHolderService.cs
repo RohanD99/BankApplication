@@ -126,9 +126,9 @@ namespace BankApplication.Services
             return Response;
         }
 
-        public static Response<string> AddAcceptedCurrency(string currencyCode, decimal exchangeRate, Employee loggedInEmployee)
+        public static Response<string> AddAcceptedCurrency(string currencyCode, decimal exchangeRate)
         {
-            Response<string> Response = new Response<string>();
+            var Response = new Response<string>();
 
             try
             {
@@ -169,7 +169,6 @@ namespace BankApplication.Services
             try
             {
                 Bank selectedBank = DataStorage.Banks.FirstOrDefault(b => b.Id == loggedInEmployee.BankId);
-
                 if (selectedBank == null)
                 {
                     Response.IsSuccess = false;
@@ -307,8 +306,6 @@ namespace BankApplication.Services
 
             return Response;
         }
-
-      
 
         public AccountHolder GetAccountHolderById(string accountId)
         {
