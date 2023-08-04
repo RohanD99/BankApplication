@@ -21,6 +21,9 @@ namespace BankApplication.Views
                 switch (option)
                 {
                     case UserAccountOption.Deposit:
+                        Console.Write("Enter your account ID: ");
+                        string accountHolderID = Console.ReadLine();
+
                         Console.Write("Enter the amount to deposit: ");
                         string depositAmountInput = Console.ReadLine();
                         if (!decimal.TryParse(depositAmountInput, out decimal depositAmount))
@@ -28,8 +31,7 @@ namespace BankApplication.Views
                             Console.WriteLine("Invalid amount. Please enter a valid decimal value.");
                             break;
                         }
-
-                        Response<string> depositResponse = BankService.Deposit(loggedInAccount, depositAmount);
+                        Response<string> depositResponse = BankService.Deposit(accountHolderID, depositAmount);
                         Console.WriteLine(depositResponse.Message);
                         break;
 
@@ -45,14 +47,15 @@ namespace BankApplication.Views
                         break;
 
                     case UserAccountOption.CheckBalance:
-                        Response<string> BalanceResponse = BankService.CheckBalance(loggedInAccount);
-                        Console.WriteLine($"Your account balance: {BalanceResponse.Data}");
+                        Response<string> balanceResponse = BankService.CheckBalance(loggedInAccount);
+                        Console.WriteLine($"Your account balance: {balanceResponse.Data}");
                         break;
 
                     case UserAccountOption.Transactions:
-                        Response<string> TransactionHistoryResponse = BankService.ViewTransactionHistory(loggedInAccount);
-                        Console.WriteLine(TransactionHistoryResponse.Message);
-                        Console.WriteLine(TransactionHistoryResponse.Data);
+                        TransactionService transactionService = new TransactionService();
+                        Response<string> transactionHistoryResponse = transactionService.ViewTransactionHistory(loggedInAccount);
+                        Console.WriteLine(transactionHistoryResponse.Message);
+                        Console.WriteLine(transactionHistoryResponse.Data);
                         break;
 
                     case UserAccountOption.Logout:
@@ -115,7 +118,6 @@ namespace BankApplication.Views
 
         public void TransferFunds(AccountHolder loggedInAccount)
         {
-            BankService BankService = new BankService();
             StringBuilder sb = new StringBuilder();
 
             Utility.GetStringInput("Enter the destination account number: ", true);

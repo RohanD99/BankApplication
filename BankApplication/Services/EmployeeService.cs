@@ -9,58 +9,58 @@ namespace BankApplication.Services
     {            
         public Response<string> Create(Employee employee)
         {
-            Response<string> Response = new Response<string>();
+            Response<string> response = new Response<string>();
             try
             {
                 employee.Id = Utility.GenerateEmployeeID();
                 DataStorage.Employees.Add(employee);
-                Response.IsSuccess = true;
-                Response.Message = Constants.EmployeeSuccess;
-                Response.Data = employee.Id;
+                response.IsSuccess = true;
+                response.Message = Constants.EmployeeSuccess;
+                response.Data = employee.Id;
             }
             catch
             {
-                Response.IsSuccess = false;
-                Response.Message = Constants.EmployeeFailure;
+                response.IsSuccess = false;
+                response.Message = Constants.EmployeeFailure;
             }
-            return Response;
+            return response;
         }
      
         public Response<string> ShowAccountTransactionHistory(string accountNumber)
         {
-            AccountHolderService AccountHolderService = new AccountHolderService();
-            Response<string> Response = new Response<string>();
+            TransactionService transactionService = new TransactionService();
+            Response<string> response = new Response<string>();
             try
             {
                 AccountHolder accountToShowTransactions = DataStorage.Accounts.FirstOrDefault(a => a.AccountNumber == accountNumber);
                 if (accountToShowTransactions != null)
                 {
-                    Response<string> historyResponse = AccountHolderService.ViewAccountTransactionHistory(accountToShowTransactions);
+                    Response<string> historyResponse = transactionService.ViewAccountTransactionHistory(accountToShowTransactions);
                     if (historyResponse.IsSuccess)
                     {
-                        Response.IsSuccess = true;
-                        Response.Message = Constants.TransactionSuccess;
-                        Response.Data = historyResponse.Data;
+                        response.IsSuccess = true;
+                        response.Message = Constants.TransactionSuccess;
+                        response.Data = historyResponse.Data;
                     }
                     else
                     {
-                        Response.IsSuccess = false;
-                        Response.Message = historyResponse.Message;
+                        response.IsSuccess = false;
+                        response.Message = historyResponse.Message;
                     }
                 }
                 else
                 {
-                    Response.IsSuccess = false;
-                    Response.Message = Constants.AccountNotFound;
+                    response.IsSuccess = false;
+                    response.Message = Constants.AccountNotFound;
                 }
             }
             catch (Exception ex)
             {
-                Response.IsSuccess = false;
-                Response.Message = ex.Message;
+                response.IsSuccess = false;
+                response.Message = ex.Message;
             }
 
-            return Response;
+            return response;
         }
 
         public static Employee GetEmployeeByUsernameAndPassword(string username, string password)

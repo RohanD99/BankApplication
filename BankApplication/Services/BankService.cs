@@ -1,6 +1,5 @@
 ﻿using BankApplication.Common;
 using BankApplication.Models;
-using BankApplication.Views;
 using System;
 using System.Linq;
 using static BankApplication.Common.Enums;
@@ -11,7 +10,7 @@ namespace BankApplication.Services
     {
         public Response<string> CreateBank(Bank bank)
         {
-            Response<string> Response = new Response<string>();
+            Response<string> response = new Response<string>();
             try
             {
                 bank.Id = Utility.GenerateBankId(bank.Name);
@@ -19,246 +18,174 @@ namespace BankApplication.Services
                 bank.ModifiedOn = DateTime.Now;
                 DataStorage.Banks.Add(bank);
 
-                Response.IsSuccess = true;
-                Response.Message = Constants.BankCreation;
-                Response.Data = bank.Id;
+                response.IsSuccess = true;
+                response.Message = Constants.BankCreation;
+                response.Data = bank.Id;
             }
             catch
             {
-                Response.IsSuccess = false;
-                Response.Message = Constants.BankFailure;
+                response.IsSuccess = false;
+                response.Message = Constants.BankFailure;
             }
 
-            return Response;
+            return response;
         }
-      
-        public Response<string> Deposit(AccountHolder account, decimal amount)
+
+        public Response<string> Deposit(string accountHolderID, decimal amount)
         {
-            Response<string> Response = new Response<string>();
+            TransactionService transactionService = new TransactionService();
+            Response<string> response = new Response<string>();
 
             try
             {
-                if (amount <= 0)
+                AccountHolder accountHolder = DataStorage.Accounts.Find(account => account.Id == accountHolderID);
+                if (accountHolder != null)
                 {
-                    Response.IsSuccess = false;
-                    Response.Message = Constants.InvalidAmount;
-                    return Response;
+                    response = transactionService.PerformDepositTransaction(accountHolder, amount);
                 }
-
-                account.Balance += amount;
-
-                string transactionId = Utility.GenerateTransactionId(account.Id, account.AccountNumber);
-
-                Transaction transaction = new Transaction
+                else
                 {
-                    Id = transactionId,
-                    SrcAccount = account.AccountNumber,
-                    Type = Constants.Deposited,
-                    Amount = amount,
-                    CreatedBy = account.CreatedBy,
-                    CreatedOn = DateTime.Now
-                };
-
-                DataStorage.Transactions.Add(transaction);
-
-                Response.IsSuccess = true;
-                Response.Message = Constants.DepositSuccess;
-                Response.Data = account.Balance.ToString();
+                    response.IsSuccess = false;
+                    response.Message = Constants.AccountNotFound;
+                }
             }
             catch (Exception ex)
             {
-                Response.IsSuccess = false;
-                Response.Message = ex.Message;
+                response.IsSuccess = false;
+                response.Message = ex.Message;
             }
 
-            return Response;
+            return response;
         }
+
 
         public Response<string> Withdraw(AccountHolder account, decimal amount)
         {
-            Response<string> Response = new Response<string>();
+            TransactionService transactionService = new TransactionService();
+            Response<string> response = new Response<string>();
 
             try
             {
-                if (amount <= 0)
-                {
-                    Response.IsSuccess = false;
-                    Response.Message = Constants.InvalidAmount;
-                    return Response;
-                }
-
-                if (amount > account.Balance)
-                {
-                    Response.IsSuccess = false;
-                    Response.Message = Constants.InsufficientFunds;
-                    return Response;
-                }
-
-                account.Balance -= amount;
-                string transactionId = Utility.GenerateTransactionId(account.Id, account.AccountNumber);
-
-                Transaction transaction = new Transaction
-                {
-                    Id = transactionId,
-                    SrcAccount = account.AccountNumber,
-                    DstAccount = account.AccountNumber,
-                    Type = Constants.Withdrawal,
-                    Amount = -amount,
-                    CreatedBy = account.Name,
-                    CreatedOn = DateTime.Now
-                };
-
-                DataStorage.Transactions.Add(transaction);
-
-                Response.IsSuccess = true;
-                Response.Message = Constants.WithdrawalSuccess;
-                Response.Data = account.Balance.ToString();
+                response = transactionService.PerformWithdrawTransaction(account, amount);
             }
             catch (Exception ex)
             {
-                Response.IsSuccess = false;
-                Response.Message = ex.Message;
+                response.IsSuccess = false;
+                response.Message = ex.Message;
             }
 
-            return Response;
+            return response;
         }
 
         public Response<string> TransferFunds(AccountHolder sourceAccount, string destinationAccountNumber, decimal amount, TransferOptions transferType)
         {
-            Response<string> Response = new Response<string>();
+            TransactionService transactionService = new TransactionService();
+            Response<string> response = new Response<string>();
 
             try
             {
-                AccountHolder destinationAccount = DataStorage.Accounts.FirstOrDefault(a => a.AccountNumber == destinationAccountNumber);
-                if (destinationAccount == null)
-                {
-                    Response.IsSuccess = false;
-                    Response.Message = Constants.AccountNotFound;
-                    return Response;
-                }
-
-                decimal charge = 0;
-
-                if (transferType == TransferOptions.IMPS)
-                {
-                    charge = 0.08m;
-                }
-                else if (transferType == TransferOptions.RTGS)
-                {
-                    charge = 0.05m;
-                }
-                else
-                {
-                    Response.IsSuccess = false;
-                    Response.Message = Constants.InvalidType;
-                    return Response;
-                }
-
-                decimal transferAmount = amount + (amount * charge);
-                if (transferAmount <= 0)
-                {
-                    Response.IsSuccess = false;
-                    Response.Message = Constants.InvalidAmount;
-                    return Response;
-                }
-
-                if (transferAmount > sourceAccount.Balance)
-                {
-                    Response.IsSuccess = false;
-                    Response.Message = Constants.InsufficientFunds;
-                    return Response;
-                }
-
-                sourceAccount.Balance -= transferAmount;
-                destinationAccount.Balance += amount;
-
-                // Create and store source transaction
-                Transaction sourceTransaction = new Transaction
-                {
-                    Id = Utility.GenerateTransactionId(sourceAccount.Id, sourceAccount.AccountNumber),
-                    SrcAccount = sourceAccount.AccountNumber,
-                    DstAccount = destinationAccountNumber,
-                    Type = Constants.TransferFunds,
-                    Amount = -transferAmount,
-                    CreatedBy = sourceAccount.Name,
-                    CreatedOn = DateTime.Now
-                };
-
-                // Create and store destination transaction
-                Transaction destinationTransaction = new Transaction
-                {
-                    Id = Utility.GenerateTransactionId(destinationAccount.Id, destinationAccountNumber),
-                    SrcAccount = sourceAccount.AccountNumber,
-                    DstAccount = destinationAccountNumber,
-                    Type = Constants.TransferFunds,
-                    Amount = amount,
-                    CreatedBy = destinationAccount.Name,
-                    CreatedOn = DateTime.Now
-                };
-
-                DataStorage.Transactions.Add(sourceTransaction);
-                DataStorage.Transactions.Add(destinationTransaction);
-
-                Response.IsSuccess = true;
-                Response.Message = Constants.TransferFundsSuccess;
+                response = transactionService.PerformTransferFundsTransaction(sourceAccount, destinationAccountNumber, amount, transferType);
             }
             catch (Exception ex)
             {
-                Response.IsSuccess = false;
-                Response.Message = ex.Message;
+                response.IsSuccess = false;
+                response.Message = ex.Message;
             }
 
-            return Response;
+            return response;
         }
-    
+
         public Response<string> CheckBalance(AccountHolder account)
         {
-            Response<string> Response = new Response<string>();
+            Response<string> response = new Response<string>();
 
             try
             {
-                Response.IsSuccess = true;
-                Response.Data = account.Balance.ToString();
+                response.IsSuccess = true;
+                response.Data = account.Balance.ToString();
             }
             catch (Exception ex)
             {
-                Response.IsSuccess = false;
-                Response.Message = ex.Message;
+                response.IsSuccess = false;
+                response.Message = ex.Message;
             }
 
-            return Response;
+            return response;
         }
 
-        public Response<string> ViewTransactionHistory(AccountHolder account)
+        public static Response<string> AddAcceptedCurrency(string currencyCode, decimal exchangeRate)
         {
-            Response<string> Response = new Response<string>();
+            Response<string> response = new Response<string>();
 
             try
             {
-                var transactions = DataStorage.Transactions
-                    .Where(t => t.SrcAccount == account.AccountNumber || t.DstAccount == account.AccountNumber)
-                    .ToList();
-
-                if (transactions.Any())
+                if (Constants.acceptedCurrencies.ContainsKey(currencyCode))
                 {
-                    EmployeeView.PrintTransactionDetails(transactions);
-                    Response.IsSuccess = true;
-                    Response.Message = Constants.TransactionSuccess;
+                    response.IsSuccess = false;
+                    response.Message = Constants.CurrencyExists;
+                    return response;
+                }
+
+                if (exchangeRate <= 0)
+                {
+                    response.IsSuccess = false;
+                    response.Message = Constants.InvalidRate;
+                    return response;
                 }
                 else
                 {
-                    Response.IsSuccess = false;
-                    Response.Message = Constants.TransactionFailure;
-                    Response.Data = string.Empty;
+                    Constants.acceptedCurrencies.Add(currencyCode, exchangeRate);
+
+                    response.IsSuccess = true;
+                    response.Message = Constants.NewCurrency;
                 }
             }
             catch (Exception ex)
             {
-                Response.IsSuccess = false;
-                Response.Message = ex.Message;
+                response.IsSuccess = false;
+                response.Message = ex.Message;
             }
 
-            return Response;
+            return response;
+        }
+
+        public Response<string> UpdateServiceCharges(float rtgsCharge, float impsCharge, string bankID, bool isSameBankAccount)
+        {
+            Response<string> response = new Response<string>();
+
+            try
+            {
+                Bank bank = DataStorage.Banks.FirstOrDefault(b => b.Id == bankID);
+                if (bank == null)
+                {
+                    response.IsSuccess = false;
+                    response.Message = Constants.BankNotFound;
+                    return response;
+                }
+
+                if (isSameBankAccount)
+                {
+                    response.Message = Constants.ServiceChargeForSameAccount;
+                    bank.RTGSforSameBank = rtgsCharge;
+                    bank.IMPSforSameBank = impsCharge;
+                }
+                else
+                {
+                    response.Message = Constants.ServiceChargeForOtherAccount;
+                    bank.RTGSforOtherBank = rtgsCharge;
+                    bank.IMPSforOtherBank = impsCharge;
+                }
+
+                response.IsSuccess = true;
+                response.Message = Constants.ServiceChargesUpdated;
+            }
+            catch (Exception ex)
+            {
+                response.IsSuccess = false;
+                response.Message = ex.Message;
+            }
+
+            return response;
         }
 
         public Employee GetEmployee(string employeeId = "")

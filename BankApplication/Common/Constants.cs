@@ -51,7 +51,7 @@ namespace BankApplication.Common
 
         public static string AccountDeleted = "Account deleted";
 
-        public static string AccountUpdated = "Account updated successfully";
+        public static string AccountHolderUpdateSuccess = "Account updated successfully";
 
         public static string AccountUpdateFailure = "Account not updated.";
 

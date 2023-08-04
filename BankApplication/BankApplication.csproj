@@ -58,6 +58,7 @@
     <Compile Include="Services\AccountHolderService.cs" />
     <Compile Include="Services\BankService.cs" />
     <Compile Include="Services\EmployeeService.cs" />
+    <Compile Include="Services\TransactionService.cs" />
     <Compile Include="Views\AccountHolderView.cs" />
     <Compile Include="Views\BankView.cs" />
     <Compile Include="Views\EmployeeView.cs" />

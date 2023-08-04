@@ -2,6 +2,7 @@
 using BankApplication.Models;
 using BankApplication.Services;
 using System;
+using System.Collections.Generic;
 using static BankApplication.Common.Enums;
 
 namespace BankApplication.Views
@@ -9,6 +10,7 @@ namespace BankApplication.Views
     internal class AccountHolderView
     {
         static AccountHolderService AccountHolderService = new AccountHolderService();
+
         public static void BankStaffMenu()
         {
             BankStaffOption option;
@@ -37,10 +39,30 @@ namespace BankApplication.Views
 
                     case BankStaffOption.ShowAllAccountHolders:
                         Employee employee = BankService.GetEmployee();
-                        Response<string> showAllResponse = AccountHolderService.ShowAllAccounts(employee);
-                        Console.WriteLine(showAllResponse.Message);
-                        Console.WriteLine(showAllResponse.Data);
+                        Response<List<AccountHolder>> showAllResponse = AccountHolderService.ShowAllAccounts(employee.BankId);
+
+                        if (showAllResponse.IsSuccess)
+                        {
+                            Console.WriteLine(showAllResponse.Message);
+                            foreach (AccountHolder accountHolder in showAllResponse.Data)
+                            {
+                                Console.WriteLine($"Account holder ID: {accountHolder.Id}\n" +
+                                                  $"Account holder Name: {accountHolder.Name}\n" +
+                                                  $"Account holder Username: {accountHolder.UserName}\n" +
+                                                  $"Account holder's Password: {accountHolder.Password}\n" +
+                                                  $"Account holder's Account Number: {accountHolder.AccountNumber}\n" +
+                                                  $"Account holder's Acc type: {accountHolder.AccountType}\n" +
+                                                  $"Created by: {employee.CreatedBy}\n" +
+                                                  $"Created on: {accountHolder.CreatedOn}\n" +
+                                                  "----------------------------------------");
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine(showAllResponse.Message);
+                        }
                         break;
+
 
                     case BankStaffOption.AddCurrency:
                         Utility.GetStringInput("Enter Currency Code: ", true);
@@ -51,23 +73,27 @@ namespace BankApplication.Views
                         {
                             Console.WriteLine("Invalid exchange rate. Please enter a valid decimal number.");
                         }
-                        Response<string> response = AccountHolderService.AddAcceptedCurrency(currencyCode, exchangeRate);
+                        Response<string> response = BankService.AddAcceptedCurrency(currencyCode, exchangeRate);
                         break;
 
                     case BankStaffOption.UpdateServiceChargesForSameBank:
+                        string bankIdForSameBank = Utility.GetStringInput("Enter Bank ID: ", true);
                         Utility.GetStringInput("Enter RTGS Charge for Same Bank: ", true);
                         float rtgsChargeSameBank = Convert.ToSingle(Console.ReadLine());
                         Utility.GetStringInput("Enter IMPS Charge for Same Bank: ", true);
                         float impsChargeSameBank = Convert.ToSingle(Console.ReadLine());
-                        Response<string> updateSameBankChargeResponse = AccountHolderService.AddServiceChargeForSameBankAccount(rtgsChargeSameBank, impsChargeSameBank, loggedInEmployee);
+                        Response<string> updateSameBankChargeResponse = BankService.UpdateServiceCharges(rtgsChargeSameBank, impsChargeSameBank, bankIdForSameBank, true);
+                        Console.WriteLine(updateSameBankChargeResponse.Message);
                         break;
 
                     case BankStaffOption.UpdateServiceChargesForOtherBank:
+                        string bankIdForOtherBank = Utility.GetStringInput("Enter Bank ID: ", true);
                         Utility.GetStringInput("Enter RTGS Charge for Other Bank: ", true);
                         float rtgsChargeOtherBank = Convert.ToSingle(Console.ReadLine());
                         Utility.GetStringInput("Enter IMPS Charge for Other Bank: ", true);
                         float impsChargeOtherBank = Convert.ToSingle(Console.ReadLine());
-                        Response<string> updateOtherBankChargeResponse = AccountHolderService.AddServiceChargeForOtherBankAccount(rtgsChargeOtherBank, impsChargeOtherBank, loggedInEmployee);
+                        Response<string> updateOtherBankChargeResponse = BankService.UpdateServiceCharges(rtgsChargeOtherBank, impsChargeOtherBank, bankIdForOtherBank, false);
+                        Console.WriteLine(updateOtherBankChargeResponse.Message);
                         break;
 
                     case BankStaffOption.ShowAccountHolderTransactions:
@@ -78,9 +104,10 @@ namespace BankApplication.Views
                         break;
 
                     case BankStaffOption.RevertTransaction:
+                        TransactionService transactionService = new TransactionService();   
                         Utility.GetStringInput("Enter Transaction ID to revert: ", true);
                         string transactionIDToRevert = Console.ReadLine();
-                        Response<string> revertResponse = AccountHolderService.RevertTransaction(transactionIDToRevert);
+                        Response<string> revertResponse = transactionService.RevertTransaction(transactionIDToRevert);
                         Console.WriteLine(revertResponse.Message);
                         break;
 
@@ -129,6 +156,7 @@ namespace BankApplication.Views
                 Console.WriteLine(response.Message);
             }
         }
+
         public static void UpdateAccountHolder(AccountHolder accountHolder)
         {
             AccountHolderService AccountHolderService = new AccountHolderService();
