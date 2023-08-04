@@ -93,8 +93,6 @@ namespace BankApplication.Services
         public Response<string> ShowAllAccounts(Employee employee)
         {
             Response<string> Response = new Response<string>();
-            StringBuilder sb = new StringBuilder();
-
             try
             {
                 if (employee == null)
