@@ -99,11 +99,7 @@ namespace BankApplication.Views
             BankService bankService = new BankService();
             AccountHolderService accountHolderService = new AccountHolderService();
             Employee employee = bankService.GetEmployee();
-            if (employee == null)
-            {
-                Console.WriteLine("Employee not found");
-                return;
-            }
+
             AccountHolder accountHolder = new AccountHolder()
             {
                 UserName = Utility.GetStringInput("Enter username", true),
