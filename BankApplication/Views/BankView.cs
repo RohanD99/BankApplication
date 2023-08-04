@@ -65,9 +65,6 @@ namespace BankApplication.Views
                     RTGSforOtherBank = 2,
                     RTGSforSameBank = 0
                 };
-
-                // Instead of adding directly do a validation check
-                // Fluent validation
                 var response = BankService.CreateBank(Bank);
                 Console.WriteLine(response.Message);
 
@@ -146,102 +143,6 @@ namespace BankApplication.Views
                 Console.WriteLine(ex.Message);
             }
         }
-
-        public void AddAccountHolder()
-        {
-            BankService BankService = new BankService();
-            AccountHolderService AccountHolderService = new AccountHolderService();
-            Console.Write("Enter Employee ID: ");
-            string employeeId = Console.ReadLine();
-            Employee Employee = BankService.GetEmployee(employeeId);
-
-            if (Employee == null)
-            {
-                Console.WriteLine("Employee not found");
-                return;
-            }
-
-            AccountHolder accountHolder = new AccountHolder()
-            {
-                UserName = Utility.GetStringInput("Enter username", true),
-                Password = Utility.GetStringInput("Enter password", true),
-                Name = Utility.GetStringInput("Enter account holder name", true),
-                AccountType = Utility.GetStringInput("Enter account type", true),
-                CreatedBy = Employee.Designation,
-                CreatedOn = DateTime.Now,
-                Type = Enums.UserType.AccountHolder
-            };
-
-            Response<string> Response = AccountHolderService.Create(accountHolder, Employee);
-
-            if (Response.IsSuccess)
-            {
-                Console.WriteLine("Account holder added successfully.");
-                Console.WriteLine($"Account holder ID: {accountHolder.Id}\n" +
-                  $"Account holder Name: {accountHolder.Name}\n" +
-                  $"Account holder Username: {accountHolder.UserName}\n" +
-                  $"Account holder's Password: {accountHolder.Password}\n" +
-                  $"Account holder's Account Number: {accountHolder.AccountNumber}\n" +
-                  $"Account holder's Acc type: {accountHolder.AccountType}\n" +
-                  $"Created by: {accountHolder.CreatedBy}\n" +
-                  $"Created on: {accountHolder.CreatedOn}\n" +
-                  "----------------------------------------");
-            }
-            else
-            {
-                Console.WriteLine(Response.Message);
-            }
-        }
-
-        public void UpdateAccountHolder(AccountHolder accountHolder)
-        {
-            AccountHolderService AccountHolderService = new AccountHolderService();
-
-            if (accountHolder != null)
-            {
-                Console.WriteLine("Please enter the updated details:");
-                accountHolder.UserName = Utility.GetStringInput(Constants.Username, false, accountHolder.UserName);
-                accountHolder.Password = Utility.GetStringInput(Constants.Password, false, accountHolder.Password);
-                accountHolder.Name = Utility.GetStringInput(Constants.AccountHolderName, false, accountHolder.Name);
-                accountHolder.AccountType = Utility.GetStringInput(Constants.AccountType, false, accountHolder.AccountType);
-
-                Response<AccountHolder> updateResponse = AccountHolderService.Update(accountHolder);
-
-                if (updateResponse.IsSuccess)
-                {
-                    Console.WriteLine(updateResponse.Message);
-                }
-                else
-                {
-                    Console.WriteLine(updateResponse.Message);
-                }
-            }
-            else
-            {
-                Console.WriteLine(Constants.AccountUpdateFailure);
-            }
-        }
-
-        public void DeleteAccountHolder()
-        {
-            Utility.GetStringInput("Enter Account ID to delete account holder: ", true);
-            string accountToDelete = Console.ReadLine();
-            AccountHolderService AccountHolderService = new AccountHolderService();
-
-            Response<string> DeleteResponse = AccountHolderService.Delete(accountToDelete);
-
-            if (DeleteResponse.IsSuccess)
-            {
-                Console.WriteLine(DeleteResponse.Message);
-            }
-            else
-            {
-                Console.WriteLine(DeleteResponse.Message);
-            }
-        }
-
-
-
         public static void LoginAsBankStaff()
         {
             string username = Utility.GetStringInput("Username", true);
