@@ -10,24 +10,16 @@ namespace BankApplication.Services
 {
     internal class TransactionService
     {
+        private Transaction transaction;
         public Response<string> PerformDepositTransaction(AccountHolder accountHolder, decimal amount)
         {
             Response<string> response = new Response<string>();
 
             try
             {
-                if (amount <= 0)
-                {
-                    response.IsSuccess = false;
-                    response.Message = Constants.InvalidAmount;
-                    return response;
-                }
-
-                accountHolder.Balance += amount;
-
                 string transactionId = Utility.GenerateTransactionId(accountHolder.Id, accountHolder.AccountNumber);
 
-                Transaction transaction = new Transaction
+                transaction = new Transaction
                 {
                     Id = transactionId,
                     SrcAccount = accountHolder.AccountNumber,
@@ -57,25 +49,10 @@ namespace BankApplication.Services
             Response<string> response = new Response<string>();
 
             try
-            {
-                if (amount <= 0)
-                {
-                    response.IsSuccess = false;
-                    response.Message = Constants.InvalidAmount;
-                    return response;
-                }
-
-                if (amount > account.Balance)
-                {
-                    response.IsSuccess = false;
-                    response.Message = Constants.InsufficientFunds;
-                    return response;
-                }
-
-                account.Balance -= amount;
+            {               
                 string transactionId = Utility.GenerateTransactionId(account.Id, account.AccountNumber);
 
-                Transaction transaction = new Transaction
+                transaction = new Transaction
                 {
                     Id = transactionId,
                     SrcAccount = account.AccountNumber,
@@ -104,52 +81,11 @@ namespace BankApplication.Services
         public Response<string> PerformTransferFundsTransaction(AccountHolder sourceAccount, string destinationAccountNumber, decimal amount, TransferOptions transferType)
         {
             Response<string> response = new Response<string>();
-
             try
             {
-                AccountHolder destinationAccount = DataStorage.Accounts.FirstOrDefault(a => a.AccountNumber == destinationAccountNumber);
-                if (destinationAccount == null)
-                {
-                    response.IsSuccess = false;
-                    response.Message = Constants.AccountNotFound;
-                    return response;
-                }
-
+                AccountHolder destinationAccount = DataStorage.AccountHolders.FirstOrDefault(a => a.AccountNumber == destinationAccountNumber);
                 decimal charge = 0;
-
-                if (transferType == TransferOptions.IMPS)
-                {
-                    charge = 0.08m;
-                }
-                else if (transferType == TransferOptions.RTGS)
-                {
-                    charge = 0.05m;
-                }
-                else
-                {
-                    response.IsSuccess = false;
-                    response.Message = Constants.InvalidType;
-                    return response;
-                }
-
                 decimal transferAmount = amount + (amount * charge);
-                if (transferAmount <= 0)
-                {
-                    response.IsSuccess = false;
-                    response.Message = Constants.InvalidAmount;
-                    return response;
-                }
-
-                if (transferAmount > sourceAccount.Balance)
-                {
-                    response.IsSuccess = false;
-                    response.Message = Constants.InsufficientFunds;
-                    return response;
-                }
-
-                sourceAccount.Balance -= transferAmount;
-                destinationAccount.Balance += amount;
-
                 // Create and store source transaction
                 Transaction sourceTransaction = new Transaction
                 {
@@ -188,6 +124,7 @@ namespace BankApplication.Services
 
             return response;
         }
+
         public Response<string> ViewAccountTransactionHistory(AccountHolder account)
         {
             Response<string> response = new Response<string>();
@@ -221,11 +158,11 @@ namespace BankApplication.Services
 
             try
             {
-                Transaction transactionToRevert = DataStorage.Transactions.FirstOrDefault(t => t.Id == transactionId);
+                Transaction transactionToRevert = DataStorage.Transactions.Find(t => t.Id == transactionId);
 
                 if (transactionToRevert != null)
                 {
-                    AccountHolder account = DataStorage.Accounts.FirstOrDefault(a => a.AccountNumber == transactionToRevert.SrcAccount);
+                    AccountHolder account = DataStorage.AccountHolders.Find(a => a.AccountNumber == transactionToRevert.SrcAccount);
 
                     if (account != null)
                     {
@@ -244,14 +181,14 @@ namespace BankApplication.Services
                     }
                     else
                     {
-                        // account was not found
+                        //account was not found
                         response.IsSuccess = false;
                         response.Message = Constants.AccountNotFound;
                     }
                 }
                 else
                 {
-                    // The transaction with the given ID was not found
+                    //The transaction with the given ID was not found
                     response.IsSuccess = false;
                     response.Message = Constants.TransactionFailure;
                 }
@@ -266,8 +203,46 @@ namespace BankApplication.Services
             return response;
         }
 
-        public Response<string> ViewTransactionHistory(AccountHolder account)
+        public Response<string> ShowAccountTransactionHistory(string accountNumber)
         {
+            TransactionService transactionService = new TransactionService();
+            Response<string> response = new Response<string>();
+            try
+            {
+                AccountHolder accountToShowTransactions = DataStorage.AccountHolders.Find(a => a.AccountNumber == accountNumber);
+                if (accountToShowTransactions != null)
+                {
+                    Response<string> historyResponse = transactionService.ViewAccountTransactionHistory(accountToShowTransactions);
+                    if (historyResponse.IsSuccess)
+                    {
+                        response.IsSuccess = true;
+                        response.Message = Constants.TransactionSuccess;
+                        response.Data = historyResponse.Data;
+                    }
+                    else
+                    {
+                        response.IsSuccess = false;
+                        response.Message = historyResponse.Message;
+                    }
+                }
+                else
+                {
+                    response.IsSuccess = false;
+                    response.Message = Constants.AccountNotFound;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.IsSuccess = false;
+                response.Message = ex.Message;
+            }
+
+            return response;
+        }
+    
+
+         public Response<string> ViewTransactionHistory(AccountHolder account)
+         {
             Response<string> response = new Response<string>();
 
             try
@@ -296,6 +271,6 @@ namespace BankApplication.Services
             }
 
             return response;
-        }
+         }
     }
 }

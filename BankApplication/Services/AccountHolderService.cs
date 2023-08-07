@@ -14,13 +14,13 @@ namespace BankApplication.Services
             try
             {
                 accountHolder.Id = Utility.GenerateAccountId(accountHolder.Name);
-                accountHolder.AccountNumber = Utility.GenerateAccountNumber(accountHolder.Name);
+                accountHolder.AccountNumber = Utility.GenerateAccountNumber();
                 accountHolder.BankId = employee.BankId;
 
-                DataStorage.Accounts.Add(accountHolder);
+                DataStorage.AccountHolders.Add(accountHolder);
 
                 response.IsSuccess = true;
-                response.Message = Constants.AccountSuccess;
+                response.Message = Constants.AccountCreationSuccess;
             }
             catch (Exception ex)
             {
@@ -45,6 +45,12 @@ namespace BankApplication.Services
                     oldAccountHolder.Password = accountHolder.Password;
                     oldAccountHolder.Name = accountHolder.Name;
                     oldAccountHolder.AccountType = accountHolder.AccountType;
+
+                    int index = DataStorage.AccountHolders.IndexOf(oldAccountHolder);
+                    if (index >= 0)
+                    {
+                        DataStorage.AccountHolders[index] = oldAccountHolder;
+                    }
 
                     response.IsSuccess = true;
                     response.Message = Constants.AccountHolderUpdateSuccess;
@@ -72,10 +78,9 @@ namespace BankApplication.Services
             try
             {
                 AccountHolder accountHolderToDelete = GetAccountHolderById(accountId);
-
                 if (accountHolderToDelete != null)
                 {
-                    DataStorage.Accounts.Remove(accountHolderToDelete);
+                    DataStorage.AccountHolders.Remove(accountHolderToDelete);
                     response.IsSuccess = true;
                     response.Message = Constants.AccountDeleted;
                 }
@@ -94,12 +99,13 @@ namespace BankApplication.Services
             return response;
         }
 
-        public Response<List<AccountHolder>> ShowAllAccounts(string bankID)
+
+        public Response<List<AccountHolder>> GetAllAccountHolders(string bankID)
         {
             Response<List<AccountHolder>> response = new Response<List<AccountHolder>>();
             try
             {
-                response.Data = string.IsNullOrEmpty(bankID) ? new List<AccountHolder>() : DataStorage.Accounts.Where(a => a.BankId == bankID).ToList();
+                response.Data = string.IsNullOrEmpty(bankID) ? new List<AccountHolder>() : DataStorage.AccountHolders.Where(a => a.BankId == bankID).ToList();
                 response.IsSuccess = true;
             }
             catch (Exception ex)
@@ -113,7 +119,7 @@ namespace BankApplication.Services
 
         public AccountHolder GetAccountHolderById(string accountId)
         {
-            return DataStorage.Accounts.FirstOrDefault(a => a.Id == accountId);
+            return DataStorage.AccountHolders.FirstOrDefault(a => a.Id == accountId);
         }
     }
 }

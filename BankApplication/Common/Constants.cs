@@ -5,9 +5,9 @@ namespace BankApplication.Common
     internal class Constants
     {
         //Bank
-        public static string BankCreation = "Bank created successfully.";
+        public static string BankCreationSuccess = "Bank created successfully.";
 
-        public static string BankFailure = "Bank creation failed.";
+        public static string BankCreationFailure = "Bank creation failed.";
 
         public static string BankNotFound = "Bank not Found";
      
@@ -44,10 +44,10 @@ namespace BankApplication.Common
 
         public static string EmployeeFailure = "Employee not created";
 
-        //Accounts
-        public static string AccountSuccess = "Account created successfully";
+        //Accounts 
+        public static string AccountCreationSuccess = "Account created successfully";
 
-        public static string AccountFailure = "Account not created";
+        public static string AccountCreationFailure = "Account not created";
 
         public static string AccountDeleted = "Account deleted";
 

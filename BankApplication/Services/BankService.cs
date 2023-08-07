@@ -8,6 +8,12 @@ namespace BankApplication.Services
 {
     internal class BankService
     {
+        private TransactionService transactionService;
+
+        public BankService()
+        {
+            this.transactionService = new TransactionService();
+        }
         public Response<string> CreateBank(Bank bank)
         {
             Response<string> response = new Response<string>();
@@ -19,13 +25,13 @@ namespace BankApplication.Services
                 DataStorage.Banks.Add(bank);
 
                 response.IsSuccess = true;
-                response.Message = Constants.BankCreation;
+                response.Message = Constants.BankCreationSuccess;
                 response.Data = bank.Id;
             }
             catch
             {
                 response.IsSuccess = false;
-                response.Message = Constants.BankFailure;
+                response.Message = Constants.BankCreationFailure;
             }
 
             return response;
@@ -33,15 +39,21 @@ namespace BankApplication.Services
 
         public Response<string> Deposit(string accountHolderID, decimal amount)
         {
-            TransactionService transactionService = new TransactionService();
             Response<string> response = new Response<string>();
 
             try
             {
-                AccountHolder accountHolder = DataStorage.Accounts.Find(account => account.Id == accountHolderID);
+                AccountHolder accountHolder = DataStorage.AccountHolders.Find(account => account.Id == accountHolderID);
                 if (accountHolder != null)
                 {
-                    response = transactionService.PerformDepositTransaction(accountHolder, amount);
+                    accountHolder.Balance += amount;
+                    response = this.transactionService.PerformDepositTransaction(accountHolder, amount);
+                }
+                else if (amount <= 0)
+                {
+                    response.IsSuccess = false;
+                    response.Message = Constants.InvalidAmount;
+                    return response;
                 }
                 else
                 {
@@ -61,12 +73,28 @@ namespace BankApplication.Services
 
         public Response<string> Withdraw(AccountHolder account, decimal amount)
         {
-            TransactionService transactionService = new TransactionService();
             Response<string> response = new Response<string>();
 
             try
             {
-                response = transactionService.PerformWithdrawTransaction(account, amount);
+                if (amount <= 0)
+                {
+                    response.IsSuccess = false;
+                    response.Message = Constants.InvalidAmount;
+                    return response;
+                }
+
+                else if (amount > account.Balance)
+                {
+                    response.IsSuccess = false;
+                    response.Message = Constants.InsufficientFunds;
+                    return response;
+                }
+                else
+                {
+                    account.Balance -= amount;
+                    response = this.transactionService.PerformWithdrawTransaction(account, amount);
+                }
             }
             catch (Exception ex)
             {
@@ -79,12 +107,54 @@ namespace BankApplication.Services
 
         public Response<string> TransferFunds(AccountHolder sourceAccount, string destinationAccountNumber, decimal amount, TransferOptions transferType)
         {
-            TransactionService transactionService = new TransactionService();
             Response<string> response = new Response<string>();
 
             try
             {
-                response = transactionService.PerformTransferFundsTransaction(sourceAccount, destinationAccountNumber, amount, transferType);
+                AccountHolder destinationAccount = DataStorage.AccountHolders.FirstOrDefault(a => a.AccountNumber == destinationAccountNumber);
+                if (destinationAccount == null)
+                {
+                    response.IsSuccess = false;
+                    response.Message = Constants.AccountNotFound;
+                    return response;
+                }
+
+                decimal charge = 0;
+                if (transferType == TransferOptions.IMPS)
+                {
+                    charge = 0.08m;
+                }
+                else if (transferType == TransferOptions.RTGS)
+                {
+                    charge = 0.05m;
+                }
+                else
+                {
+                    response.IsSuccess = false;
+                    response.Message = Constants.InvalidType;
+                    return response;
+                }
+
+                decimal transferAmount = amount + (amount * charge);
+                if (transferAmount <= 0)
+                {
+                    response.IsSuccess = false;
+                    response.Message = Constants.InvalidAmount;
+                    return response;
+                }
+
+                else if (transferAmount > sourceAccount.Balance)
+                {
+                    response.IsSuccess = false;
+                    response.Message = Constants.InsufficientFunds;
+                    return response;
+                }
+                else
+                {
+                    sourceAccount.Balance -= transferAmount;
+                    destinationAccount.Balance += amount;
+                    response = this.transactionService.PerformTransferFundsTransaction(sourceAccount, destinationAccountNumber, amount, transferType);
+                }
             }
             catch (Exception ex)
             {
@@ -188,9 +258,9 @@ namespace BankApplication.Services
             return response;
         }
 
-        public Employee GetEmployee(string employeeId = "")
+        public Employee GetEmployee()
         {
-            return DataStorage.Employees.FirstOrDefault(emp => emp.Type == Enums.UserType.Employee && emp.Id == employeeId);
+            return DataStorage.Employees.FirstOrDefault(emp => emp.Type == Enums.UserType.Employee);
         }
     }
 }

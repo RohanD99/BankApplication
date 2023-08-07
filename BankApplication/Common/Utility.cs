@@ -48,9 +48,9 @@ namespace BankApplication.Common
             return $"TXN{bankId}{accountId}{DateTime.Now.ToString("yyyyMMddHHmmss")}";
         }
 
-        public static string GenerateAccountNumber(string name)
+        public static string GenerateAccountNumber()
         {
-            return string.IsNullOrEmpty(name) ? "" : $"{DateTime.Now.ToString("yyMMddHHmmss")}";
+            return $"{DateTime.Now.ToString("yyMMddHHmmss")}";
         }
 
         public static string GenerateAccountId(string name)

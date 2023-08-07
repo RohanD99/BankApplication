@@ -43,7 +43,8 @@ namespace BankApplication.Views
                         break;
 
                     case UserAccountOption.Transfer:
-                        TransferFunds(loggedInAccount);
+                        BankView bankView = new BankView();
+                        bankView.TransferFunds(loggedInAccount);
                         break;
 
                     case UserAccountOption.CheckBalance:
@@ -114,48 +115,7 @@ namespace BankApplication.Views
             }
 
             return result;
-        }
-
-        public void TransferFunds(AccountHolder loggedInAccount)
-        {
-            StringBuilder sb = new StringBuilder();
-
-            Utility.GetStringInput("Enter the destination account number: ", true);
-            string destinationAccountNumber = Console.ReadLine();
-
-            Utility.GetStringInput("Enter the transfer type (0 for IMPS, 1 for RTGS): ", true);
-            int transferTypeInput = Convert.ToInt32(Console.ReadLine());
-
-            TransferOptions transferType;
-            if (transferTypeInput == 0)
-            {
-                transferType = TransferOptions.IMPS;
-            }
-            else if (transferTypeInput == 1)
-            {
-                transferType = TransferOptions.RTGS;
-            }
-            else
-            {
-                sb.AppendLine(Constants.InvalidType);
-                return;
-            }
-
-            Utility.GetStringInput("Enter the amount to transfer: ", true);
-            decimal transferAmount = Convert.ToDecimal(Console.ReadLine());
-
-            Response<string> transferResponse = BankService.TransferFunds(loggedInAccount, destinationAccountNumber, transferAmount, transferType);
-
-            if (transferResponse.IsSuccess)
-            {
-                sb.AppendLine(transferResponse.Message);
-                sb.AppendLine($"New balance: {loggedInAccount.Balance}");
-            }
-            else
-            {
-                sb.AppendLine(transferResponse.Message);
-            }
-        }
+        }  
     }
 }
 

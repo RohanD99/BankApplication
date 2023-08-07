@@ -10,7 +10,6 @@ namespace BankApplication.Views
     internal class AccountHolderView
     {
         static AccountHolderService AccountHolderService = new AccountHolderService();
-
         public static void BankStaffMenu()
         {
             BankStaffOption option;
@@ -39,7 +38,7 @@ namespace BankApplication.Views
 
                     case BankStaffOption.ShowAllAccountHolders:
                         Employee employee = BankService.GetEmployee();
-                        Response<List<AccountHolder>> showAllResponse = AccountHolderService.ShowAllAccounts(employee.BankId);
+                        Response<List<AccountHolder>> showAllResponse = AccountHolderService.GetAllAccountHolders(employee.BankId);
 
                         if (showAllResponse.IsSuccess)
                         {
@@ -62,7 +61,6 @@ namespace BankApplication.Views
                             Console.WriteLine(showAllResponse.Message);
                         }
                         break;
-
 
                     case BankStaffOption.AddCurrency:
                         Utility.GetStringInput("Enter Currency Code: ", true);
@@ -97,17 +95,17 @@ namespace BankApplication.Views
                         break;
 
                     case BankStaffOption.ShowAccountHolderTransactions:
-                        EmployeeService EmployeeService = new EmployeeService();
+                        TransactionService transactionService = new TransactionService();
                         Utility.GetStringInput("Enter Account Holder's Account Number: ", true);
                         string accountNumber = Console.ReadLine();
-                        EmployeeService.ShowAccountTransactionHistory(accountNumber);
+                        transactionService.ShowAccountTransactionHistory(accountNumber);
                         break;
 
                     case BankStaffOption.RevertTransaction:
-                        TransactionService transactionService = new TransactionService();   
+                        TransactionService TransactionService = new TransactionService();   
                         Utility.GetStringInput("Enter Transaction ID to revert: ", true);
                         string transactionIDToRevert = Console.ReadLine();
-                        Response<string> revertResponse = transactionService.RevertTransaction(transactionIDToRevert);
+                        Response<string> revertResponse = TransactionService.RevertTransaction(transactionIDToRevert);
                         Console.WriteLine(revertResponse.Message);
                         break;
 
@@ -140,16 +138,18 @@ namespace BankApplication.Views
             Response<string> response = accountHolderService.Create(accountHolder,employee);
             if (response.IsSuccess)
             {
-                Console.WriteLine("Account holder added successfully.");
-                Console.WriteLine($"Account holder ID: {accountHolder.Id}");
-                Console.WriteLine($"Account holder Name: {accountHolder.Name}");
-                Console.WriteLine($"Account holder Username: {accountHolder.UserName}");
-                Console.WriteLine($"Account holder's Password: {accountHolder.Password}");
-                Console.WriteLine($"Account holder's Account Number: {accountHolder.AccountNumber}");
-                Console.WriteLine($"Account holder's Acc type: {accountHolder.AccountType}");
-                Console.WriteLine($"Created by: {accountHolder.CreatedBy}");
-                Console.WriteLine($"Created on: {accountHolder.CreatedOn}");
-                Console.WriteLine("----------------------------------------");
+                Console.WriteLine(
+                    $"Account holder added successfully.\n" +
+                    $"Account holder ID: {accountHolder.Id}\n" +
+                    $"Account holder Name: {accountHolder.Name}\n" +
+                    $"Account holder Username: {accountHolder.UserName}\n" +
+                    $"Account holder's Password: {accountHolder.Password}\n" +
+                    $"Account holder's Account Number: {accountHolder.AccountNumber}\n" +
+                    $"Account holder's Acc type: {accountHolder.AccountType}\n" +
+                    $"Created by: {accountHolder.CreatedBy}\n" +
+                    $"Created on: {accountHolder.CreatedOn}\n" +
+                    $"----------------------------------------"
+                );
             }
             else
             {
@@ -188,19 +188,27 @@ namespace BankApplication.Views
 
         public static void DeleteAccountHolder()
         {
-            Utility.GetStringInput("Enter Account ID to delete account holder: ", true);
-            string accountToDelete = Console.ReadLine();
-            AccountHolderService AccountHolderService = new AccountHolderService();
+            string accountToDelete = Utility.GetStringInput("Enter Account ID to delete account holder: ", true);
+            AccountHolderService accountHolderService = new AccountHolderService();
 
-            Response<string> DeleteResponse = AccountHolderService.Delete(accountToDelete);
+            Response<string> deleteResponse = accountHolderService.Delete(accountToDelete);
 
-            if (DeleteResponse.IsSuccess)
+            Console.WriteLine(deleteResponse.Message);
+        }
+
+        public static void LoginAsAccountHolder()
+        {
+            EmployeeView EmployeeView = new EmployeeView();
+            string username = Utility.GetStringInput("Username", true);
+            string password = Utility.GetStringInput("Password", true);
+            AccountHolder loggedInAccountHolder = SecurityService.Login<AccountHolder>(username, password, typeof(AccountHolder));
+            if (loggedInAccountHolder != null)
             {
-                Console.WriteLine(DeleteResponse.Message);
+                EmployeeView.UserAccountMenu(loggedInAccountHolder);
             }
             else
             {
-                Console.WriteLine(DeleteResponse.Message);
+                Console.WriteLine("Account not found");
             }
         }
     }

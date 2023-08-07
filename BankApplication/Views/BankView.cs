@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using BankApplication.Common;
 using BankApplication.Models;
 using BankApplication.Services;
@@ -9,6 +10,11 @@ namespace BankApplication.Views
     public class BankView
     {
         private Employee CurrentEmployee;
+        private BankService bankService;
+        public BankView()
+        {
+            bankService = new BankService();
+        }
         public void Initialize()
         {
             try
@@ -25,7 +31,7 @@ namespace BankApplication.Views
                             break;
 
                         case MainMenu.LoginAsAccountHolder:
-                            LoginAsAccountHolder();
+                            AccountHolderView.LoginAsAccountHolder();
                             break;
 
                         case MainMenu.LoginAsBankStaff:
@@ -52,7 +58,6 @@ namespace BankApplication.Views
 
         private void CreateNewBank()
         {
-            BankService BankService = new BankService();
             try
             {
                 Bank Bank = new Bank()
@@ -65,7 +70,7 @@ namespace BankApplication.Views
                     RTGSforOtherBank = 2,
                     RTGSforSameBank = 0
                 };
-                var response = BankService.CreateBank(Bank);
+                var response = bankService.CreateBank(Bank);
                 Console.WriteLine(response.Message);
 
                 if (!response.IsSuccess)
@@ -81,9 +86,8 @@ namespace BankApplication.Views
                     Console.WriteLine($"IFSC Code: {Bank.IFSC}");
                     Console.WriteLine($"Created By: {Bank.CreatedBy}");
                     Console.WriteLine($"Created On: {Bank.CreatedOn}");
-                }
-
-                var adminName = SetupBankAdmin(Bank.Id);
+                    var adminName = SetupBankAdmin(Bank.Id);
+                }            
             }
             catch (Exception ex)
             {
@@ -143,11 +147,12 @@ namespace BankApplication.Views
                 Console.WriteLine(ex.Message);
             }
         }
+
         public static void LoginAsBankStaff()
         {
             string username = Utility.GetStringInput("Username", true);
             string password = Utility.GetStringInput("Password", true);
-            Employee loggedInEmployee = EmployeeService.GetEmployeeByUsernameAndPassword(username, password);
+            Employee loggedInEmployee = SecurityService.Login<Employee>(username, password, typeof(Employee));
 
             if (loggedInEmployee != null)
             {
@@ -159,19 +164,44 @@ namespace BankApplication.Views
             }
         }
 
-        public static void LoginAsAccountHolder()
+        public void TransferFunds(AccountHolder loggedInAccount)
         {
-            EmployeeView EmployeeView = new EmployeeView();
-            string username = Utility.GetStringInput("Username", true);
-            string password = Utility.GetStringInput("Password", true);
-            AccountHolder loggedInAccountHolder = EmployeeService.GetAccountHolderByUsernameAndPassword(username, password);
-            if (loggedInAccountHolder != null)
+            StringBuilder sb = new StringBuilder();
+
+            Utility.GetStringInput("Enter the destination account number: ", true);
+            string destinationAccountNumber = Console.ReadLine();
+
+            Utility.GetStringInput("Enter the transfer type (0 for IMPS, 1 for RTGS): ", true);
+            int transferTypeInput = Convert.ToInt32(Console.ReadLine());
+
+            TransferOptions transferType;
+            if (transferTypeInput == 0)
             {
-                EmployeeView.UserAccountMenu(loggedInAccountHolder);
+                transferType = TransferOptions.IMPS;
+            }
+            else if (transferTypeInput == 1)
+            {
+                transferType = TransferOptions.RTGS;
             }
             else
             {
-                Console.WriteLine("Account not found");
+                sb.AppendLine(Constants.InvalidType);
+                return;
+            }
+
+            Utility.GetStringInput("Enter the amount to transfer: ", true);
+            decimal transferAmount = Convert.ToDecimal(Console.ReadLine());
+
+            Response<string> transferResponse = bankService.TransferFunds(loggedInAccount, destinationAccountNumber, transferAmount, transferType);
+
+            if (transferResponse.IsSuccess)
+            {
+                sb.AppendLine(transferResponse.Message);
+                sb.AppendLine($"New balance: {loggedInAccount.Balance}");
+            }
+            else
+            {
+                sb.AppendLine(transferResponse.Message);
             }
         }
     }

@@ -12,7 +12,7 @@ namespace BankApplication.Common
         public static List<Employee> Employees = new List<Employee>();
 
         // Storing accounts
-        public static List<AccountHolder> Accounts = new List<AccountHolder>();
+        public static List<AccountHolder> AccountHolders = new List<AccountHolder>();
 
         // Storing transactions
         public static List<Transaction> Transactions = new List<Transaction>();
