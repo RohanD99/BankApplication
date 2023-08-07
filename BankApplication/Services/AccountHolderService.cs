@@ -31,26 +31,23 @@ namespace BankApplication.Services
             return response;
         }
 
-        public Response<AccountHolder> Update(AccountHolder accountHolder)
+        public Response<AccountHolder> Update(AccountHolder updatedAccountHolder)
         {
             Response<AccountHolder> response = new Response<AccountHolder>();
 
             try
             {
-                AccountHolder oldAccountHolder = GetAccountHolderById(accountHolder.Id);
+                AccountHolder oldAccountHolder = GetAccountHolderById(updatedAccountHolder.Id);
 
                 if (oldAccountHolder != null)
                 {
-                    oldAccountHolder.UserName = accountHolder.UserName;
-                    oldAccountHolder.Password = accountHolder.Password;
-                    oldAccountHolder.Name = accountHolder.Name;
-                    oldAccountHolder.AccountType = accountHolder.AccountType;
+                    oldAccountHolder.UserName = updatedAccountHolder.UserName;
+                    oldAccountHolder.Password = updatedAccountHolder.Password;
+                    oldAccountHolder.Name = updatedAccountHolder.Name;
+                    oldAccountHolder.AccountType = updatedAccountHolder.AccountType;
 
-                    int index = DataStorage.AccountHolders.IndexOf(oldAccountHolder);
-                    if (index >= 0)
-                    {
-                        DataStorage.AccountHolders[index] = oldAccountHolder;
-                    }
+                    DataStorage.AccountHolders.Remove(oldAccountHolder);
+                    DataStorage.AccountHolders.Add(updatedAccountHolder);
 
                     response.IsSuccess = true;
                     response.Message = Constants.AccountHolderUpdateSuccess;
