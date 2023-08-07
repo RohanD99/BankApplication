@@ -40,9 +40,9 @@ namespace BankApplication.Common
         public static string ViewTransactionHistory = "Viewing transaction history for account number: {0}";
 
         //Employees
-        public static string EmployeeSuccess = "Employee created successfully";
+        public static string EmployeeCreationSuccess = "Employee created successfully";
 
-        public static string EmployeeFailure = "Employee not created";
+        public static string EmployeeCreationFailure = "Employee not created";
 
         //Accounts 
         public static string AccountCreationSuccess = "Account created successfully";

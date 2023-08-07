@@ -13,13 +13,13 @@ namespace BankApplication.Services
                 employee.Id = Utility.GenerateEmployeeID();
                 DataStorage.Employees.Add(employee);
                 response.IsSuccess = true;
-                response.Message = Constants.EmployeeSuccess;
+                response.Message = Constants.EmployeeCreationSuccess;
                 response.Data = employee.Id;
             }
             catch
             {
                 response.IsSuccess = false;
-                response.Message = Constants.EmployeeFailure;
+                response.Message = Constants.EmployeeCreationFailure;
             }
             return response;
         }
