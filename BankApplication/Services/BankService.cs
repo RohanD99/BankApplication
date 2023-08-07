@@ -183,7 +183,7 @@ namespace BankApplication.Services
             return response;
         }
 
-        public static Response<string> AddAcceptedCurrency(string currencyCode, decimal exchangeRate)
+        public Response<string> AddAcceptedCurrency(string currencyCode, decimal exchangeRate)
         {
             Response<string> response = new Response<string>();
 
@@ -195,8 +195,7 @@ namespace BankApplication.Services
                     response.Message = Constants.CurrencyExists;
                     return response;
                 }
-
-                if (exchangeRate <= 0)
+                else if (exchangeRate <= 0)
                 {
                     response.IsSuccess = false;
                     response.Message = Constants.InvalidRate;
@@ -205,7 +204,6 @@ namespace BankApplication.Services
                 else
                 {
                     Constants.acceptedCurrencies.Add(currencyCode, exchangeRate);
-
                     response.IsSuccess = true;
                     response.Message = Constants.NewCurrency;
                 }

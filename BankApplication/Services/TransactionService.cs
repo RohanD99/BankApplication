@@ -240,9 +240,8 @@ namespace BankApplication.Services
             return response;
         }
     
-
-         public Response<string> ViewTransactionHistory(AccountHolder account)
-         {
+        public Response<string> ViewTransactionHistory(AccountHolder account)
+        {
             Response<string> response = new Response<string>();
 
             try
@@ -271,6 +270,6 @@ namespace BankApplication.Services
             }
 
             return response;
-         }
+        }
     }
 }
