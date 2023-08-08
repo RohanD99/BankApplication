@@ -174,11 +174,7 @@ namespace BankApplication.Views
                 if (updateResponse.IsSuccess)
                 {
                     Console.WriteLine(updateResponse.Message);
-                }
-                else
-                {
-                    Console.WriteLine(updateResponse.Message);
-                }
+                }                
             }
             else
             {

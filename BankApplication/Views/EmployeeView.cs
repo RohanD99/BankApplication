@@ -82,21 +82,6 @@ namespace BankApplication.Views
             }
             Console.WriteLine(sb.ToString());
         }
-
-        public static void PrintAccountDetails(IEnumerable<AccountHolder> Accounts)
-        {
-            StringBuilder sb = new StringBuilder();
-            foreach (var account in Accounts)
-            {
-                sb.AppendLine($"Account Number: {account.AccountNumber}");
-                sb.AppendLine($"Constants.AccountHolderName: {account.Name}");
-                sb.AppendLine($"Balance: {account.Balance}");
-                sb.AppendLine($"Account Type: {account.AccountType}");
-                sb.AppendLine("----------------------------");
-            }
-            Console.WriteLine(sb.ToString());
-        }
-
         public static string GetTransactionHistoryString(List<Transaction> transactions)
         {
             if (transactions == null || transactions.Count == 0)
