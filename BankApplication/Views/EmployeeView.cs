@@ -2,8 +2,6 @@
 using BankApplication.Models;
 using BankApplication.Services;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using static BankApplication.Common.Enums;
 
 namespace BankApplication.Views

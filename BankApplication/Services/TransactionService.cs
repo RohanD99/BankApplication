@@ -1,6 +1,5 @@
 ﻿using BankApplication.Common;
 using BankApplication.Models;
-using BankApplication.Views;
 using System;
 using System.Collections.Generic;
 using System.Linq;
