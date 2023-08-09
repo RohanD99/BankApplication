@@ -22,7 +22,6 @@ namespace BankApplication.Views
                     case UserAccountOption.Deposit:
                         Console.Write("Enter your account ID: ");
                         string accountHolderID = Console.ReadLine();
-
                         Console.Write("Enter the amount to deposit: ");
                         string depositAmountInput = Console.ReadLine();
                         if (!decimal.TryParse(depositAmountInput, out decimal depositAmount))

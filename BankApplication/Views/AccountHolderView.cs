@@ -10,14 +10,15 @@ namespace BankApplication.Views
 {
     internal class AccountHolderView
     {
-        static AccountHolderService AccountHolderService = new AccountHolderService();
+        static AccountHolderService accountHolderService = new AccountHolderService();
         public static void BankStaffMenu()
         {
             BankStaffOption option;
             do
             {
-                BankService BankService = new BankService();
-                Employee loggedInEmployee = BankService.GetEmployee();
+                BankService bankService = new BankService();
+                TransactionService transactionService = new TransactionService();
+                Employee loggedInEmployee = bankService.GetEmployee();
                 Utility.GenerateOptions(Constants.BankStaffOption);
                 option = (BankStaffOption)Convert.ToInt32(Console.ReadLine());
                 switch (option)
@@ -40,7 +41,7 @@ namespace BankApplication.Views
                     case BankStaffOption.ShowAllAccountHolders:
                         Console.Write("Enter Bank ID to view account holders: ");
                         string bankIdToView = Console.ReadLine();  
-                        Response<List<AccountHolder>> showAllResponse = AccountHolderService.GetAllAccountHolders(bankIdToView);
+                        Response<List<AccountHolder>> showAllResponse = accountHolderService.GetAllAccountHolders(bankIdToView);
 
                         if (showAllResponse.IsSuccess)
                         {
@@ -80,7 +81,7 @@ namespace BankApplication.Views
                         {
                             Console.WriteLine("Invalid exchange rate. Please enter a valid decimal number.");
                         }
-                        Response<string> response = BankService.AddAcceptedCurrency(currencyCode, exchangeRate);
+                        Response<string> response = bankService.AddAcceptedCurrency(currencyCode, exchangeRate);
                         break;
 
                     case BankStaffOption.UpdateServiceChargesForSameBank:
@@ -89,7 +90,7 @@ namespace BankApplication.Views
                         float rtgsChargeSameBank = Convert.ToSingle(Console.ReadLine());
                         Utility.GetStringInput("Enter IMPS Charge for Same Bank: ", true);
                         float impsChargeSameBank = Convert.ToSingle(Console.ReadLine());
-                        Response<string> updateSameBankChargeResponse = BankService.UpdateServiceCharges(rtgsChargeSameBank, impsChargeSameBank, bankIdForSameBank, true);
+                        Response<string> updateSameBankChargeResponse = bankService.UpdateServiceCharges(rtgsChargeSameBank, impsChargeSameBank, bankIdForSameBank, true);
                         Console.WriteLine(updateSameBankChargeResponse.Message);
                         break;
 
@@ -99,12 +100,11 @@ namespace BankApplication.Views
                         float rtgsChargeOtherBank = Convert.ToSingle(Console.ReadLine());
                         Utility.GetStringInput("Enter IMPS Charge for Other Bank: ", true);
                         float impsChargeOtherBank = Convert.ToSingle(Console.ReadLine());
-                        Response<string> updateOtherBankChargeResponse = BankService.UpdateServiceCharges(rtgsChargeOtherBank, impsChargeOtherBank, bankIdForOtherBank, false);
+                        Response<string> updateOtherBankChargeResponse = bankService.UpdateServiceCharges(rtgsChargeOtherBank, impsChargeOtherBank, bankIdForOtherBank, false);
                         Console.WriteLine(updateOtherBankChargeResponse.Message);
                         break;
 
-                    case BankStaffOption.ShowAccountHolderTransactions:
-                        TransactionService transactionService = new TransactionService();
+                    case BankStaffOption.ShowAccountHolderTransactions:                       
                         string accountNumber = Utility.GetStringInput("Enter Account Holder's Account Number: ", true);
                         Response<string> transactionHistoryResponse = transactionService.GetTransactionHistory(null, accountNumber);
 
@@ -120,10 +120,9 @@ namespace BankApplication.Views
                         break;
 
                     case BankStaffOption.RevertTransaction:
-                        TransactionService TransactionService = new TransactionService();   
                         Utility.GetStringInput("Enter Transaction ID to revert: ", true);
                         string transactionIDToRevert = Console.ReadLine();
-                        Response<string> revertResponse = TransactionService.RevertTransaction(transactionIDToRevert);
+                        Response<string> revertResponse = transactionService.RevertTransaction(transactionIDToRevert);
                         Console.WriteLine(revertResponse.Message);
                         break;
 
