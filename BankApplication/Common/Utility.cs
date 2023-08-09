@@ -21,6 +21,7 @@ namespace BankApplication.Common
             {
                 Console.Write($" (or press Enter to keep the current value '{defaultValue}')");
             }
+
             Console.Write(": ");
             string input = Console.ReadLine();
 
@@ -35,7 +36,7 @@ namespace BankApplication.Common
 
         public static string GenerateBankId(string bankName)
         {
-            return string.IsNullOrEmpty(bankName) ? "" : $"{bankName.Substring(0, Math.Min(3, bankName.Length))}{DateTime.Now:yyyyMMddHHmmss}";
+            return string.IsNullOrEmpty(bankName) ? $"{bankName.Length >= 3}" : $"{bankName.Substring(0, Math.Min(3, bankName.Length))}{DateTime.Now:yyyyMMddHHmmss}";
         }
 
         public static string GenerateEmployeeID()

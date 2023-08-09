@@ -41,6 +41,13 @@
             AccountHolder
         }
 
+        public enum TransactionType
+        {
+            Deposit,
+            Withdraw,
+            Transfer
+        }
+
         public enum TransferOptions
         {
             IMPS,

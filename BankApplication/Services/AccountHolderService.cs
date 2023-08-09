@@ -8,14 +8,13 @@ namespace BankApplication.Services
 {
     internal class AccountHolderService
     {
-        public Response<string> Create(AccountHolder accountHolder, Employee employee)
+        public Response<string> Create(AccountHolder accountHolder)
         {
             Response<string> response = new Response<string>();
             try
             {
                 accountHolder.Id = Utility.GenerateAccountId(accountHolder.Name);
                 accountHolder.AccountNumber = Utility.GenerateAccountNumber();
-                accountHolder.BankId = employee.BankId;
 
                 DataStorage.AccountHolders.Add(accountHolder);
 
@@ -31,23 +30,26 @@ namespace BankApplication.Services
             return response;
         }
 
-        public Response<AccountHolder> Update(AccountHolder updatedAccountHolder)
+        public Response<AccountHolder> Update(AccountHolder accountHolder)
         {
             Response<AccountHolder> response = new Response<AccountHolder>();
 
             try
             {
-                AccountHolder oldAccountHolder = GetAccountHolderById(updatedAccountHolder.Id);
+                AccountHolder oldAccountHolder = GetAccountHolderById(accountHolder.Id);
 
                 if (oldAccountHolder != null)
                 {
-                    oldAccountHolder.UserName = updatedAccountHolder.UserName;
-                    oldAccountHolder.Password = updatedAccountHolder.Password;
-                    oldAccountHolder.Name = updatedAccountHolder.Name;
-                    oldAccountHolder.AccountType = updatedAccountHolder.AccountType;
+                    oldAccountHolder.UserName = accountHolder.UserName;
+                    oldAccountHolder.Password = accountHolder.Password;
+                    oldAccountHolder.Name = accountHolder.Name;
+                    oldAccountHolder.AccountType = accountHolder.AccountType;
 
-                    DataStorage.AccountHolders.Remove(oldAccountHolder);
-                    DataStorage.AccountHolders.Add(updatedAccountHolder);
+                    int index = DataStorage.AccountHolders.IndexOf(oldAccountHolder);
+                    if (index >= 0)
+                    {
+                        DataStorage.AccountHolders[index] = oldAccountHolder;
+                    }
 
                     response.IsSuccess = true;
                     response.Message = Constants.AccountHolderUpdateSuccess;
@@ -116,7 +118,26 @@ namespace BankApplication.Services
 
         public AccountHolder GetAccountHolderById(string accountId)
         {
-            return DataStorage.AccountHolders.FirstOrDefault(a => a.Id == accountId);
+            try
+            {
+                return DataStorage.AccountHolders.FirstOrDefault(a => a.Id == accountId);
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        public AccountHolder GetAccountHolderByAccountNumber(string accountNumber)
+        {
+            try
+            {
+                return DataStorage.AccountHolders.Find(a => a.AccountNumber == accountNumber);
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
         }
     }
 }

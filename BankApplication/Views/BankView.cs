@@ -79,13 +79,14 @@ namespace BankApplication.Views
                 }
                 else
                 {
-                    Console.WriteLine("Bank Details:");
-                    Console.WriteLine($"Bank ID: {Bank.Id.ToUpper()}");
-                    Console.WriteLine($"Bank Name: {Bank.Name}");
-                    Console.WriteLine($"Location: {Bank.Location}");
-                    Console.WriteLine($"IFSC Code: {Bank.IFSC}");
-                    Console.WriteLine($"Created By: {Bank.CreatedBy}");
-                    Console.WriteLine($"Created On: {Bank.CreatedOn}");
+                    Console.WriteLine("Bank Details:\n" +
+                                       $"Bank ID: {Bank.Id.ToUpper()}\n" +
+                                       $"Bank Name: {Bank.Name}\n" +
+                                       $"Location: {Bank.Location}\n" +
+                                       $"IFSC Code: {Bank.IFSC}\n" +
+                                       $"Created By: {Bank.CreatedBy}\n" +
+                                       $"Created On: {Bank.CreatedOn}");
+
                     var adminName = SetupBankAdmin(Bank.Id);
                 }            
             }
@@ -164,15 +165,13 @@ namespace BankApplication.Views
             }
         }
 
-        public void TransferFunds(AccountHolder loggedInAccount)
+        public void GetTransferFunds(AccountHolder loggedInAccount)
         {
             StringBuilder sb = new StringBuilder();
+            AccountHolderService accountHolderService = new AccountHolderService();
 
-            Utility.GetStringInput("Enter the destination account number: ", true);
-            string destinationAccountNumber = Console.ReadLine();
-
-            Utility.GetStringInput("Enter the transfer type (0 for IMPS, 1 for RTGS): ", true);
-            int transferTypeInput = Convert.ToInt32(Console.ReadLine());
+            string destinationAccountNumber = Utility.GetStringInput("Enter the destination account number: ", true);
+            int transferTypeInput = Convert.ToInt32(Utility.GetStringInput("Enter the transfer type (0 for IMPS, 1 for RTGS): ", true));
 
             TransferOptions transferType;
             if (transferTypeInput == 0)
@@ -192,12 +191,21 @@ namespace BankApplication.Views
             Utility.GetStringInput("Enter the amount to transfer: ", true);
             decimal transferAmount = Convert.ToDecimal(Console.ReadLine());
 
-            Response<string> transferResponse = bankService.TransferFunds(loggedInAccount, destinationAccountNumber, transferAmount, transferType);
+            AccountHolder destinationAccount = accountHolderService.GetAccountHolderByAccountNumber(destinationAccountNumber);
+
+            if (destinationAccount == null)
+            {
+                sb.AppendLine(Constants.AccountNotFound);
+                return;
+            }
+
+            Response<string> transferResponse = bankService.TransferFunds(loggedInAccount, destinationAccount, transferAmount, transferType);
 
             if (transferResponse.IsSuccess)
             {
                 sb.AppendLine(transferResponse.Message);
                 sb.AppendLine($"New balance: {loggedInAccount.Balance}");
+                sb.AppendLine(Constants.TransferFundsSuccess);
             }
             else
             {

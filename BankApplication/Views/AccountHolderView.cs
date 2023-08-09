@@ -3,6 +3,7 @@ using BankApplication.Models;
 using BankApplication.Services;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using static BankApplication.Common.Enums;
 
 namespace BankApplication.Views
@@ -37,23 +38,31 @@ namespace BankApplication.Views
                         break;
 
                     case BankStaffOption.ShowAllAccountHolders:
-                        Employee employee = BankService.GetEmployee();
-                        Response<List<AccountHolder>> showAllResponse = AccountHolderService.GetAllAccountHolders(employee.BankId);
+                        Console.Write("Enter Bank ID to view account holders: ");
+                        string bankIdToView = Console.ReadLine();  
+                        Response<List<AccountHolder>> showAllResponse = AccountHolderService.GetAllAccountHolders(bankIdToView);
 
                         if (showAllResponse.IsSuccess)
                         {
-                            Console.WriteLine(showAllResponse.Message);
-                            foreach (AccountHolder accountHolder in showAllResponse.Data)
+                            if (showAllResponse.Data.Any())  
                             {
-                                Console.WriteLine($"Account holder ID: {accountHolder.Id}\n" +
-                                                  $"Account holder Name: {accountHolder.Name}\n" +
-                                                  $"Account holder Username: {accountHolder.UserName}\n" +
-                                                  $"Account holder's Password: {accountHolder.Password}\n" +
-                                                  $"Account holder's Account Number: {accountHolder.AccountNumber}\n" +
-                                                  $"Account holder's Acc type: {accountHolder.AccountType}\n" +
-                                                  $"Created by: {employee.CreatedBy}\n" +
-                                                  $"Created on: {accountHolder.CreatedOn}\n" +
-                                                  "----------------------------------------");
+                                Console.WriteLine(showAllResponse.Message);
+                                foreach (AccountHolder accountHolder in showAllResponse.Data)
+                                {
+                                    Console.WriteLine($"Account holder ID: {accountHolder.Id}\n" +
+                                                      $"Account holder Name: {accountHolder.Name}\n" +
+                                                      $"Account holder Username: {accountHolder.UserName}\n" +
+                                                      $"Account holder's Password: {accountHolder.Password}\n" +
+                                                      $"Account holder's Account Number: {accountHolder.AccountNumber}\n" +
+                                                      $"Account holder's Acc type: {accountHolder.AccountType}\n" +
+                                                      $"Created by: {accountHolder.CreatedBy}\n" +
+                                                      $"Created on: {accountHolder.CreatedOn}\n" +
+                                                      "----------------------------------------");
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine("No account holders found for the specified bank.");
                             }
                         }
                         else
@@ -96,9 +105,18 @@ namespace BankApplication.Views
 
                     case BankStaffOption.ShowAccountHolderTransactions:
                         TransactionService transactionService = new TransactionService();
-                        Utility.GetStringInput("Enter Account Holder's Account Number: ", true);
-                        string accountNumber = Console.ReadLine();
-                        transactionService.ShowAccountTransactionHistory(accountNumber);
+                        string accountNumber = Utility.GetStringInput("Enter Account Holder's Account Number: ", true);
+                        Response<string> transactionHistoryResponse = transactionService.GetTransactionHistory(null, accountNumber);
+
+                        if (transactionHistoryResponse.IsSuccess)
+                        {
+                            Console.WriteLine(transactionHistoryResponse.Message);
+                            Console.WriteLine(transactionHistoryResponse.Data);
+                        }
+                        else
+                        {
+                            Console.WriteLine(transactionHistoryResponse.Message);
+                        }
                         break;
 
                     case BankStaffOption.RevertTransaction:
@@ -133,9 +151,10 @@ namespace BankApplication.Views
                 AccountType = Utility.GetStringInput("Enter account type", true),
                 CreatedBy = employee.Designation,
                 CreatedOn = DateTime.Now,
-                Type = Enums.UserType.AccountHolder
+                Type = Enums.UserType.AccountHolder,
+                BankId = employee.BankId
             };
-            Response<string> response = accountHolderService.Create(accountHolder,employee);
+            Response<string> response = accountHolderService.Create(accountHolder);
             if (response.IsSuccess)
             {
                 Console.WriteLine(
@@ -168,7 +187,7 @@ namespace BankApplication.Views
                 accountHolder.Password = Utility.GetStringInput(Constants.Password, false, accountHolder.Password);
                 accountHolder.Name = Utility.GetStringInput(Constants.AccountHolderName, false, accountHolder.Name);
                 accountHolder.AccountType = Utility.GetStringInput(Constants.AccountType, false, accountHolder.AccountType);
-
+                
                 Response<AccountHolder> updateResponse = AccountHolderService.Update(accountHolder);
 
                 if (updateResponse.IsSuccess)

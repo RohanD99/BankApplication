@@ -10,7 +10,8 @@ namespace BankApplication.Views
 {
     internal class EmployeeView
     {  
-        BankService BankService = new BankService();
+        BankService bankService = new BankService();
+        AccountHolderService accountHolderService = new AccountHolderService();
         public void UserAccountMenu(AccountHolder loggedInAccount)
         {
             UserAccountOption option;
@@ -31,33 +32,53 @@ namespace BankApplication.Views
                             Console.WriteLine("Invalid amount. Please enter a valid decimal value.");
                             break;
                         }
-                        Response<string> depositResponse = BankService.Deposit(accountHolderID, depositAmount);
-                        Console.WriteLine(depositResponse.Message);
+
+                        AccountHolder accountHolder = accountHolderService.GetAccountHolderById(accountHolderID);
+
+                        if (accountHolder != null)
+                        {
+                            Response<string> depositResponse = bankService.Deposit(accountHolder, depositAmount);
+
+                            Console.WriteLine(depositResponse.Message);
+                        }
+                        else
+                        {
+                            Console.WriteLine("Account holder not found.");
+                        }
                         break;
 
                     case UserAccountOption.Withdraw:
                         Utility.GetStringInput("Enter the amount to withdraw: ", true);
                         decimal withdrawAmount = Convert.ToDecimal(Console.ReadLine());
-                        Response<string> WithdrawResponse = BankService.Withdraw(loggedInAccount, withdrawAmount);
+                        Response<string> WithdrawResponse = bankService.Withdraw(loggedInAccount, withdrawAmount);
                         Console.WriteLine(WithdrawResponse.Message);
                         break;
 
                     case UserAccountOption.Transfer:
                         BankView bankView = new BankView();
-                        bankView.TransferFunds(loggedInAccount);
+                        bankView.GetTransferFunds(loggedInAccount);
                         break;
 
                     case UserAccountOption.CheckBalance:
-                        Response<string> balanceResponse = BankService.CheckBalance(loggedInAccount);
+                        Response<string> balanceResponse = bankService.CheckBalance(loggedInAccount);
                         Console.WriteLine($"Your account balance: {balanceResponse.Data}");
                         break;
 
                     case UserAccountOption.Transactions:
                         TransactionService transactionService = new TransactionService();
-                        Response<string> transactionHistoryResponse = transactionService.ViewTransactionHistory(loggedInAccount);
-                        Console.WriteLine(transactionHistoryResponse.Message);
-                        Console.WriteLine(transactionHistoryResponse.Data);
+                        Response<string> transactionHistoryResponse = transactionService.GetTransactionHistory(loggedInAccount);
+
+                        if (transactionHistoryResponse.IsSuccess)
+                        {
+                            Console.WriteLine(transactionHistoryResponse.Message);
+                            Console.WriteLine(transactionHistoryResponse.Data);
+                        }
+                        else
+                        {
+                            Console.WriteLine(transactionHistoryResponse.Message);
+                        }
                         break;
+
 
                     case UserAccountOption.Logout:
                         break;
@@ -67,40 +88,7 @@ namespace BankApplication.Views
                         break;
                 }
             } while (option != UserAccountOption.Logout);
-        }
-
-        public static void PrintTransactionDetails(List<Transaction> transactions)
-        {
-            StringBuilder sb = new StringBuilder();
-            foreach (var transaction in transactions)
-            {
-                sb.AppendLine($"Transaction ID: {transaction.Id}");
-                sb.AppendLine($"Transaction Type: {transaction.Type}");
-                sb.AppendLine($"Transaction Amount: {transaction.Amount}");
-                sb.AppendLine($"Transaction Date: {transaction.CreatedOn}");
-                sb.AppendLine("----------------------------");
-            }
-            Console.WriteLine(sb.ToString());
-        }
-        public static string GetTransactionHistoryString(List<Transaction> transactions)
-        {
-            if (transactions == null || transactions.Count == 0)
-            {
-                return "No transaction history found.";
-            }
-
-            string result = string.Empty;
-            foreach (var transaction in transactions)
-            {
-                result += $"Transaction ID: {transaction.Id}\n";
-                result += $"Transaction Type: {transaction.Type}\n";
-                result += $"Transaction Amount: {transaction.Amount}\n";
-                result += $"Transaction Date: {transaction.CreatedOn}\n";
-                result += "----------------------------\n";
-            }
-
-            return result;
-        }  
+        }      
     }
 }
 

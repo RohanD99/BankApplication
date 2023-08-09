@@ -49,7 +49,7 @@ namespace BankApplication.Common
 
         public static string AccountCreationFailure = "Account not created";
 
-        public static string AccountDeleted = "Account deleted";
+        public static string AccountDeleted = "Account deleted successfully";
 
         public static string AccountHolderUpdateSuccess = "Account updated successfully";
 
@@ -87,62 +87,41 @@ namespace BankApplication.Common
         public static string AccountType = "Enter Account type";
 
         // Main Menu Options
-        public static string CreateNewBank = "Create New Bank";
-        public static string LoginAsAccountHolder = "Login as Account Holder";
-        public static string LoginAsBankStaff = "Login as Bank Staff";
-        public static string Exit = "Exit";
-
         public static readonly List<string> MainMenu = new List<string>
         {
-            CreateNewBank,
-            LoginAsAccountHolder,
-            LoginAsBankStaff,
-            Exit
+        "Create New Bank",
+        "Login as Account Holder",
+        "Login as Bank Staff",
+        "Exit"
         };
+
 
         // Bank Staff Menu Options
-        public static string CreateAccountHolder = "Create Account Holder";
-        public static string UpdateAccountHolder = "Update Account Holder";
-        public static string DeleteAccountHolder = "Delete Account Holder";
-        public static string ShowAllAccountHolders = "Show All Account Holders";
-        public static string AddCurrency = "Add Currency";
-        public static string UpdateServiceChargesForSameBank = "Update Service Charges for Same Bank";
-        public static string UpdateServiceChargesForOtherBank = "Update Service Charges for Other Bank";
-        public static string ShowAccountHolderTransactions = "Show Account Holder Transactions";
-        public static string RevertTransaction = "Revert Transaction";
-        public static string Logout = "Logout";
-
         public static readonly List<string> BankStaffOption = new List<string>
         {
-            CreateAccountHolder,
-            UpdateAccountHolder,
-            DeleteAccountHolder,
-            ShowAllAccountHolders,
-            AddCurrency,
-            UpdateServiceChargesForSameBank,
-            UpdateServiceChargesForOtherBank,
-            ShowAccountHolderTransactions,
-            RevertTransaction,
-            Logout
+            "Create Account Holder",
+            "Update Account Holder",
+            "Delete Account Holder",
+            "Show All Account Holders",
+            "Add Currency",
+            "Update Service Charges for Same Bank",
+            "Update Service Charges for Other Bank",
+            "Show Account Holder Transactions",
+            "Revert Transaction",
+            "Logout"
         };
 
-        // User Account Options
-        public static string Deposit = "Deposit";
-        public static string Withdraw = "Withdraw";
-        public static string Transfer = "Transfer";
-        public static string CheckBalance = "Check Balance";
-        public static string Transactions = "Transactions";
-        public static string UserLogout = "Logout";
-
+        //User account Menu Options
         public static readonly List<string> UserAccountOption = new List<string>
         {
-            Deposit,
-            Withdraw,
-            Transfer,
-            CheckBalance,
-            Transactions,
-            Logout
+            "Deposit",
+            "Withdraw",
+            "Transfer",
+            "Check Balance",
+            "Transactions",
+            "Logout"
         };
+
 
 
         //Styles
