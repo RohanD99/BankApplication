@@ -10,7 +10,5 @@
 
         public string AccountType { get; set; }
 
-        public string BankId { get; set; }
-
     }
 }

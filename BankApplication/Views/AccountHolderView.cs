@@ -11,31 +11,37 @@ namespace BankApplication.Views
     internal class AccountHolderView
     {
         static AccountHolderService accountHolderService = new AccountHolderService();
-        public static void BankStaffMenu()
+        User loggedInUser { get; set; }
+
+        public AccountHolderView()
+        {
+            loggedInUser = new User();
+        }
+        public static void InitiateBankStaff(string bankId)
         {
             BankStaffOption option;
             do
             {
-                BankService bankService = new BankService();
-                TransactionService transactionService = new TransactionService();
-                Employee loggedInEmployee = bankService.GetEmployee();
+                BankService bankService = new BankService();               
+                AccountHolderView accountHolderView = new AccountHolderView();
+       
                 Utility.GenerateOptions(Constants.BankStaffOption);
                 option = (BankStaffOption)Convert.ToInt32(Console.ReadLine());
                 switch (option)
                 {
                     case BankStaffOption.CreateAccountHolder:
-                        AddAccountHolder();
+                        accountHolderView.AddAccountHolder();
                         break;
 
                     case BankStaffOption.UpdateAccountHolder:
                         string accountToUpdate = Utility.GetStringInput("Enter Account ID to update account holder: ", true);
                         AccountHolderService AccountService = new AccountHolderService();
                         AccountHolder accountHolderToUpdate = AccountService.GetAccountHolderById(accountToUpdate);
-                        UpdateAccountHolder(accountHolderToUpdate);
+                        accountHolderView.UpdateAccountHolder(accountHolderToUpdate);
                         break;
 
                     case BankStaffOption.DeleteAccountHolder:
-                        DeleteAccountHolder();
+                        accountHolderView.DeleteAccountHolder();
                         break;
 
                     case BankStaffOption.ShowAllAccountHolders:
@@ -54,22 +60,14 @@ namespace BankApplication.Views
                                                       $"Account holder Name: {accountHolder.Name}\n" +
                                                       $"Account holder Username: {accountHolder.UserName}\n" +
                                                       $"Account holder's Password: {accountHolder.Password}\n" +
-                                                      $"Account holder's Account Number: {accountHolder.AccountNumber}\n" +
-                                                      $"Account holder's Acc type: {accountHolder.AccountType}\n" +
-                                                      $"Created by: {accountHolder.CreatedBy}\n" +
-                                                      $"Created on: {accountHolder.CreatedOn}\n" +
-                                                      "----------------------------------------");
+                                                      $"Account holder's Account Number: {accountHolder.AccountNumber}\n");
                                 }
                             }
-                            else
-                            {
-                                Console.WriteLine("No account holders found for the specified bank.");
-                            }
+                            else                           
+                                Console.WriteLine("No account holders found for the specified bank.");                            
                         }
-                        else
-                        {
+                        else                      
                             Console.WriteLine(showAllResponse.Message);
-                        }
                         break;
 
                     case BankStaffOption.AddCurrency:
@@ -78,9 +76,7 @@ namespace BankApplication.Views
                         Utility.GetStringInput("Enter Exchange Rate: ", true);
                         decimal exchangeRate;
                         if (!decimal.TryParse(Console.ReadLine(), out exchangeRate))
-                        {
                             Console.WriteLine("Invalid exchange rate. Please enter a valid decimal number.");
-                        }
                         Response<string> response = bankService.AddAcceptedCurrency(currencyCode, exchangeRate);
                         break;
 
@@ -104,25 +100,24 @@ namespace BankApplication.Views
                         Console.WriteLine(updateOtherBankChargeResponse.Message);
                         break;
 
-                    case BankStaffOption.ShowAccountHolderTransactions:                       
+                    case BankStaffOption.ShowAccountHolderTransactions:
+                        TransactionService transactionService = new TransactionService();
                         string accountNumber = Utility.GetStringInput("Enter Account Holder's Account Number: ", true);
-                        Response<string> transactionHistoryResponse = transactionService.GetTransactionHistory(null, accountNumber);
+                        Response<List<Transaction>> transactionHistoryResponse = transactionService.GetTransactionHistory(null, accountHolderView.loggedInUser.BankId, accountNumber);
 
                         if (transactionHistoryResponse.IsSuccess)
                         {
                             Console.WriteLine(transactionHistoryResponse.Message);
-                            Console.WriteLine(transactionHistoryResponse.Data);
+                            Utility.GetTransactionDetails(transactionHistoryResponse.Data);
                         }
                         else
-                        {
                             Console.WriteLine(transactionHistoryResponse.Message);
-                        }
                         break;
-
+                        
                     case BankStaffOption.RevertTransaction:
                         Utility.GetStringInput("Enter Transaction ID to revert: ", true);
                         string transactionIDToRevert = Console.ReadLine();
-                        Response<string> revertResponse = transactionService.RevertTransaction(transactionIDToRevert);
+                        Response<string> revertResponse = bankService.RevertTransaction(transactionIDToRevert);
                         Console.WriteLine(revertResponse.Message);
                         break;
 
@@ -136,11 +131,12 @@ namespace BankApplication.Views
             } while (option != BankStaffOption.Logout);
         }
 
-        public static void AddAccountHolder()
+        public void AddAccountHolder()
         {
-            BankService bankService = new BankService();
+            EmployeeService employeeService = new EmployeeService();
             AccountHolderService accountHolderService = new AccountHolderService();
-            Employee employee = bankService.GetEmployee();
+            string employeeId = Utility.GetStringInput("Enter account Id", true);
+            Employee employee = employeeService.GetEmployee(employeeId);
 
             AccountHolder accountHolder = new AccountHolder()
             {
@@ -148,11 +144,12 @@ namespace BankApplication.Views
                 Password = Utility.GetStringInput("Enter password", true),
                 Name = Utility.GetStringInput("Enter account holder name", true),
                 AccountType = Utility.GetStringInput("Enter account type", true),
-                CreatedBy = employee.Designation,
+                CreatedBy = employee.Id,
                 CreatedOn = DateTime.Now,
                 Type = Enums.UserType.AccountHolder,
                 BankId = employee.BankId
             };
+
             Response<string> response = accountHolderService.Create(accountHolder);
             if (response.IsSuccess)
             {
@@ -162,45 +159,34 @@ namespace BankApplication.Views
                     $"Account holder Name: {accountHolder.Name}\n" +
                     $"Account holder Username: {accountHolder.UserName}\n" +
                     $"Account holder's Password: {accountHolder.Password}\n" +
-                    $"Account holder's Account Number: {accountHolder.AccountNumber}\n" +
-                    $"Account holder's Acc type: {accountHolder.AccountType}\n" +
-                    $"Created by: {accountHolder.CreatedBy}\n" +
-                    $"Created on: {accountHolder.CreatedOn}\n" +
-                    $"----------------------------------------"
+                    $"Account holder's Account Number: {accountHolder.AccountNumber}\n"
                 );
             }
             else
-            {
                 Console.WriteLine(response.Message);
-            }
         }
 
-        public static void UpdateAccountHolder(AccountHolder accountHolder)
+        public void UpdateAccountHolder(AccountHolder accountHolder)
         {
-            AccountHolderService AccountHolderService = new AccountHolderService();
-
+            AccountHolderService accountHolderService = new AccountHolderService();
+           
             if (accountHolder != null)
             {
-                Console.WriteLine("Please enter the updated details:");
-                accountHolder.UserName = Utility.GetStringInput(Constants.Username, false, accountHolder.UserName);
-                accountHolder.Password = Utility.GetStringInput(Constants.Password, false, accountHolder.Password);
-                accountHolder.Name = Utility.GetStringInput(Constants.AccountHolderName, false, accountHolder.Name);
-                accountHolder.AccountType = Utility.GetStringInput(Constants.AccountType, false, accountHolder.AccountType);
-                
-                Response<AccountHolder> updateResponse = AccountHolderService.Update(accountHolder);
+                AccountHolder oldAccountHolder = accountHolderService.GetAccountHolderByAccountNumber(accountHolder.AccountNumber);
+                oldAccountHolder.UserName = accountHolder.UserName;
+                oldAccountHolder.Password = accountHolder.Password;
+                oldAccountHolder.Name = accountHolder.Name;
+                oldAccountHolder.AccountType = accountHolder.AccountType;
 
+                Response<AccountHolder> updateResponse = accountHolderService.Update(accountHolder);
                 if (updateResponse.IsSuccess)
-                {
-                    Console.WriteLine(updateResponse.Message);
-                }                
+                    Console.WriteLine(updateResponse.Message);              
             }
             else
-            {
                 Console.WriteLine(Constants.AccountUpdateFailure);
-            }
         }
 
-        public static void DeleteAccountHolder()
+        public void DeleteAccountHolder()
         {
             string accountToDelete = Utility.GetStringInput("Enter Account ID to delete account holder: ", true);
             AccountHolderService accountHolderService = new AccountHolderService();
@@ -210,20 +196,17 @@ namespace BankApplication.Views
             Console.WriteLine(deleteResponse.Message);
         }
 
-        public static void LoginAsAccountHolder()
+        public void LoginAsAccountHolder()
         {
+            SecurityService securityService = new SecurityService();
             EmployeeView EmployeeView = new EmployeeView();
             string username = Utility.GetStringInput("Username", true);
             string password = Utility.GetStringInput("Password", true);
-            AccountHolder loggedInAccountHolder = SecurityService.Login<AccountHolder>(username, password, typeof(AccountHolder));
+            AccountHolder loggedInAccountHolder = securityService.Login<AccountHolder>(username, password, UserType.AccountHolder);
             if (loggedInAccountHolder != null)
-            {
-                EmployeeView.UserAccountMenu(loggedInAccountHolder);
-            }
+                EmployeeView.InitiateUserAccount(loggedInAccountHolder);
             else
-            {
                 Console.WriteLine("Account not found");
-            }
         }
     }
 }

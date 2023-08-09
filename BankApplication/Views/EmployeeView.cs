@@ -2,6 +2,7 @@
 using BankApplication.Models;
 using BankApplication.Services;
 using System;
+using System.Collections.Generic;
 using static BankApplication.Common.Enums;
 
 namespace BankApplication.Views
@@ -10,7 +11,7 @@ namespace BankApplication.Views
     {  
         BankService bankService = new BankService();
         AccountHolderService accountHolderService = new AccountHolderService();
-        public void UserAccountMenu(AccountHolder loggedInAccount)
+        public void InitiateUserAccount(AccountHolder loggedInAccount)
         {
             UserAccountOption option;
             do
@@ -35,13 +36,10 @@ namespace BankApplication.Views
                         if (accountHolder != null)
                         {
                             Response<string> depositResponse = bankService.Deposit(accountHolder, depositAmount);
-
                             Console.WriteLine(depositResponse.Message);
                         }
                         else
-                        {
                             Console.WriteLine("Account holder not found.");
-                        }
                         break;
 
                     case UserAccountOption.Withdraw:
@@ -63,19 +61,16 @@ namespace BankApplication.Views
 
                     case UserAccountOption.Transactions:
                         TransactionService transactionService = new TransactionService();
-                        Response<string> transactionHistoryResponse = transactionService.GetTransactionHistory(loggedInAccount);
+                        Response<List<Transaction>> transactionHistoryResponse = transactionService.GetTransactionHistory(loggedInAccount, loggedInAccount.BankId, loggedInAccount.AccountNumber);
 
                         if (transactionHistoryResponse.IsSuccess)
                         {
                             Console.WriteLine(transactionHistoryResponse.Message);
-                            Console.WriteLine(transactionHistoryResponse.Data);
+                            Utility.GetTransactionDetails(transactionHistoryResponse.Data);
                         }
                         else
-                        {
                             Console.WriteLine(transactionHistoryResponse.Message);
-                        }
                         break;
-
 
                     case UserAccountOption.Logout:
                         break;
@@ -88,5 +83,3 @@ namespace BankApplication.Views
         }      
     }
 }
-
-

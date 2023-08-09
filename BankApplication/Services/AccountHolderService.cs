@@ -36,14 +36,14 @@ namespace BankApplication.Services
 
             try
             {
-                AccountHolder oldAccountHolder = GetAccountHolderById(accountHolder.Id);
+                AccountHolder oldAccountHolder = GetAccountHolderByAccountNumber(accountHolder.AccountNumber);
 
                 if (oldAccountHolder != null)
                 {
-                    oldAccountHolder.UserName = accountHolder.UserName;
-                    oldAccountHolder.Password = accountHolder.Password;
-                    oldAccountHolder.Name = accountHolder.Name;
-                    oldAccountHolder.AccountType = accountHolder.AccountType;
+                    oldAccountHolder.UserName = Utility.GetStringInput(Constants.Username, false, accountHolder.UserName);
+                    oldAccountHolder.Password = Utility.GetStringInput(Constants.Password, false, accountHolder.Password);
+                    oldAccountHolder.Name = Utility.GetStringInput(Constants.AccountHolderName, false, accountHolder.Name);
+                    oldAccountHolder.AccountType = Utility.GetStringInput(Constants.AccountType, false, accountHolder.AccountType);
 
                     int index = DataStorage.AccountHolders.IndexOf(oldAccountHolder);
                     if (index >= 0)
@@ -97,7 +97,6 @@ namespace BankApplication.Services
 
             return response;
         }
-
 
         public Response<List<AccountHolder>> GetAllAccountHolders(string bankID)
         {

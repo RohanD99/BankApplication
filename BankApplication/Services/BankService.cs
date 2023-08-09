@@ -9,12 +9,11 @@ namespace BankApplication.Services
     internal class BankService
     {
         private TransactionService transactionService;
-
         public BankService()
         {
             this.transactionService = new TransactionService();
         }
-        public Response<string> CreateBank(Bank bank)
+        public Response<string> Create(Bank bank)
         {
             Response<string> response = new Response<string>();
             try
@@ -49,19 +48,15 @@ namespace BankApplication.Services
                     return response;
                 }
                 account.Balance += amount;
-                string transactionId = transactionService.GetTransactionId(account);
-
-                Transaction transaction = new Transaction
+                string transactionId = transactionService.AddTransactionAndGetId(new Transaction
                 {
-                    Id = transactionId,
                     SrcAccount = account.AccountNumber,
                     Type = Constants.Deposited,
                     Amount = amount,
                     CreatedBy = account.CreatedBy,
                     CreatedOn = DateTime.Now
-                };
+                }, account);
 
-                transactionService.AddTransactionToDataStorage(transaction);
                 response.IsSuccess = true;
                 response.Message = Constants.DepositSuccess;
                 response.Data = account.Balance.ToString();
@@ -92,19 +87,16 @@ namespace BankApplication.Services
                     return response;
                 }
                 account.Balance -= amount;
-                string transactionId = transactionService.GetTransactionId(account);
-                Transaction transaction = new Transaction
+                string transactionId = transactionService.AddTransactionAndGetId(new Transaction
                 {
-                    Id = transactionId,
                     SrcAccount = account.AccountNumber,
                     DstAccount = account.AccountNumber,
                     Type = Constants.Withdrawal,
                     Amount = -amount,
                     CreatedBy = account.Name,
                     CreatedOn = DateTime.Now
-                };
+                }, account);
 
-                transactionService.AddTransactionToDataStorage(transaction);
                 response.IsSuccess = true;
                 response.Message = Constants.WithdrawalSuccess;
                 response.Data = account.Balance.ToString();
@@ -152,31 +144,29 @@ namespace BankApplication.Services
                 }
                 sourceAccount.Balance -= transferAmount;
                 destinationAccount.Balance += amount;
+
                 // source transaction
-                Transaction sourceTransaction = new Transaction
+                transactionService.AddTransactionAndGetId(new Transaction
                 {
-                    Id = transactionService.GetTransactionId(sourceAccount),
                     SrcAccount = sourceAccount.AccountNumber,
                     DstAccount = destinationAccount.AccountNumber,
                     Type = Constants.TransferFunds,
                     Amount = -transferAmount,
                     CreatedBy = sourceAccount.Name,
                     CreatedOn = DateTime.Now
-                };
+                }, sourceAccount);
+
                 // destination transaction
-                Transaction destinationTransaction = new Transaction
+                transactionService.AddTransactionAndGetId(new Transaction
                 {
-                    Id = transactionService.GetTransactionId(destinationAccount),
                     SrcAccount = sourceAccount.AccountNumber,
                     DstAccount = destinationAccount.AccountNumber,
                     Type = Constants.TransferFunds,
                     Amount = amount,
                     CreatedBy = destinationAccount.Name,
                     CreatedOn = DateTime.Now
-                };
+                }, destinationAccount);
 
-                transactionService.AddTransactionToDataStorage(sourceTransaction);
-                transactionService.AddTransactionToDataStorage(destinationTransaction);
                 response.IsSuccess = true;
                 response.Message = Constants.TransferFundsSuccess;
             }
@@ -279,9 +269,54 @@ namespace BankApplication.Services
             return response;
         }
 
-        public Employee GetEmployee()
+        public Response<string> RevertTransaction(string transactionId)
         {
-            return DataStorage.Employees.FirstOrDefault(emp => emp.Type == Enums.UserType.Employee);
+            Response<string> response = new Response<string>();
+
+            try
+            {
+                Transaction transactionToRevert = DataStorage.Transactions.Find(t => t.Id == transactionId);
+
+                if (transactionToRevert != null)
+                {
+                    AccountHolder account = DataStorage.AccountHolders.Find(a => a.AccountNumber == transactionToRevert.SrcAccount);
+
+                    if (account != null)
+                    {
+                        if (account.Balance < transactionToRevert.Amount)
+                        {
+                            response.IsSuccess = false;
+                            response.Message = Constants.TransactionFailure;
+                        }
+                        else
+                        {
+                            // Revert the transaction by adding the transaction amount back to the account balance
+                            account.Balance += transactionToRevert.Amount;
+                            response.IsSuccess = true;
+                            response.Message = Constants.TransactionRevert;
+                        }
+                    }
+                    else
+                    {
+                        //account was not found
+                        response.IsSuccess = false;
+                        response.Message = Constants.AccountNotFound;
+                    }
+                }
+                else
+                {
+                    //The transaction with the given ID was not found
+                    response.IsSuccess = false;
+                    response.Message = Constants.TransactionFailure;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.IsSuccess = false;
+                response.Message = ex.Message;
+            }
+
+            return response;
         }
     }
 }

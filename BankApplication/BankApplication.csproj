@@ -43,7 +43,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Builders\TransactionBuilder.cs" />
     <Compile Include="Common\Constants.cs" />
     <Compile Include="Common\DataStorage.cs" />
     <Compile Include="Common\Enums.cs" />

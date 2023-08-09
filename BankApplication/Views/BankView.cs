@@ -9,7 +9,6 @@ namespace BankApplication.Views
 {
     public class BankView
     {
-        private Employee CurrentEmployee;
         private BankService bankService;
         public BankView()
         {
@@ -31,7 +30,8 @@ namespace BankApplication.Views
                             break;
 
                         case MainMenu.LoginAsAccountHolder:
-                            AccountHolderView.LoginAsAccountHolder();
+                            AccountHolderView accountHolderView = new AccountHolderView();
+                            accountHolderView.LoginAsAccountHolder();
                             break;
 
                         case MainMenu.LoginAsBankStaff:
@@ -70,7 +70,7 @@ namespace BankApplication.Views
                     RTGSforOtherBank = 2,
                     RTGSforSameBank = 0
                 };
-                var response = bankService.CreateBank(Bank);
+                var response = bankService.Create(Bank);
                 Console.WriteLine(response.Message);
 
                 if (!response.IsSuccess)
@@ -88,6 +88,7 @@ namespace BankApplication.Views
                                        $"Created On: {Bank.CreatedOn}");
 
                     var adminName = SetupBankAdmin(Bank.Id);
+                    AddEmployee();
                 }            
             }
             catch (Exception ex)
@@ -96,7 +97,7 @@ namespace BankApplication.Views
             }
         }
 
-        private string SetupBankAdmin(string bankID)
+        private bool SetupBankAdmin(string bankID)
         {
             EmployeeService EmployeeService = new EmployeeService();
             try
@@ -110,19 +111,17 @@ namespace BankApplication.Views
                     Type = Enums.UserType.Admin
                 };
 
-                EmployeeService.Create(Admin);
-                Console.WriteLine("Admin added successfully");
-                CurrentEmployee = Admin;
-                AddEmployee();
+                var response = EmployeeService.Create(Admin);
+                Console.WriteLine(response.Message);
                 Console.WriteLine($"Employee's ID : {Admin.Id}");
-                Console.WriteLine($"Employee's BankID : {Admin.BankId}");
-                Console.WriteLine("----------------------------------------");
-                return Admin.Id;
+                Console.WriteLine($"Employee's BankID : {Admin.BankId}");            
+                return response.IsSuccess;
+                
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                return null;
+                return false;
             }
         }
 
@@ -149,20 +148,20 @@ namespace BankApplication.Views
             }
         }
 
-        public static void LoginAsBankStaff()
+        public void LoginAsBankStaff()
         {
+            SecurityService securityService = new SecurityService();
             string username = Utility.GetStringInput("Username", true);
             string password = Utility.GetStringInput("Password", true);
-            Employee loggedInEmployee = SecurityService.Login<Employee>(username, password, typeof(Employee));
+            Employee loggedInEmployee = securityService.Login<Employee>(username, password, UserType.Employee);
 
             if (loggedInEmployee != null)
             {
-                AccountHolderView.BankStaffMenu();
+                string bankId = Utility.GetStringInput("Bank ID", true);
+                AccountHolderView.InitiateBankStaff(bankId);           
             }
             else
-            {
-                Console.WriteLine("Account not found");
-            }
+                Console.WriteLine("Account not found");            
         }
 
         public void GetTransferFunds(AccountHolder loggedInAccount)

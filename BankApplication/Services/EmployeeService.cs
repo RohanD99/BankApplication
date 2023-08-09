@@ -1,5 +1,6 @@
 ﻿using BankApplication.Common;
 using BankApplication.Models;
+using System.Linq;
 
 namespace BankApplication.Services
 {
@@ -22,6 +23,11 @@ namespace BankApplication.Services
                 response.Message = Constants.EmployeeCreationFailure;
             }
             return response;
+        }
+
+        public Employee GetEmployee(string employeeId)
+        {
+            return DataStorage.Employees.FirstOrDefault(emp => emp.Type == Enums.UserType.Employee && emp.Id == employeeId);
         }
     }   
 }

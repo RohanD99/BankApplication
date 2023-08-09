@@ -1,19 +1,19 @@
 ﻿using BankApplication.Common;
-using BankApplication.Models;
 using System;
 using System.Linq;
+using static BankApplication.Common.Enums;
 
 namespace BankApplication.Services
 {
     internal class SecurityService
     {
-        public static T Login<T>(string username, string password, Type userType)
+        public T Login<T>(string username, string password, UserType usertype)
         {
-            if (userType == typeof(Employee))
+            if (usertype == UserType.Employee)
             {
                 return (T)Convert.ChangeType(DataStorage.Employees.FirstOrDefault(e => e.UserName == username && e.Password == password), typeof(T));
             }
-            else if (userType == typeof(AccountHolder))
+            else if (usertype == UserType.AccountHolder)
             {
                 return (T)Convert.ChangeType(DataStorage.AccountHolders.FirstOrDefault(a => a.UserName == username && a.Password == password), typeof(T));
             }

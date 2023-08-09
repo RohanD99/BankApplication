@@ -39,6 +39,8 @@ namespace BankApplication.Common
 
         public static string ViewTransactionHistory = "Viewing transaction history for account number: {0}";
 
+        public static string InvalidTransactionInput = "Account number and BankID should not be empty";
+
         //Employees
         public static string EmployeeCreationSuccess = "Employee created successfully";
 

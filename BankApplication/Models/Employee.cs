@@ -6,8 +6,6 @@
 
         public string Email { get; set; }
 
-        public string BankId { get; set; }
-
         public string Designation { get; set; }
     }
 }
