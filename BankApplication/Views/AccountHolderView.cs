@@ -35,8 +35,8 @@ namespace BankApplication.Views
 
                     case BankStaffOption.UpdateAccountHolder:
                         string accountToUpdate = Utility.GetStringInput("Enter Account ID to update account holder: ", true);
-                        AccountHolderService AccountService = new AccountHolderService();
-                        AccountHolder accountHolderToUpdate = AccountService.GetAccountHolderById(accountToUpdate);
+                        AccountHolderService accountService = new AccountHolderService();
+                        AccountHolder accountHolderToUpdate = accountService.GetAccountHolderById(accountToUpdate);
                         accountHolderView.UpdateAccountHolder(accountHolderToUpdate);
                         break;
 

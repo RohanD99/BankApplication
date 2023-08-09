@@ -119,7 +119,7 @@ namespace BankApplication.Services
         {
             try
             {
-                return DataStorage.AccountHolders.FirstOrDefault(a => a.Id == accountId);
+                return DataStorage.AccountHolders.Find(a => a.Id == accountId);
             }
             catch (Exception ex)
             {

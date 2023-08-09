@@ -236,7 +236,7 @@ namespace BankApplication.Services
 
             try
             {
-                Bank bank = DataStorage.Banks.FirstOrDefault(b => b.Id == bankID);
+                Bank bank = DataStorage.Banks.Find(b => b.Id == bankID);
                 if (bank == null)
                 {
                     response.IsSuccess = false;
