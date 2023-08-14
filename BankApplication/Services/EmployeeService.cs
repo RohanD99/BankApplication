@@ -1,6 +1,5 @@
 ﻿using BankApplication.Common;
 using BankApplication.Models;
-using System.Linq;
 
 namespace BankApplication.Services
 {

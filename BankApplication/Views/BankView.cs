@@ -65,7 +65,7 @@ namespace BankApplication.Views
         {
             try
             {
-                Bank Bank = new Bank()
+                Bank bank = new Bank()
                 {
                     Name = Utility.GetStringInput("Enter Bank Name", true),
                     Location = Utility.GetStringInput("Enter Location", true),
@@ -75,7 +75,7 @@ namespace BankApplication.Views
                     RTGSforOtherBank = 2,
                     RTGSforSameBank = 0
                 };
-                var response = this.BankService.Create(Bank);
+                var response = this.BankService.Create(bank);
                 Console.WriteLine(response.Message);
 
                 if (!response.IsSuccess)
@@ -85,14 +85,14 @@ namespace BankApplication.Views
                 else
                 {
                     Console.WriteLine("Bank Details:\n" +
-                                       $"Bank ID: {Bank.Id.ToUpper()}\n" +
-                                       $"Bank Name: {Bank.Name}\n" +
-                                       $"Location: {Bank.Location}\n" +
-                                       $"IFSC Code: {Bank.IFSC}\n" +
-                                       $"Created By: {Bank.CreatedBy}\n" +
-                                       $"Created On: {Bank.CreatedOn}");
+                                       $"Bank ID: {bank.Id.ToUpper()}\n" +
+                                       $"Bank Name: {bank.Name}\n" +
+                                       $"Location: {bank.Location}\n" +
+                                       $"IFSC Code: {bank.IFSC}\n" +
+                                       $"Created By: {bank.CreatedBy}\n" +
+                                       $"Created On: {bank.CreatedOn}");
 
-                    var adminName = SetupBankAdmin(Bank.Id);                    
+                    var adminName = SetupBankAdmin(bank.Id);                    
                 }            
             }
             catch (Exception ex)
@@ -103,10 +103,10 @@ namespace BankApplication.Views
 
         private bool SetupBankAdmin(string bankID)
         {
-            EmployeeService EmployeeService = new EmployeeService();
+            EmployeeService employeeService = new EmployeeService();
             try
             {
-                Employee Admin = new Employee()
+                Employee admin = new Employee()
                 {
                     BankId = bankID,
                     Name = Utility.GetStringInput("Enter Admin Name", true),
@@ -115,10 +115,10 @@ namespace BankApplication.Views
                     Type = Enums.UserType.Admin
                 };
 
-                var response = EmployeeService.Create(Admin);
+                var response = employeeService.Create(admin);
                 Console.WriteLine(response.Message);
-                Console.WriteLine($"Admin's ID : {Admin.Id}");
-                Console.WriteLine($"Admin's Password : {Admin.Password}");   
+                Console.WriteLine($"Admin's ID : {admin.Id}");
+                Console.WriteLine($"Admin's Password : {admin.Password}");   
                 return response.IsSuccess;       
             }
             catch (Exception ex)
@@ -132,7 +132,7 @@ namespace BankApplication.Views
         {
             try
             {
-                Employee Employee = new Employee()
+                Employee employee = new Employee()
                 {
                     Id = Utility.GenerateEmployeeID(),
                     Name = Utility.GetStringInput("Enter Employee Name", true),
@@ -143,7 +143,7 @@ namespace BankApplication.Views
                     Type = Enums.UserType.Employee
                 };
 
-                DataStorage.Employees.Add(Employee);
+                DataStorage.Employees.Add(employee);
                 Console.WriteLine("Employee added successfully");
             }
             catch (Exception ex)
