@@ -1,18 +1,19 @@
 ﻿using BankApplication.Common;
 using BankApplication.Models;
 using System;
-using System.Linq;
 using static BankApplication.Common.Enums;
 
 namespace BankApplication.Services
 {
     internal class BankService
     {
-        private TransactionService transactionService;
+        private TransactionService TransactionService;
+
         public BankService()
         {
-            this.transactionService = new TransactionService();
+            this.TransactionService = new TransactionService();
         }
+
         public Response<string> Create(Bank bank)
         {
             Response<string> response = new Response<string>();
@@ -48,7 +49,7 @@ namespace BankApplication.Services
                     return response;
                 }
                 account.Balance += amount;
-                string transactionId = transactionService.AddTransactionAndGetId(new Transaction
+                string transactionId = this.TransactionService.AddTransactionAndGetId(new Transaction
                 {
                     SrcAccount = account.AccountNumber,
                     Type = Constants.Deposited,
@@ -87,7 +88,7 @@ namespace BankApplication.Services
                     return response;
                 }
                 account.Balance -= amount;
-                string transactionId = transactionService.AddTransactionAndGetId(new Transaction
+                string transactionId = this.TransactionService.AddTransactionAndGetId(new Transaction
                 {
                     SrcAccount = account.AccountNumber,
                     DstAccount = account.AccountNumber,
@@ -146,7 +147,7 @@ namespace BankApplication.Services
                 destinationAccount.Balance += amount;
 
                 // source transaction
-                transactionService.AddTransactionAndGetId(new Transaction
+                this.TransactionService.AddTransactionAndGetId(new Transaction
                 {
                     SrcAccount = sourceAccount.AccountNumber,
                     DstAccount = destinationAccount.AccountNumber,
@@ -157,7 +158,7 @@ namespace BankApplication.Services
                 }, sourceAccount);
 
                 // destination transaction
-                transactionService.AddTransactionAndGetId(new Transaction
+                this.TransactionService.AddTransactionAndGetId(new Transaction
                 {
                     SrcAccount = sourceAccount.AccountNumber,
                     DstAccount = destinationAccount.AccountNumber,

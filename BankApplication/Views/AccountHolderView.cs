@@ -10,13 +10,16 @@ namespace BankApplication.Views
 {
     internal class AccountHolderView
     {
-        static AccountHolderService accountHolderService = new AccountHolderService();
-        User loggedInUser { get; set; }
+
+        static AccountHolderService AccountHolderService = new AccountHolderService();
+
+        public User LoggedInUser { get; set; }
 
         public AccountHolderView()
         {
-            loggedInUser = new User();
+            this.LoggedInUser = new User();
         }
+
         public static void InitiateBankStaff(string bankId)
         {
             BankStaffOption option;
@@ -47,7 +50,7 @@ namespace BankApplication.Views
                     case BankStaffOption.ShowAllAccountHolders:
                         Console.Write("Enter Bank ID to view account holders: ");
                         string bankIdToView = Console.ReadLine();  
-                        Response<List<AccountHolder>> showAllResponse = accountHolderService.GetAllAccountHolders(bankIdToView);
+                        Response<List<AccountHolder>> showAllResponse = AccountHolderService.GetAllAccountHolders(bankIdToView);
 
                         if (showAllResponse.IsSuccess)
                         {
@@ -103,7 +106,7 @@ namespace BankApplication.Views
                     case BankStaffOption.ShowAccountHolderTransactions:
                         TransactionService transactionService = new TransactionService();
                         string accountNumber = Utility.GetStringInput("Enter Account Holder's Account Number: ", true);
-                        Response<List<Transaction>> transactionHistoryResponse = transactionService.GetTransactionHistory(null, accountHolderView.loggedInUser.BankId, accountNumber);
+                        Response<List<Transaction>> transactionHistoryResponse = transactionService.GetTransactionHistory(null, accountHolderView.LoggedInUser.BankId, accountNumber);
 
                         if (transactionHistoryResponse.IsSuccess)
                         {
@@ -135,8 +138,14 @@ namespace BankApplication.Views
         {
             EmployeeService employeeService = new EmployeeService();
             AccountHolderService accountHolderService = new AccountHolderService();
-            string employeeId = Utility.GetStringInput("Enter account Id", true);
-            Employee employee = employeeService.GetEmployee(employeeId);
+
+            Employee employee = employeeService.GetEmployee();
+
+            if (employee == null)
+            {
+                Console.WriteLine("Employee not found. Cannot proceed to add account holder.");
+                return;
+            }
 
             AccountHolder accountHolder = new AccountHolder()
             {
@@ -163,7 +172,9 @@ namespace BankApplication.Views
                 );
             }
             else
+            {
                 Console.WriteLine(response.Message);
+            }
         }
 
         public void UpdateAccountHolder(AccountHolder accountHolder)
@@ -196,17 +207,6 @@ namespace BankApplication.Views
             Console.WriteLine(deleteResponse.Message);
         }
 
-        public void LoginAsAccountHolder()
-        {
-            SecurityService securityService = new SecurityService();
-            EmployeeView EmployeeView = new EmployeeView();
-            string username = Utility.GetStringInput("Username", true);
-            string password = Utility.GetStringInput("Password", true);
-            AccountHolder loggedInAccountHolder = securityService.Login<AccountHolder>(username, password, UserType.AccountHolder);
-            if (loggedInAccountHolder != null)
-                EmployeeView.InitiateUserAccount(loggedInAccountHolder);
-            else
-                Console.WriteLine("Account not found");
-        }
+       
     }
 }

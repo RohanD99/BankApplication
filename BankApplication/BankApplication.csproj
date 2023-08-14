@@ -63,6 +63,7 @@
     <Compile Include="Views\AccountHolderView.cs" />
     <Compile Include="Views\BankView.cs" />
     <Compile Include="Views\EmployeeView.cs" />
+    <Compile Include="Views\SecurityView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

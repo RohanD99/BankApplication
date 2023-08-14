@@ -3,7 +3,6 @@ using BankApplication.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace BankApplication.Services
 {
@@ -36,9 +35,7 @@ namespace BankApplication.Services
                     return response;
                 }
 
-                List<Transaction> transactions = DataStorage.Transactions
-                    .Where(t => t.SrcAccount == accountNumber || t.DstAccount == accountNumber)
-                    .ToList();
+                List<Transaction> transactions = DataStorage.Transactions.Where(t => t.SrcAccount == accountNumber || t.DstAccount == accountNumber).ToList();
 
                 if (transactions.Any())
                 {

@@ -9,8 +9,8 @@ namespace BankApplication.Views
 {
     internal class EmployeeView
     {  
-        BankService bankService = new BankService();
-        AccountHolderService accountHolderService = new AccountHolderService();
+        BankService BankService = new BankService();
+        AccountHolderService AccountHolderService = new AccountHolderService();
         public void InitiateUserAccount(AccountHolder loggedInAccount)
         {
             UserAccountOption option;
@@ -31,11 +31,11 @@ namespace BankApplication.Views
                             break;
                         }
 
-                        AccountHolder accountHolder = accountHolderService.GetAccountHolderById(accountHolderID);
+                        AccountHolder accountHolder = AccountHolderService.GetAccountHolderById(accountHolderID);
 
                         if (accountHolder != null)
                         {
-                            Response<string> depositResponse = bankService.Deposit(accountHolder, depositAmount);
+                            Response<string> depositResponse = BankService.Deposit(accountHolder, depositAmount);
                             Console.WriteLine(depositResponse.Message);
                         }
                         else
@@ -45,7 +45,7 @@ namespace BankApplication.Views
                     case UserAccountOption.Withdraw:
                         Utility.GetStringInput("Enter the amount to withdraw: ", true);
                         decimal withdrawAmount = Convert.ToDecimal(Console.ReadLine());
-                        Response<string> WithdrawResponse = bankService.Withdraw(loggedInAccount, withdrawAmount);
+                        Response<string> WithdrawResponse = BankService.Withdraw(loggedInAccount, withdrawAmount);
                         Console.WriteLine(WithdrawResponse.Message);
                         break;
 
@@ -55,7 +55,7 @@ namespace BankApplication.Views
                         break;
 
                     case UserAccountOption.CheckBalance:
-                        Response<string> balanceResponse = bankService.CheckBalance(loggedInAccount);
+                        Response<string> balanceResponse = BankService.CheckBalance(loggedInAccount);
                         Console.WriteLine($"Your account balance: {balanceResponse.Data}");
                         break;
 
@@ -80,6 +80,6 @@ namespace BankApplication.Views
                         break;
                 }
             } while (option != UserAccountOption.Logout);
-        }      
+        }
     }
 }

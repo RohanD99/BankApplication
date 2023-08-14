@@ -25,9 +25,9 @@ namespace BankApplication.Services
             return response;
         }
 
-        public Employee GetEmployee(string employeeId)
+        public Employee GetEmployee(string employeeId = "")
         {
-            return DataStorage.Employees.FirstOrDefault(emp => emp.Type == Enums.UserType.Employee && emp.Id == employeeId);
+            return DataStorage.Employees.Find(emp => emp.Type == Enums.UserType.Employee && emp.Id == employeeId);
         }
     }   
 }

@@ -15,7 +15,6 @@ namespace BankApplication.Common
         public static List<AccountHolder> AccountHolders = new List<AccountHolder>();
 
         // Storing transactions
-        public static List<Transaction> Transactions = new List<Transaction>();
-            
+        public static List<Transaction> Transactions = new List<Transaction>();       
     }
 }

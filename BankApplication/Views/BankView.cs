@@ -9,11 +9,15 @@ namespace BankApplication.Views
 {
     public class BankView
     {
-        private BankService bankService;
+        private BankService BankService;
+        SecurityView SecurityView = new SecurityView();
+        private AccountHolderView AccountHolderView = new AccountHolderView();
+
         public BankView()
         {
-            bankService = new BankService();
+            this.BankService = new BankService();
         }
+
         public void Initialize()
         {
             try
@@ -27,15 +31,16 @@ namespace BankApplication.Views
                     {
                         case MainMenu.CreateNewBank:
                             CreateNewBank();
-                            break;
+                            if (AccountHolderView.LoggedInUser.Type == UserType.Admin)
+                                AddEmployee();
+                            break; ;
 
                         case MainMenu.LoginAsAccountHolder:
-                            AccountHolderView accountHolderView = new AccountHolderView();
-                            accountHolderView.LoginAsAccountHolder();
+                            SecurityView.LoginAsAccountHolder();                            
                             break;
 
                         case MainMenu.LoginAsBankStaff:
-                            LoginAsBankStaff();
+                            SecurityView.LoginAsBankStaff();
                             break;
 
                         case MainMenu.Exit:
@@ -70,7 +75,7 @@ namespace BankApplication.Views
                     RTGSforOtherBank = 2,
                     RTGSforSameBank = 0
                 };
-                var response = bankService.Create(Bank);
+                var response = this.BankService.Create(Bank);
                 Console.WriteLine(response.Message);
 
                 if (!response.IsSuccess)
@@ -87,8 +92,7 @@ namespace BankApplication.Views
                                        $"Created By: {Bank.CreatedBy}\n" +
                                        $"Created On: {Bank.CreatedOn}");
 
-                    var adminName = SetupBankAdmin(Bank.Id);
-                    AddEmployee();
+                    var adminName = SetupBankAdmin(Bank.Id);                    
                 }            
             }
             catch (Exception ex)
@@ -113,10 +117,9 @@ namespace BankApplication.Views
 
                 var response = EmployeeService.Create(Admin);
                 Console.WriteLine(response.Message);
-                Console.WriteLine($"Employee's ID : {Admin.Id}");
-                Console.WriteLine($"Employee's BankID : {Admin.BankId}");            
-                return response.IsSuccess;
-                
+                Console.WriteLine($"Admin's ID : {Admin.Id}");
+                Console.WriteLine($"Admin's Password : {Admin.Password}");   
+                return response.IsSuccess;       
             }
             catch (Exception ex)
             {
@@ -131,6 +134,7 @@ namespace BankApplication.Views
             {
                 Employee Employee = new Employee()
                 {
+                    Id = Utility.GenerateEmployeeID(),
                     Name = Utility.GetStringInput("Enter Employee Name", true),
                     UserName = Utility.GetStringInput("Enter UserName", true),
                     Password = Utility.GetStringInput("Enter Password", true),
@@ -146,22 +150,6 @@ namespace BankApplication.Views
             {
                 Console.WriteLine(ex.Message);
             }
-        }
-
-        public void LoginAsBankStaff()
-        {
-            SecurityService securityService = new SecurityService();
-            string username = Utility.GetStringInput("Username", true);
-            string password = Utility.GetStringInput("Password", true);
-            Employee loggedInEmployee = securityService.Login<Employee>(username, password, UserType.Employee);
-
-            if (loggedInEmployee != null)
-            {
-                string bankId = Utility.GetStringInput("Bank ID", true);
-                AccountHolderView.InitiateBankStaff(bankId);           
-            }
-            else
-                Console.WriteLine("Account not found");            
         }
 
         public void GetTransferFunds(AccountHolder loggedInAccount)
@@ -198,7 +186,7 @@ namespace BankApplication.Views
                 return;
             }
 
-            Response<string> transferResponse = bankService.TransferFunds(loggedInAccount, destinationAccount, transferAmount, transferType);
+            Response<string> transferResponse = this.BankService.TransferFunds(loggedInAccount, destinationAccount, transferAmount, transferType);
 
             if (transferResponse.IsSuccess)
             {

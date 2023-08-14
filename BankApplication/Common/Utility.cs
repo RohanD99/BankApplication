@@ -38,7 +38,7 @@ namespace BankApplication.Common
 
         public static string GenerateBankId(string bankName)
         {
-            return string.IsNullOrEmpty(bankName) ? $"{bankName.Length >= 3}" : $"{bankName.Substring(0, Math.Min(3, bankName.Length))}{DateTime.Now:yyyyMMddHHmmss}";
+            return !string.IsNullOrEmpty(bankName) && bankName.Length >= 3 ? bankName.Substring(0, 3) + DateTime.Now.ToString("yyyyMMddHHmmss") : string.Empty;
         }
 
         public static string GenerateEmployeeID()
@@ -73,6 +73,13 @@ namespace BankApplication.Common
                 sb.AppendLine("----------------------------");
             }
             return sb.ToString();
+        }
+
+        public static bool GetYesNoInput(string message)
+        {
+            Console.Write(message);
+            string response = Console.ReadLine().ToLower();
+            return response == "yes";
         }
     }
 }
