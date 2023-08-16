@@ -74,12 +74,5 @@ namespace BankApplication.Common
             }
             return sb.ToString();
         }
-
-        public static bool GetYesNoInput(string message)
-        {
-            Console.Write(message);
-            string response = Console.ReadLine().ToLower();
-            return response == "yes";
-        }
     }
 }
