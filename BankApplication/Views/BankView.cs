@@ -33,7 +33,7 @@ namespace BankApplication.Views
                             CreateNewBank();
                             if (AccountHolderView.LoggedInUser.Type == UserType.Admin)
                                 AddEmployee();
-                            break; ;
+                            break;
 
                         case MainMenu.LoginAsAccountHolder:
                             SecurityView.LoginAsAccountHolder();                            
