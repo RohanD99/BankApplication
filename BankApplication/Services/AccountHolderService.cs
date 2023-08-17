@@ -103,8 +103,17 @@ namespace BankApplication.Services
             Response<List<AccountHolder>> response = new Response<List<AccountHolder>>();
             try
             {
-                response.Data = string.IsNullOrEmpty(bankID) ? new List<AccountHolder>() : DataStorage.AccountHolders.Where(a => a.BankId == bankID).ToList();
-                response.IsSuccess = true;
+                if (string.IsNullOrEmpty(bankID))
+                {
+                    response.IsSuccess = false;
+                    response.Message = Constants.EmptyBankInput;
+                }
+                else
+                {
+                    List<AccountHolder> accountHolders = DataStorage.AccountHolders.Where(a => a.BankId == bankID).ToList();
+                    response.Data = accountHolders;
+                    response.IsSuccess = true;
+                }
             }
             catch (Exception ex)
             {
@@ -114,6 +123,7 @@ namespace BankApplication.Services
 
             return response;
         }
+
 
         public AccountHolder GetAccountHolderById(string accountId)
         {

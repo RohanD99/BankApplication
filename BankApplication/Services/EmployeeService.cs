@@ -21,14 +21,15 @@ namespace BankApplication.Services
                 response.IsSuccess = false;
                 response.Message = Constants.EmployeeCreationFailure;
             }
+
             return response;
         }
 
-        public Employee GetEmployee(string employeeId = "")
+        public Employee GetEmployeeByBankId(string bankId)
         {
-            return DataStorage.Employees.Find(emp => emp.Type == Enums.UserType.Employee && emp.Id == employeeId);
+            return DataStorage.Employees.Find(emp => emp.Type == Enums.UserType.Employee && emp.BankId == bankId);         
         }
-    }   
+    }
 }
 
      

@@ -13,6 +13,8 @@ namespace BankApplication.Common
      
         public static string InvalidAmount = "Invalid amount. It should be greater than zero.";
 
+        public static string EmptyBankInput = "Bank ID cannot be empty.";
+
         //Deposit
         public static string DepositSuccess = "Deposit successful";
 

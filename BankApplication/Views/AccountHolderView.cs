@@ -33,6 +33,7 @@ namespace BankApplication.Views
                 switch (option)
                 {
                     case BankStaffOption.CreateAccountHolder:
+               
                         accountHolderView.AddAccountHolder();
                         break;
 
@@ -85,7 +86,6 @@ namespace BankApplication.Views
 
                     case BankStaffOption.UpdateServiceChargesForSameBank:
                         string bankIdForSameBank = Utility.GetStringInput("Enter Bank ID: ", true);
-                        Utility.GetStringInput("Enter RTGS Charge for Same Bank: ", true);
                         float rtgsChargeSameBank = Convert.ToSingle(Console.ReadLine());
                         Utility.GetStringInput("Enter IMPS Charge for Same Bank: ", true);
                         float impsChargeSameBank = Convert.ToSingle(Console.ReadLine());
@@ -139,13 +139,9 @@ namespace BankApplication.Views
             EmployeeService employeeService = new EmployeeService();
             AccountHolderService accountHolderService = new AccountHolderService();
 
-            Employee employee = employeeService.GetEmployee();
-
-            if (employee == null)
-            {
-                Console.WriteLine("Employee not found. Cannot proceed to add account holder.");
-                return;
-            }
+            string getBankId = Utility.GetStringInput("Enter bankid", true);
+            Employee employee = new Employee();
+            employee = employeeService.GetEmployeeByBankId(getBankId);
 
             AccountHolder accountHolder = new AccountHolder()
             {
@@ -153,10 +149,8 @@ namespace BankApplication.Views
                 Password = Utility.GetStringInput("Enter password", true),
                 Name = Utility.GetStringInput("Enter account holder name", true),
                 AccountType = Utility.GetStringInput("Enter account type", true),
-                CreatedBy = employee.Id,
                 CreatedOn = DateTime.Now,
                 Type = Enums.UserType.AccountHolder,
-                BankId = employee.BankId
             };
 
             Response<string> response = accountHolderService.Create(accountHolder);
@@ -205,8 +199,6 @@ namespace BankApplication.Views
             Response<string> deleteResponse = accountHolderService.Delete(accountToDelete);
 
             Console.WriteLine(deleteResponse.Message);
-        }
-
-       
+        }     
     }
 }

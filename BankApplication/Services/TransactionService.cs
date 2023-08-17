@@ -34,7 +34,7 @@ namespace BankApplication.Services
                     response.Message = Constants.InvalidTransactionInput;
                     return response;
                 }
-
+           
                 List<Transaction> transactions = DataStorage.Transactions.Where(t => t.SrcAccount == accountNumber || t.DstAccount == accountNumber).ToList();
 
                 if (transactions.Any())

@@ -9,13 +9,17 @@ namespace BankApplication.Views
 {
     public class BankView
     {
-        private BankService BankService;
-        SecurityView SecurityView = new SecurityView();
-        private AccountHolderView AccountHolderView = new AccountHolderView();
+        BankService BankService;
+        SecurityView SecurityView;
+        AccountHolderView AccountHolderView;
+        EmployeeView EmployeeView;
 
         public BankView()
         {
             this.BankService = new BankService();
+            this.SecurityView = new SecurityView();
+            this.AccountHolderView = new AccountHolderView();
+            this.EmployeeView = new EmployeeView();
         }
 
         public void Initialize()
@@ -32,15 +36,15 @@ namespace BankApplication.Views
                         case MainMenu.CreateNewBank:
                             CreateNewBank();
                             if (AccountHolderView.LoggedInUser.Type == UserType.Admin)
-                                AddEmployee();
+                                this.EmployeeView.AddEmployee();
                             break;
 
                         case MainMenu.LoginAsAccountHolder:
-                            SecurityView.LoginAsAccountHolder();                            
+                            this.SecurityView.LoginAsAccountHolder();                            
                             break;
 
                         case MainMenu.LoginAsBankStaff:
-                            SecurityView.LoginAsBankStaff();
+                            this.SecurityView.LoginAsBankStaff();
                             break;
 
                         case MainMenu.Exit:
@@ -125,30 +129,6 @@ namespace BankApplication.Views
             {
                 Console.WriteLine(ex.Message);
                 return false;
-            }
-        }
-
-        private void AddEmployee()
-        {
-            try
-            {
-                Employee employee = new Employee()
-                {
-                    Id = Utility.GenerateEmployeeID(),
-                    Name = Utility.GetStringInput("Enter Employee Name", true),
-                    UserName = Utility.GetStringInput("Enter UserName", true),
-                    Password = Utility.GetStringInput("Enter Password", true),
-                    Email = Utility.GetStringInput("Enter Email", true),
-                    Designation = Utility.GetStringInput("Enter Designation", true),
-                    Type = Enums.UserType.Employee
-                };
-
-                DataStorage.Employees.Add(employee);
-                Console.WriteLine("Employee added successfully");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
             }
         }
 

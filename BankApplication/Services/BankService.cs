@@ -67,6 +67,7 @@ namespace BankApplication.Services
                 response.IsSuccess = false;
                 response.Message = ex.Message;
             }
+
             return response;
         }
 
@@ -107,6 +108,7 @@ namespace BankApplication.Services
                 response.IsSuccess = false;
                 response.Message = ex.Message;
             }
+
             return response;
         }
 
@@ -176,6 +178,7 @@ namespace BankApplication.Services
                 response.IsSuccess = false;
                 response.Message = ex.Message;
             }
+
             return response;
         }
 

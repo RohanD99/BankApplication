@@ -81,5 +81,29 @@ namespace BankApplication.Views
                 }
             } while (option != UserAccountOption.Logout);
         }
+
+        public void AddEmployee()
+        {
+            try
+            {
+                Employee employee = new Employee()
+                {
+                    Id = Utility.GenerateEmployeeID(),
+                    Name = Utility.GetStringInput("Enter Employee Name", true),
+                    UserName = Utility.GetStringInput("Enter UserName", true),
+                    Password = Utility.GetStringInput("Enter Password", true),
+                    Email = Utility.GetStringInput("Enter Email", true),
+                    Designation = Utility.GetStringInput("Enter Designation", true),
+                    Type = Enums.UserType.Employee
+                };
+
+                DataStorage.Employees.Add(employee);
+                Console.WriteLine("Employee added successfully");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
     }
 }
