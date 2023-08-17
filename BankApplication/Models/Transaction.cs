@@ -1,4 +1,5 @@
 ﻿using System;
+using static BankApplication.Common.Enums;
 
 namespace BankApplication.Models
 {
@@ -10,7 +11,7 @@ namespace BankApplication.Models
 
         public string DstAccount { get; set; }
 
-        public string Type { get; set; }
+        public TransactionType Type { get; set; }
 
         public decimal Amount { get; set; }
 

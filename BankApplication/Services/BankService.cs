@@ -51,11 +51,12 @@ namespace BankApplication.Services
                 account.Balance += amount;
                 string transactionId = this.TransactionService.AddTransactionAndGetId(new Transaction
                 {
-                    SrcAccount = account.AccountNumber,
-                    Type = Constants.Deposited,
+                    SrcAccount = account.AccountNumber,                 
+                    Type = TransactionType.Deposit,
                     Amount = amount,
                     CreatedBy = account.CreatedBy,
-                    CreatedOn = DateTime.Now
+                    CreatedOn = DateTime.Now,
+                    
                 }, account);
 
                 response.IsSuccess = true;
@@ -93,7 +94,7 @@ namespace BankApplication.Services
                 {
                     SrcAccount = account.AccountNumber,
                     DstAccount = account.AccountNumber,
-                    Type = Constants.Withdrawal,
+                    Type = TransactionType.Withdraw,
                     Amount = -amount,
                     CreatedBy = account.Name,
                     CreatedOn = DateTime.Now
@@ -153,7 +154,7 @@ namespace BankApplication.Services
                 {
                     SrcAccount = sourceAccount.AccountNumber,
                     DstAccount = destinationAccount.AccountNumber,
-                    Type = Constants.TransferFunds,
+                    Type = TransactionType.Transfer,
                     Amount = -transferAmount,
                     CreatedBy = sourceAccount.Name,
                     CreatedOn = DateTime.Now
@@ -164,7 +165,7 @@ namespace BankApplication.Services
                 {
                     SrcAccount = sourceAccount.AccountNumber,
                     DstAccount = destinationAccount.AccountNumber,
-                    Type = Constants.TransferFunds,
+                    Type = TransactionType.Transfer,
                     Amount = amount,
                     CreatedBy = destinationAccount.Name,
                     CreatedOn = DateTime.Now
