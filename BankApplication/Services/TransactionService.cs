@@ -13,7 +13,8 @@ namespace BankApplication.Services
             try
             {
                 DataStorage.Transactions.Add(transaction);
-                return Utility.GenerateTransactionId(transaction.SrcBankId, transaction.SrcAccount);
+                transaction.Id = Utility.GenerateTransactionId(transaction.SrcBankId, transaction.SrcAccount);
+                return transaction.Id;
             }
             catch (Exception ex)
             {
@@ -40,6 +41,7 @@ namespace BankApplication.Services
 
                 if (transactions.Any())
                 {
+                    
                     response.IsSuccess = true;
                     response.Message = Constants.TransactionSuccess;
                     response.Data = transactions;

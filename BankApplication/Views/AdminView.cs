@@ -103,6 +103,7 @@ namespace BankApplication.Views
                 Password = Utility.GetStringInput("Enter password", true),
                 Name = Utility.GetStringInput("Enter account holder name", true),
                 AccountType = Utility.GetStringInput("Enter account type", true),
+                BankId = Utility.GetStringInput("Enter bankId",true),
                 CreatedOn = DateTime.Now,
                 Type = Enums.UserType.AccountHolder,
             };
@@ -187,7 +188,8 @@ namespace BankApplication.Views
             if (transactionHistoryResponse.IsSuccess)
             {
                 Console.WriteLine(transactionHistoryResponse.Message);
-                Utility.GetTransactionDetails(transactionHistoryResponse.Data);
+                string transactionDetails = Utility.GetTransactionDetails(transactionHistoryResponse.Data);
+                Console.WriteLine(transactionDetails);
             }
             else
             {

@@ -125,7 +125,7 @@ namespace BankApplication.Views
             }
         }
 
-        public void Login(UserType userType)
+        private void Login(UserType userType)
         {
             SecurityService securityService = new SecurityService();
             string username = Utility.GetStringInput("Username", true);

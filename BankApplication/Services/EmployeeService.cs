@@ -85,7 +85,7 @@ namespace BankApplication.Services
             return response;
         }
 
-        public List<Employee> GetAllEmployees()
+                public List<Employee> GetAllEmployees()
         {
             return DataStorage.Employees.Where(emp => emp.Type == Enums.UserType.Employee).ToList();
         }
@@ -94,6 +94,7 @@ namespace BankApplication.Services
         {
             return DataStorage.Employees.Find(emp => emp.Type == Enums.UserType.Employee && emp.BankId == bankId);         
         }
+
     }
 }
 

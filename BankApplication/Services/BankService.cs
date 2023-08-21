@@ -54,6 +54,7 @@ namespace BankApplication.Services
                     string transactionId = this.TransactionService.Create(new Transaction
                     {
                         SrcAccount = accountHolder.AccountNumber,
+                        SrcBankId = accountHolder.BankId,
                         Type = TransactionType.Deposit,
                         Amount = amount,
                         CreatedBy = accountHolder.CreatedBy,

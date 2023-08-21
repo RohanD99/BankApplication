@@ -59,7 +59,7 @@ namespace BankApplication.Views
             } while (option != UserAccountOption.Logout);
         }
 
-        private void PerformTransfer()
+        public void PerformTransfer()
         {
             string sourceAccountHolderID = Utility.GetStringInput("Enter source account holder ID: ", true);
             string destinationAccountHolderID = Utility.GetStringInput("Enter destination account holder ID: ", true);
@@ -78,21 +78,26 @@ namespace BankApplication.Views
             Console.WriteLine(transferResponse.Message);
         }
 
-        private void ProcessTransaction(AccountHolder accountHolder)
+        public void ProcessTransaction(AccountHolder accountHolder)
         {
+            string accountNumber = accountHolder.AccountNumber;
+            string bankId = accountHolder.BankId;
+
             TransactionService transactionService = new TransactionService();
-            Response<List<Transaction>> transactionHistoryResponse = transactionService.GetTransactionHistory(accountHolder.BankId, accountHolder.AccountNumber);
+            Response<List<Transaction>> transactionHistoryResponse = transactionService.GetTransactionHistory(bankId, accountNumber);
 
             if (transactionHistoryResponse.IsSuccess)
             {
                 Console.WriteLine(transactionHistoryResponse.Message);
-                Utility.GetTransactionDetails(transactionHistoryResponse.Data);
+                string transactionDetails = Utility.GetTransactionDetails(transactionHistoryResponse.Data);
+                Console.WriteLine(transactionDetails);
             }
             else
             {
                 Console.WriteLine(transactionHistoryResponse.Message);
             }
         }
+
 
         public void PerformDeposit()
         {

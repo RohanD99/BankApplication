@@ -173,7 +173,8 @@ namespace BankApplication.Views
             if (transactionHistoryResponse.IsSuccess)
             {
                 Console.WriteLine(transactionHistoryResponse.Message);
-                Utility.GetTransactionDetails(transactionHistoryResponse.Data);
+                string transactionDetails = Utility.GetTransactionDetails(transactionHistoryResponse.Data);
+                Console.WriteLine(transactionDetails);
             }
             else
             {
@@ -186,7 +187,6 @@ namespace BankApplication.Views
             string bankId = Utility.GetStringInput("Enter Account Holder's BankId: ", true);
             ShowAccountHolderTransactions(bankId);
         }
-
 
         private void UpdateServiceChargesForBank(bool isSameBankAccount)
         {
