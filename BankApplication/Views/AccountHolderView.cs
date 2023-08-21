@@ -45,8 +45,8 @@ namespace BankApplication.Views
                         break;
 
                     case UserAccountOption.Transactions:
-                        if (LoggedInUser is AccountHolder transactionAccountHolder)                       
-                        this.ProcessTransaction(transactionAccountHolder);
+                        if (LoggedInUser is AccountHolder transactionAccountHolder)
+                            this.ProcessTransaction(transactionAccountHolder);
                         break;
 
                     case UserAccountOption.Logout:

@@ -36,7 +36,7 @@ namespace BankApplication.Services
 
             try
             {
-                AccountHolder oldAccountHolder = GetAccountHolderByAccountNumber(accountHolder.AccountNumber);
+                AccountHolder oldAccountHolder = GetAccountHolderById(accountHolder.AccountNumber);
 
                 if (oldAccountHolder != null)
                 {
@@ -129,18 +129,6 @@ namespace BankApplication.Services
             try
             {
                 return DataStorage.AccountHolders.Find(a => a.Id == accountId);
-            }
-            catch (Exception ex)
-            {
-                return null;
-            }
-        }
-
-        public AccountHolder GetAccountHolderByAccountNumber(string accountNumber)
-        {
-            try
-            {
-                return DataStorage.AccountHolders.Find(a => a.AccountNumber == accountNumber);
             }
             catch (Exception ex)
             {

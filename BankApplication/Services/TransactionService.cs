@@ -8,7 +8,6 @@ namespace BankApplication.Services
 {
     internal class TransactionService
     {
-
         public string Create(Transaction transaction)
         {
             try

@@ -348,10 +348,5 @@ namespace BankApplication.Services
 
             return response;
         }
-
-        public Bank GetBankById(string bankId)
-        {
-            return DataStorage.Banks.Find(bank => bank.Id == bankId);
-        }
     }
 }

@@ -32,7 +32,7 @@ namespace BankApplication.Services
             Response<string> response = new Response<string>();
             try
             {
-                Employee employee = DataStorage.Employees.FirstOrDefault(emp => emp.Id == updatedEmployee.Id);
+                Employee employee = DataStorage.Employees.Find(emp => emp.Id == updatedEmployee.Id);
                 if (employee != null)
                 {
                     employee.Name = updatedEmployee.Name;
@@ -63,7 +63,7 @@ namespace BankApplication.Services
             Response<string> response = new Response<string>();
             try
             {
-                Employee employee = DataStorage.Employees.FirstOrDefault(emp => emp.Id == employeeId);
+                Employee employee = DataStorage.Employees.Find(emp => emp.Id == employeeId);
                 if (employee != null)
                 {
                     DataStorage.Employees.Remove(employee);
@@ -85,14 +85,14 @@ namespace BankApplication.Services
             return response;
         }
 
-        public Employee GetEmployeeByBankId(string bankId)
-        {
-            return DataStorage.Employees.Find(emp => emp.Type == Enums.UserType.Employee && emp.BankId == bankId);         
-        }
-
         public List<Employee> GetAllEmployees()
         {
             return DataStorage.Employees.Where(emp => emp.Type == Enums.UserType.Employee).ToList();
+        }
+
+        public Employee GetEmployeeByBankId(string bankId)
+        {
+            return DataStorage.Employees.Find(emp => emp.Type == Enums.UserType.Employee && emp.BankId == bankId);         
         }
     }
 }
