@@ -97,10 +97,6 @@ namespace BankApplication.Views
             EmployeeService employeeService = new EmployeeService();
             AccountHolderService accountHolderService = new AccountHolderService();
 
-            string getBankId = Utility.GetStringInput("Enter bankid", true);
-            Employee employee = new Employee();
-            employee = employeeService.GetEmployeeByBankId(getBankId);
-
             AccountHolder accountHolder = new AccountHolder()
             {
                 UserName = Utility.GetStringInput("Enter username", true),
