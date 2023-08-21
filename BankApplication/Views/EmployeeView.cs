@@ -57,8 +57,7 @@ namespace BankApplication.Views
                         break;
 
                     case BankStaffOption.ShowAccountHolderTransactions:
-                        string bankId = Utility.GetStringInput("Enter Account Holder's BankId: ", true);
-                        ShowAccountHolderTransactions(bankId);
+                        this.ShowAccountHolderTransactionsForEmployee();
                         break;
 
                     case BankStaffOption.RevertTransaction:
@@ -181,6 +180,13 @@ namespace BankApplication.Views
                 Console.WriteLine(transactionHistoryResponse.Message);
             }
         }
+
+        private void ShowAccountHolderTransactionsForEmployee()
+        {
+            string bankId = Utility.GetStringInput("Enter Account Holder's BankId: ", true);
+            ShowAccountHolderTransactions(bankId);
+        }
+
 
         private void UpdateServiceChargesForBank(bool isSameBankAccount)
         {

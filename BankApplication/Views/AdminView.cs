@@ -75,8 +75,7 @@ namespace BankApplication.Views
                         break;
 
                     case AdminOption.ShowAccountHolderTransactions:
-                        string bankId = Utility.GetStringInput("Enter Account Holder's BankId: ", true);
-                        this.ShowAccountHolderTransactions(bankId);
+                        this.ShowAccountHolderTransactionsForAdmin();
                         break;
 
                     case AdminOption.RevertTransaction:
@@ -266,6 +265,13 @@ namespace BankApplication.Views
                                   $"Employee Password: {emp.Password}\n");
             }
         }
+
+        public void ShowAccountHolderTransactionsForAdmin()
+        {
+            string bankId = Utility.GetStringInput("Enter Account Holder's BankId: ", true);
+            ShowAccountHolderTransactions(bankId);
+        }
+
 
         public void AddCurrency()
         {
