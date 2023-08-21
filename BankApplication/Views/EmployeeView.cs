@@ -49,11 +49,11 @@ namespace BankApplication.Views
                         break;
 
                     case BankStaffOption.UpdateServiceChargesForSameBank:
-                        UpdateServiceChargesForBank(true);
+                        this.UpdateServiceChargesForBank(true);
                         break;
 
                     case BankStaffOption.UpdateServiceChargesForOtherBank:
-                        UpdateServiceChargesForBank(false);
+                        this.UpdateServiceChargesForBank(false);
                         break;
 
                     case BankStaffOption.ShowAccountHolderTransactions:
