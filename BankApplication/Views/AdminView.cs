@@ -8,71 +8,89 @@ using static BankApplication.Common.Enums;
 
 namespace BankApplication.Views
 {
-    internal class EmployeeView
+    internal class AdminView
     {
         AccountHolderService AccountHolderService;
-        BankService BankService; 
+        BankService BankService;
+        EmployeeService EmployeeService;
 
-        public EmployeeView(User loggedInUser)
+        public AdminView(Employee loggedInUser)
         {
             this.AccountHolderService = new AccountHolderService();
             this.BankService = new BankService();
+            this.EmployeeService = new EmployeeService();
         }
 
         public void Initiate()
         {
-            BankStaffOption option;
+            AdminOption option;
             do
             {
-                Utility.GenerateOptions(Constants.BankStaffOption);
-                option = (BankStaffOption)Convert.ToInt32(Console.ReadLine());
+                Utility.GenerateOptions(Constants.AdminOption);
+                option = (AdminOption)Convert.ToInt32(Console.ReadLine());
                 switch (option)
                 {
-                    case BankStaffOption.CreateAccountHolder:
+                    case AdminOption.CreateEmployee:
+                        this.AddEmployee();
+                        break;
+
+                    case AdminOption.UpdateEmployee:
+                        this.UpdateEmployee();
+                        break;
+
+                    case AdminOption.DeleteEmployee:
+                        this.DeleteEmployee();
+                        break;
+
+                    case AdminOption.GetEmployees:
+                        this.GetAllEmployees();
+                        break;
+
+                    case AdminOption.CreateAccountHolder:
                         this.AddAccountHolder();
                         break;
 
-                    case BankStaffOption.UpdateAccountHolder:
+                    case AdminOption.UpdateAccountHolder:
                         this.UpdateAccountHolder();
                         break;
 
-                    case BankStaffOption.DeleteAccountHolder:
+                    case AdminOption.DeleteAccountHolder:
                         this.DeleteAccountHolder();
                         break;
 
-                    case BankStaffOption.ShowAllAccountHolders:
+                    case AdminOption.ShowAllAccountHolders:
                         this.ShowAllAccountHolders();
                         break;
 
-                    case BankStaffOption.AddCurrency:
+                    case AdminOption.AddCurrency:
                         this.AddCurrency();
                         break;
 
-                    case BankStaffOption.UpdateServiceChargesForSameBank:
-                        UpdateServiceChargesForBank(true);
+                    case AdminOption.UpdateServiceChargesForSameBank:
+                        this.UpdateServiceChargesForBank(true);
                         break;
 
-                    case BankStaffOption.UpdateServiceChargesForOtherBank:
-                        UpdateServiceChargesForBank(false);
+                    case AdminOption.UpdateServiceChargesForOtherBank:
+                        this.UpdateServiceChargesForBank(false);
                         break;
 
-                    case BankStaffOption.ShowAccountHolderTransactions:
+                    case AdminOption.ShowAccountHolderTransactions:
                         string bankId = Utility.GetStringInput("Enter Account Holder's BankId: ", true);
-                        ShowAccountHolderTransactions(bankId);
+                        this.ShowAccountHolderTransactions(bankId);
                         break;
 
-                    case BankStaffOption.RevertTransaction:
+                    case AdminOption.RevertTransaction:
                         this.RevertTransaction();
                         break;
 
-                    case BankStaffOption.Logout:
+                    case AdminOption.Logout:
                         break;
 
                     default:
                         Console.WriteLine("Please enter a valid input.");
                         break;
                 }
-            } while (option != BankStaffOption.Logout);
+            } while (option != AdminOption.Logout);
         }
 
         public void AddAccountHolder()
@@ -165,7 +183,7 @@ namespace BankApplication.Views
                 Console.WriteLine(showAllResponse.Message);          
         }
 
-        private void ShowAccountHolderTransactions(string bankId)
+        public void ShowAccountHolderTransactions(string bankId)
         {
             TransactionService transactionService = new TransactionService();
             string accountNumber = Utility.GetStringInput("Enter Account Holder's Account Number: ", true);
@@ -182,7 +200,7 @@ namespace BankApplication.Views
             }
         }
 
-        private void UpdateServiceChargesForBank(bool isSameBankAccount)
+        public void UpdateServiceChargesForBank(bool isSameBankAccount)
         {
             string bankID = Utility.GetStringInput("Bank ID", true);
             decimal rtgsCharge = Utility.GetDecimalInput("RTGS Charge", true);
@@ -190,6 +208,63 @@ namespace BankApplication.Views
 
             Response<string> updateResponse = BankService.UpdateServiceCharges(rtgsCharge, impsCharge, bankID, isSameBankAccount);
             Console.WriteLine(updateResponse.Message);
+        }
+
+        public void AddEmployee()
+        {
+            try
+            {
+                Employee employee = new Employee()
+                {
+                    Id = Utility.GenerateEmployeeID(),
+                    Name = Utility.GetStringInput("Enter Employee Name", true),
+                    UserName = Utility.GetStringInput("Enter UserName", true),
+                    Password = Utility.GetStringInput("Enter Password", true),
+                    Email = Utility.GetStringInput("Enter Email", true),
+                    Designation = Utility.GetStringInput("Enter Designation", true),
+                    Type = Enums.UserType.Employee
+                };
+
+                DataStorage.Employees.Add(employee);
+                Console.WriteLine("Employee added successfully");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        public void UpdateEmployee()
+        {
+            string employeeIdToUpdate = Utility.GetStringInput("Enter Employee ID to update: ", true);
+            Employee updatedEmployee = new Employee();
+            updatedEmployee.Id = employeeIdToUpdate;
+            updatedEmployee.Name = Utility.GetStringInput("Enter updated Employee Name: ", true);
+            updatedEmployee.UserName = Utility.GetStringInput("Enter updated User Name: ", true);
+            updatedEmployee.Password = Utility.GetStringInput("Enter updated Password: ", true);
+            updatedEmployee.Email = Utility.GetStringInput("Enter updated Email: ", true);
+
+            Response<string> updateResponse = EmployeeService.Update(updatedEmployee);
+            Console.WriteLine(updateResponse.Message);
+        }
+
+        public void DeleteEmployee()
+        {
+            string employeeIdToDelete = Utility.GetStringInput("Enter Employee ID to delete: ", true);
+            Response<string> deleteResponse = EmployeeService.Delete(employeeIdToDelete);
+            Console.WriteLine(deleteResponse.Message);
+        }
+
+        public void GetAllEmployees()
+        {
+            List<Employee> employees = EmployeeService.GetAllEmployees();
+            foreach (Employee emp in employees)
+            {
+                Console.WriteLine($"Employee ID: {emp.Id}\n" +
+                                  $"Employee Name: {emp.Name}\n" +
+                                  $"Employee UserName: {emp.UserName}\n" +
+                                  $"Employee Password: {emp.Password}\n");
+            }
         }
 
         public void AddCurrency()

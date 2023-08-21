@@ -1,25 +1,18 @@
-﻿using System;
-using System.Text;
-using BankApplication.Common;
+﻿using BankApplication.Common;
 using BankApplication.Models;
 using BankApplication.Services;
+using System;
 using static BankApplication.Common.Enums;
 
 namespace BankApplication.Views
 {
     public class BankView
     {
-        BankService BankService;
-        SecurityView SecurityView;
-        AccountHolderView AccountHolderView;
-        EmployeeView EmployeeView;
+        private BankService BankService;
 
         public BankView()
         {
             this.BankService = new BankService();
-            this.SecurityView = new SecurityView();
-            this.AccountHolderView = new AccountHolderView();
-            this.EmployeeView = new EmployeeView();
         }
 
         public void Initialize()
@@ -33,27 +26,25 @@ namespace BankApplication.Views
                     option = (MainMenu)Convert.ToInt32(Console.ReadLine());
                     switch (option)
                     {
-                        case MainMenu.CreateNewBank:
-                            CreateNewBank();
-                            if (AccountHolderView.LoggedInUser.Type == UserType.Admin)
-                                this.EmployeeView.AddEmployee();
+                        case MainMenu.CreateNewBank:             
+                            this.SetupBank();                          
                             break;
 
                         case MainMenu.LoginAsAccountHolder:
-                            this.SecurityView.LoginAsAccountHolder();                            
+                            this.Login(UserType.AccountHolder);
                             break;
 
                         case MainMenu.LoginAsBankStaff:
-                            this.SecurityView.LoginAsBankStaff();
+                            this.Login(UserType.Employee);
                             break;
 
                         case MainMenu.Exit:
                             Console.WriteLine("Thank you for Visiting...");
                             Environment.Exit(Environment.ExitCode);
                             break;
+
                         default:
                             Console.WriteLine("Please enter a valid input.");
-                            this.Initialize();
                             break;
                     }
                 } while (option != MainMenu.Exit);
@@ -65,7 +56,7 @@ namespace BankApplication.Views
             }
         }
 
-        private void CreateNewBank()
+        private void SetupBank()
         {
             try
             {
@@ -82,22 +73,22 @@ namespace BankApplication.Views
                 var response = this.BankService.Create(bank);
                 Console.WriteLine(response.Message);
 
-                if (!response.IsSuccess)
+                if (response.IsSuccess)
                 {
-                    CreateNewBank();
+                    Console.WriteLine("Bank Details:\n" +
+                                      $"Bank ID: {bank.Id.ToUpper()}\n" +
+                                      $"Bank Name: {bank.Name}\n" +
+                                      $"Location: {bank.Location}\n" +
+                                      $"IFSC Code: {bank.IFSC}\n" +
+                                      $"Created By: {bank.CreatedBy}\n" +
+                                      $"Created On: {bank.CreatedOn}");
+
+                    SetupBankAdmin(bank.Id);
                 }
                 else
                 {
-                    Console.WriteLine("Bank Details:\n" +
-                                       $"Bank ID: {bank.Id.ToUpper()}\n" +
-                                       $"Bank Name: {bank.Name}\n" +
-                                       $"Location: {bank.Location}\n" +
-                                       $"IFSC Code: {bank.IFSC}\n" +
-                                       $"Created By: {bank.CreatedBy}\n" +
-                                       $"Created On: {bank.CreatedOn}");
-
-                    var adminName = SetupBankAdmin(bank.Id);                    
-                }            
+                    Console.WriteLine("Failed to create bank. Please try again.");
+                }
             }
             catch (Exception ex)
             {
@@ -105,7 +96,7 @@ namespace BankApplication.Views
             }
         }
 
-        private bool SetupBankAdmin(string bankID)
+        private void SetupBankAdmin(string bankID)
         {
             EmployeeService employeeService = new EmployeeService();
             try
@@ -120,65 +111,41 @@ namespace BankApplication.Views
                 };
 
                 var response = employeeService.Create(admin);
+                if (!response.IsSuccess)
+                    SetupBankAdmin(bankID);
+
                 Console.WriteLine(response.Message);
                 Console.WriteLine($"Admin's ID : {admin.Id}");
-                Console.WriteLine($"Admin's Password : {admin.Password}");   
-                return response.IsSuccess;       
+                Console.WriteLine($"Admin's Password : {admin.Password}");
+                this.Login(UserType.Admin);
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                return false;
             }
         }
 
-        public void GetTransferFunds(AccountHolder loggedInAccount)
+        public void Login(UserType userType)
         {
-            StringBuilder sb = new StringBuilder();
-            AccountHolderService accountHolderService = new AccountHolderService();
+            SecurityService securityService = new SecurityService();
+            string username = Utility.GetStringInput("Username", true);
+            string password = Utility.GetStringInput("Password", true);
+            User loggedinUser = securityService.Login(username, password, userType);
 
-            string destinationAccountNumber = Utility.GetStringInput("Enter the destination account number: ", true);
-            int transferTypeInput = Convert.ToInt32(Utility.GetStringInput("Enter the transfer type (0 for IMPS, 1 for RTGS): ", true));
-
-            TransferOptions transferType;
-            if (transferTypeInput == 0)
+            if (loggedinUser != null)
             {
-                transferType = TransferOptions.IMPS;
-            }
-            else if (transferTypeInput == 1)
-            {
-                transferType = TransferOptions.RTGS;
-            }
-            else
-            {
-                sb.AppendLine(Constants.InvalidType);
-                return;
-            }
-
-            Utility.GetStringInput("Enter the amount to transfer: ", true);
-            decimal transferAmount = Convert.ToDecimal(Console.ReadLine());
-
-            AccountHolder destinationAccount = accountHolderService.GetAccountHolderByAccountNumber(destinationAccountNumber);
-
-            if (destinationAccount == null)
-            {
-                sb.AppendLine(Constants.AccountNotFound);
-                return;
-            }
-
-            Response<string> transferResponse = this.BankService.TransferFunds(loggedInAccount, destinationAccount, transferAmount, transferType);
-
-            if (transferResponse.IsSuccess)
-            {
-                sb.AppendLine(transferResponse.Message);
-                sb.AppendLine($"New balance: {loggedInAccount.Balance}");
-                sb.AppendLine(Constants.TransferFundsSuccess);
+                if (userType == UserType.Employee && loggedinUser is Employee employee)
+                    new EmployeeView(employee).Initiate();
+                else if (userType == UserType.AccountHolder && loggedinUser is AccountHolder accountHolder)
+                    new AccountHolderView(accountHolder).Initiate();
+                else if (userType == UserType.Admin && loggedinUser is Employee admin)
+                    new AdminView(admin).Initiate(); 
             }
             else
             {
-                sb.AppendLine(transferResponse.Message);
+                Console.WriteLine("Login failed. Please check your username and password.");
+                Login(userType);
             }
         }
     }
 }
-

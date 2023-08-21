@@ -3,202 +3,120 @@ using BankApplication.Models;
 using BankApplication.Services;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using static BankApplication.Common.Enums;
 
 namespace BankApplication.Views
 {
     internal class AccountHolderView
     {
-
-        static AccountHolderService AccountHolderService = new AccountHolderService();
+        BankService BankService;
 
         public User LoggedInUser { get; set; }
 
-        public AccountHolderView()
+        public AccountHolderView(User loggedInUser)
         {
-            this.LoggedInUser = new User();
+            this.LoggedInUser = loggedInUser;
+            this.BankService = new BankService();
         }
 
-        public static void InitiateBankStaff(string bankId)
+        public void Initiate()
         {
-            BankStaffOption option;
+            UserAccountOption option;
             do
             {
-                BankService bankService = new BankService();               
-                AccountHolderView accountHolderView = new AccountHolderView();
-       
-                Utility.GenerateOptions(Constants.BankStaffOption);
-                option = (BankStaffOption)Convert.ToInt32(Console.ReadLine());
+                Utility.GenerateOptions(Constants.UserAccountOption);
+                option = (UserAccountOption)Convert.ToInt32(Console.ReadLine());
                 switch (option)
                 {
-                    case BankStaffOption.CreateAccountHolder:
-               
-                        accountHolderView.AddAccountHolder();
+                    case UserAccountOption.Deposit:
+                        this.PerformDeposit();
                         break;
 
-                    case BankStaffOption.UpdateAccountHolder:
-                        string accountToUpdate = Utility.GetStringInput("Enter Account ID to update account holder: ", true);
-                        AccountHolderService accountService = new AccountHolderService();
-                        AccountHolder accountHolderToUpdate = accountService.GetAccountHolderById(accountToUpdate);
-                        accountHolderView.UpdateAccountHolder(accountHolderToUpdate);
+                    case UserAccountOption.Withdraw:
+                        this.PerformWithdraw();
                         break;
 
-                    case BankStaffOption.DeleteAccountHolder:
-                        accountHolderView.DeleteAccountHolder();
+                    case UserAccountOption.Transfer:
+                        this.PerformTransfer();
                         break;
 
-                    case BankStaffOption.ShowAllAccountHolders:
-                        Console.Write("Enter Bank ID to view account holders: ");
-                        string bankIdToView = Console.ReadLine();  
-                        Response<List<AccountHolder>> showAllResponse = AccountHolderService.GetAllAccountHolders(bankIdToView);
-
-                        if (showAllResponse.IsSuccess)
-                        {
-                            if (showAllResponse.Data.Any())  
-                            {
-                                Console.WriteLine(showAllResponse.Message);
-                                foreach (AccountHolder accountHolder in showAllResponse.Data)
-                                {
-                                    Console.WriteLine($"Account holder ID: {accountHolder.Id}\n" +
-                                                      $"Account holder Name: {accountHolder.Name}\n" +
-                                                      $"Account holder Username: {accountHolder.UserName}\n" +
-                                                      $"Account holder's Password: {accountHolder.Password}\n" +
-                                                      $"Account holder's Account Number: {accountHolder.AccountNumber}\n");
-                                }
-                            }
-                            else                           
-                                Console.WriteLine("No account holders found for the specified bank.");                            
-                        }
-                        else                      
-                            Console.WriteLine(showAllResponse.Message);
+                    case UserAccountOption.CheckBalance:
+                        this.PerformCheckBalance();
                         break;
 
-                    case BankStaffOption.AddCurrency:
-                        Utility.GetStringInput("Enter Currency Code: ", true);
-                        string currencyCode = Console.ReadLine().ToUpper();
-                        Utility.GetStringInput("Enter Exchange Rate: ", true);
-                        decimal exchangeRate;
-                        if (!decimal.TryParse(Console.ReadLine(), out exchangeRate))
-                            Console.WriteLine("Invalid exchange rate. Please enter a valid decimal number.");
-                        Response<string> response = bankService.AddAcceptedCurrency(currencyCode, exchangeRate);
+                    case UserAccountOption.Transactions:
+                        if (LoggedInUser is AccountHolder transactionAccountHolder)                       
+                        this.ProcessTransaction(transactionAccountHolder);
                         break;
 
-                    case BankStaffOption.UpdateServiceChargesForSameBank:
-                        string bankIdForSameBank = Utility.GetStringInput("Enter Bank ID: ", true);
-                        float rtgsChargeSameBank = Convert.ToSingle(Console.ReadLine());
-                        Utility.GetStringInput("Enter IMPS Charge for Same Bank: ", true);
-                        float impsChargeSameBank = Convert.ToSingle(Console.ReadLine());
-                        Response<string> updateSameBankChargeResponse = bankService.UpdateServiceCharges(rtgsChargeSameBank, impsChargeSameBank, bankIdForSameBank, true);
-                        Console.WriteLine(updateSameBankChargeResponse.Message);
-                        break;
-
-                    case BankStaffOption.UpdateServiceChargesForOtherBank:
-                        string bankIdForOtherBank = Utility.GetStringInput("Enter Bank ID: ", true);
-                        Utility.GetStringInput("Enter RTGS Charge for Other Bank: ", true);
-                        float rtgsChargeOtherBank = Convert.ToSingle(Console.ReadLine());
-                        Utility.GetStringInput("Enter IMPS Charge for Other Bank: ", true);
-                        float impsChargeOtherBank = Convert.ToSingle(Console.ReadLine());
-                        Response<string> updateOtherBankChargeResponse = bankService.UpdateServiceCharges(rtgsChargeOtherBank, impsChargeOtherBank, bankIdForOtherBank, false);
-                        Console.WriteLine(updateOtherBankChargeResponse.Message);
-                        break;
-
-                    case BankStaffOption.ShowAccountHolderTransactions:
-                        TransactionService transactionService = new TransactionService();
-                        string accountNumber = Utility.GetStringInput("Enter Account Holder's Account Number: ", true);
-                        Response<List<Transaction>> transactionHistoryResponse = transactionService.GetTransactionHistory(null, accountHolderView.LoggedInUser.BankId, accountNumber);
-
-                        if (transactionHistoryResponse.IsSuccess)
-                        {
-                            Console.WriteLine(transactionHistoryResponse.Message);
-                            Utility.GetTransactionDetails(transactionHistoryResponse.Data);
-                        }
-                        else
-                            Console.WriteLine(transactionHistoryResponse.Message);
-                        break;
-                        
-                    case BankStaffOption.RevertTransaction:
-                        Utility.GetStringInput("Enter Transaction ID to revert: ", true);
-                        string transactionIDToRevert = Console.ReadLine();
-                        Response<string> revertResponse = bankService.RevertTransaction(transactionIDToRevert);
-                        Console.WriteLine(revertResponse.Message);
-                        break;
-
-                    case BankStaffOption.Logout:
+                    case UserAccountOption.Logout:
                         break;
 
                     default:
                         Console.WriteLine("Please enter a valid input.");
                         break;
                 }
-            } while (option != BankStaffOption.Logout);
+            } while (option != UserAccountOption.Logout);
         }
 
-        public void AddAccountHolder()
+        private void PerformTransfer()
         {
-            EmployeeService employeeService = new EmployeeService();
-            AccountHolderService accountHolderService = new AccountHolderService();
+            string sourceAccountHolderID = Utility.GetStringInput("Enter source account holder ID: ", true);
+            string destinationAccountHolderID = Utility.GetStringInput("Enter destination account holder ID: ", true);
+            decimal transferAmount = Utility.GetDecimalInput("Enter the amount to transfer: ", true);
 
-            string getBankId = Utility.GetStringInput("Enter bankid", true);
-            Employee employee = new Employee();
-            employee = employeeService.GetEmployeeByBankId(getBankId);
+            Console.WriteLine("Choose transfer type:\n1. IMPS\n2. RTGS");
+            decimal transferTypeChoice = Utility.GetDecimalInput("Enter your choice: ", true);
 
-            AccountHolder accountHolder = new AccountHolder()
+            TransferOptions transferType;
+            if (transferTypeChoice == 2)
+                transferType = TransferOptions.RTGS;
+            else
+                transferType = TransferOptions.IMPS;
+            
+            Response<string> transferResponse = BankService.TransferFunds(sourceAccountHolderID, destinationAccountHolderID, transferAmount, transferType);
+            Console.WriteLine(transferResponse.Message);
+        }
+
+        private void ProcessTransaction(AccountHolder accountHolder)
+        {
+            TransactionService transactionService = new TransactionService();
+            Response<List<Transaction>> transactionHistoryResponse = transactionService.GetTransactionHistory(accountHolder.BankId, accountHolder.AccountNumber);
+
+            if (transactionHistoryResponse.IsSuccess)
             {
-                UserName = Utility.GetStringInput("Enter username", true),
-                Password = Utility.GetStringInput("Enter password", true),
-                Name = Utility.GetStringInput("Enter account holder name", true),
-                AccountType = Utility.GetStringInput("Enter account type", true),
-                CreatedOn = DateTime.Now,
-                Type = Enums.UserType.AccountHolder,
-            };
-
-            Response<string> response = accountHolderService.Create(accountHolder);
-            if (response.IsSuccess)
-            {
-                Console.WriteLine(
-                    $"Account holder added successfully.\n" +
-                    $"Account holder ID: {accountHolder.Id}\n" +
-                    $"Account holder Name: {accountHolder.Name}\n" +
-                    $"Account holder Username: {accountHolder.UserName}\n" +
-                    $"Account holder's Password: {accountHolder.Password}\n" +
-                    $"Account holder's Account Number: {accountHolder.AccountNumber}\n"
-                );
+                Console.WriteLine(transactionHistoryResponse.Message);
+                Utility.GetTransactionDetails(transactionHistoryResponse.Data);
             }
             else
             {
-                Console.WriteLine(response.Message);
+                Console.WriteLine(transactionHistoryResponse.Message);
             }
         }
 
-        public void UpdateAccountHolder(AccountHolder accountHolder)
+        public void PerformDeposit()
         {
-            AccountHolderService accountHolderService = new AccountHolderService();
-           
-            if (accountHolder != null)
+            string accountHolderID = Utility.GetStringInput("Enter your account holder ID: ", true);
+            decimal depositAmount = Utility.GetDecimalInput("Enter amount to deposit", true);
+            Response<string> depositResponse = BankService.Deposit(accountHolderID, depositAmount);
+            Console.WriteLine(depositResponse.Message);
+        }
+
+        public void PerformWithdraw()
+        {
+            string accountID = Utility.GetStringInput("Enter your account holder ID: ", true);
+            decimal withdrawAmount = Utility.GetDecimalInput("Enter the amount to withdraw: ", true);
+            Response<string> withdrawResponse = BankService.Withdraw(accountID, withdrawAmount);
+            Console.WriteLine(withdrawResponse.Message);
+        }
+
+        public void PerformCheckBalance()
+        {
+            if (LoggedInUser is AccountHolder checkBalanceAccountHolder)
             {
-                AccountHolder oldAccountHolder = accountHolderService.GetAccountHolderByAccountNumber(accountHolder.AccountNumber);
-                oldAccountHolder.UserName = accountHolder.UserName;
-                oldAccountHolder.Password = accountHolder.Password;
-                oldAccountHolder.Name = accountHolder.Name;
-                oldAccountHolder.AccountType = accountHolder.AccountType;
-
-                Response<AccountHolder> updateResponse = accountHolderService.Update(accountHolder);
-                if (updateResponse.IsSuccess)
-                    Console.WriteLine(updateResponse.Message);              
+                Response<string> checkBalanceResponse = BankService.CheckBalance(checkBalanceAccountHolder.Id);
+                Console.WriteLine($"Your account balance: {checkBalanceResponse.Data}");
             }
-            else
-                Console.WriteLine(Constants.AccountUpdateFailure);
         }
-
-        public void DeleteAccountHolder()
-        {
-            string accountToDelete = Utility.GetStringInput("Enter Account ID to delete account holder: ", true);
-            AccountHolderService accountHolderService = new AccountHolderService();
-
-            Response<string> deleteResponse = accountHolderService.Delete(accountToDelete);
-
-            Console.WriteLine(deleteResponse.Message);
-        }     
     }
 }

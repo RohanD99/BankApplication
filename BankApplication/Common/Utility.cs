@@ -36,6 +36,26 @@ namespace BankApplication.Common
             return string.IsNullOrEmpty(input) ? defaultValue : input;
         }
 
+        public static decimal GetDecimalInput(string type, bool isRequired)
+        {
+            Console.Write($"Please enter {type}: ");
+            string input = Console.ReadLine();
+
+            if (isRequired && string.IsNullOrEmpty(input))
+            {
+                Console.WriteLine($"Please provide a valid {type}.");
+                return GetDecimalInput(type, isRequired);
+            }
+
+            if (!decimal.TryParse(input, out decimal value))
+            {
+                Console.WriteLine($"Invalid {type}. Please enter a valid decimal value.");
+                return GetDecimalInput(type, isRequired);
+            }
+
+            return value;
+        }
+
         public static string GenerateBankId(string bankName)
         {
             return !string.IsNullOrEmpty(bankName) && bankName.Length >= 3 ? bankName.Substring(0, 3) + DateTime.Now.ToString("yyyyMMddHHmmss") : string.Empty;

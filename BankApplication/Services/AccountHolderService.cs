@@ -124,7 +124,6 @@ namespace BankApplication.Services
             return response;
         }
 
-
         public AccountHolder GetAccountHolderById(string accountId)
         {
             try

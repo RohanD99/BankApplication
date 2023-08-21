@@ -7,11 +7,14 @@ namespace BankApplication.Services
 {
     internal class BankService
     {
+
         private TransactionService TransactionService;
+        AccountHolderService AccountHolderService;
 
         public BankService()
         {
             this.TransactionService = new TransactionService();
+            this.AccountHolderService = new AccountHolderService();
         }
 
         public Response<string> Create(Bank bank)
@@ -37,31 +40,37 @@ namespace BankApplication.Services
             return response;
         }
 
-        public Response<string> Deposit(AccountHolder account, decimal amount)
+        public Response<string> Deposit(string accountHolderID, decimal amount)
         {
             Response<string> response = new Response<string>();
             try
             {
-                if (amount <= 0)
+                var accountHolder = this.AccountHolderService.GetAccountHolderById(accountHolderID);
+                if (accountHolder != null && amount > 0)
                 {
-                    response.IsSuccess = false;
-                    response.Message = Constants.InvalidAmount;
-                    return response;
-                }
-                account.Balance += amount;
-                string transactionId = this.TransactionService.AddTransactionAndGetId(new Transaction
-                {
-                    SrcAccount = account.AccountNumber,                 
-                    Type = TransactionType.Deposit,
-                    Amount = amount,
-                    CreatedBy = account.CreatedBy,
-                    CreatedOn = DateTime.Now,
-                    
-                }, account);
+                    accountHolder.Balance += amount;
+                    this.AccountHolderService.Update(accountHolder);
 
-                response.IsSuccess = true;
-                response.Message = Constants.DepositSuccess;
-                response.Data = account.Balance.ToString();
+                    string transactionId = this.TransactionService.Create(new Transaction
+                    {
+                        SrcAccount = accountHolder.AccountNumber,
+                        Type = TransactionType.Deposit,
+                        Amount = amount,
+                        CreatedBy = accountHolder.CreatedBy,
+                        CreatedOn = DateTime.Now,
+
+                    });
+
+                    response.IsSuccess = true;
+                    response.Message = Constants.DepositSuccess;
+                    response.Data = accountHolder.Balance.ToString();
+                }
+                else
+                {
+                    response.IsSuccess = true;
+                    response.Message = Constants.DepositFailed;
+                    response.Data = accountHolder.Balance.ToString();
+                }
             }
             catch (Exception ex)
             {
@@ -72,107 +81,35 @@ namespace BankApplication.Services
             return response;
         }
 
-        public Response<string> Withdraw(AccountHolder account, decimal amount)
+        public Response<string> Withdraw(string accountHolderID, decimal amount)
         {
             Response<string> response = new Response<string>();
             try
             {
-                if (amount <= 0)
+                var accountHolder = this.AccountHolderService.GetAccountHolderById(accountHolderID);
+                if (accountHolder != null && amount > 0 && amount <= accountHolder.Balance)
                 {
-                    response.IsSuccess = false;
-                    response.Message = Constants.InvalidAmount;
-                    return response;
-                }
-                if (amount > account.Balance)
-                {
-                    response.IsSuccess = false;
-                    response.Message = Constants.InsufficientFunds;
-                    return response;
-                }
-                account.Balance -= amount;
-                string transactionId = this.TransactionService.AddTransactionAndGetId(new Transaction
-                {
-                    SrcAccount = account.AccountNumber,
-                    DstAccount = account.AccountNumber,
-                    Type = TransactionType.Withdraw,
-                    Amount = -amount,
-                    CreatedBy = account.Name,
-                    CreatedOn = DateTime.Now
-                }, account);
+                    accountHolder.Balance -= amount;
+                    this.AccountHolderService.Update(accountHolder);
 
-                response.IsSuccess = true;
-                response.Message = Constants.WithdrawalSuccess;
-                response.Data = account.Balance.ToString();
-            }
-            catch (Exception ex)
-            {
-                response.IsSuccess = false;
-                response.Message = ex.Message;
-            }
+                    string transactionId = this.TransactionService.Create(new Transaction
+                    {
+                        SrcAccount = accountHolder.AccountNumber,
+                        Type = TransactionType.Withdraw,
+                        Amount = -amount,
+                        CreatedBy = accountHolder.CreatedBy,
+                        CreatedOn = DateTime.Now
+                    });
 
-            return response;
-        }
-
-        public Response<string> TransferFunds(AccountHolder sourceAccount, AccountHolder destinationAccount, decimal amount, TransferOptions transferType)
-        {
-            Response<string> response = new Response<string>();
-            try
-            {
-                decimal charge = 0;
-                if (transferType == TransferOptions.IMPS)
-                {
-                    charge = 0.08m;
-                }
-                else if (transferType == TransferOptions.RTGS)
-                {
-                    charge = 0.05m;
+                    response.IsSuccess = true;
+                    response.Message = Constants.WithdrawalSuccess;
+                    response.Data = accountHolder.Balance.ToString();
                 }
                 else
                 {
                     response.IsSuccess = false;
-                    response.Message = Constants.InvalidType;
-                    return response;
+                    response.Message = Constants.WithdrawalFailed;
                 }
-                decimal transferAmount = amount + (amount * charge);
-                if (transferAmount <= 0)
-                {
-                    response.IsSuccess = false;
-                    response.Message = Constants.InvalidAmount;
-                    return response;
-                }
-                if (transferAmount > sourceAccount.Balance)
-                {
-                    response.IsSuccess = false;
-                    response.Message = Constants.InsufficientFunds;
-                    return response;
-                }
-                sourceAccount.Balance -= transferAmount;
-                destinationAccount.Balance += amount;
-
-                // source transaction
-                this.TransactionService.AddTransactionAndGetId(new Transaction
-                {
-                    SrcAccount = sourceAccount.AccountNumber,
-                    DstAccount = destinationAccount.AccountNumber,
-                    Type = TransactionType.Transfer,
-                    Amount = -transferAmount,
-                    CreatedBy = sourceAccount.Name,
-                    CreatedOn = DateTime.Now
-                }, sourceAccount);
-
-                // destination transaction
-                this.TransactionService.AddTransactionAndGetId(new Transaction
-                {
-                    SrcAccount = sourceAccount.AccountNumber,
-                    DstAccount = destinationAccount.AccountNumber,
-                    Type = TransactionType.Transfer,
-                    Amount = amount,
-                    CreatedBy = destinationAccount.Name,
-                    CreatedOn = DateTime.Now
-                }, destinationAccount);
-
-                response.IsSuccess = true;
-                response.Message = Constants.TransferFundsSuccess;
             }
             catch (Exception ex)
             {
@@ -183,14 +120,103 @@ namespace BankApplication.Services
             return response;
         }
 
-        public Response<string> CheckBalance(AccountHolder account)
+        public Response<string> TransferFunds(string sourceAccountHolderID, string destinationAccountHolderID, decimal amount, TransferOptions transferType)
+        {
+            Response<string> response = new Response<string>();
+            try
+            {
+                var sourceAccountHolder = this.AccountHolderService.GetAccountHolderById(sourceAccountHolderID);
+                var destinationAccountHolder = this.AccountHolderService.GetAccountHolderById(destinationAccountHolderID);
+
+                if (sourceAccountHolder != null && destinationAccountHolder != null && amount > 0 && amount <= sourceAccountHolder.Balance)
+                {
+                    decimal charge = 0;
+                    if (transferType == TransferOptions.IMPS)
+                    {
+                        charge = 0.08m;
+                    }
+                    else if (transferType == TransferOptions.RTGS)
+                    {
+                        charge = 0.05m;
+                    }
+                    else
+                    {
+                        response.IsSuccess = false;
+                        response.Message = Constants.InvalidType;
+                        return response;
+                    }
+
+                    decimal transferAmount = amount + (amount * charge);
+                    if (transferAmount > sourceAccountHolder.Balance)
+                    {
+                        response.IsSuccess = false;
+                        response.Message = Constants.InsufficientFunds;
+                        return response;
+                    }
+
+                    sourceAccountHolder.Balance -= transferAmount;
+                    destinationAccountHolder.Balance += amount;
+
+                    this.AccountHolderService.Update(sourceAccountHolder);
+                    this.AccountHolderService.Update(destinationAccountHolder);
+
+                    Transaction sourceTransaction = new Transaction
+                    {
+                        SrcAccount = sourceAccountHolder.AccountNumber,
+                        DstAccount = destinationAccountHolder.AccountNumber,
+                        Type = TransactionType.Transfer,
+                        Amount = -transferAmount,
+                        CreatedBy = sourceAccountHolder.CreatedBy,
+                        CreatedOn = DateTime.Now
+                    };
+                    this.TransactionService.Create(sourceTransaction);
+
+                    Transaction destinationTransaction = new Transaction
+                    {
+                        SrcAccount = sourceAccountHolder.AccountNumber,
+                        DstAccount = destinationAccountHolder.AccountNumber,
+                        Type = TransactionType.Transfer,
+                        Amount = amount,
+                        CreatedBy = destinationAccountHolder.CreatedBy,
+                        CreatedOn = DateTime.Now
+                    };
+                    this.TransactionService.Create(destinationTransaction);
+
+                    response.IsSuccess = true;
+                    response.Message = Constants.TransferFundsSuccess;
+                }
+                else
+                {
+                    response.IsSuccess = false;
+                    response.Message = Constants.TransferFundsFailed;
+                }
+            }
+            catch (Exception ex)
+            {
+                response.IsSuccess = false;
+                response.Message = ex.Message;
+            }
+
+            return response;
+        }
+
+        public Response<string> CheckBalance(string accountHolderID)
         {
             Response<string> response = new Response<string>();
 
             try
             {
-                response.IsSuccess = true;
-                response.Data = account.Balance.ToString();
+                var accountHolder = this.AccountHolderService.GetAccountHolderById(accountHolderID);
+                if (accountHolder != null)
+                {
+                    response.IsSuccess = true;
+                    response.Data = accountHolder.Balance.ToString();
+                }
+                else
+                {
+                    response.IsSuccess = false;
+                    response.Message = Constants.AccountNotFound;
+                }
             }
             catch (Exception ex)
             {
@@ -200,6 +226,7 @@ namespace BankApplication.Services
 
             return response;
         }
+
 
         public Response<string> AddAcceptedCurrency(string currencyCode, decimal exchangeRate)
         {
@@ -211,13 +238,11 @@ namespace BankApplication.Services
                 {
                     response.IsSuccess = false;
                     response.Message = Constants.CurrencyExists;
-                    return response;
                 }
                 else if (exchangeRate <= 0)
                 {
                     response.IsSuccess = false;
                     response.Message = Constants.InvalidRate;
-                    return response;
                 }
                 else
                 {
@@ -235,7 +260,7 @@ namespace BankApplication.Services
             return response;
         }
 
-        public Response<string> UpdateServiceCharges(float rtgsCharge, float impsCharge, string bankID, bool isSameBankAccount)
+        public Response<string> UpdateServiceCharges(decimal rtgsCharge, decimal impsCharge, string bankID, bool isSameBankAccount)
         {
             Response<string> response = new Response<string>();
 
@@ -322,6 +347,11 @@ namespace BankApplication.Services
             }
 
             return response;
+        }
+
+        public Bank GetBankById(string bankId)
+        {
+            return DataStorage.Banks.Find(bank => bank.Id == bankId);
         }
     }
 }

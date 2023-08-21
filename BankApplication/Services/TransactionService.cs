@@ -9,12 +9,12 @@ namespace BankApplication.Services
     internal class TransactionService
     {
 
-        public string AddTransactionAndGetId(Transaction transaction, AccountHolder account)
+        public string Create(Transaction transaction)
         {
             try
             {
                 DataStorage.Transactions.Add(transaction);
-                return Utility.GenerateTransactionId(account.Id, account.AccountNumber);
+                return Utility.GenerateTransactionId(transaction.SrcBankId, transaction.SrcAccount);
             }
             catch (Exception ex)
             {
@@ -22,7 +22,7 @@ namespace BankApplication.Services
             }
         }
 
-        public Response<List<Transaction>> GetTransactionHistory(AccountHolder account, string bankId, string accountNumber)
+        public Response<List<Transaction>> GetTransactionHistory(string bankId, string accountNumber)
         {
             Response<List<Transaction>> response = new Response<List<Transaction>>();
 
@@ -34,8 +34,10 @@ namespace BankApplication.Services
                     response.Message = Constants.InvalidTransactionInput;
                     return response;
                 }
-           
-                List<Transaction> transactions = DataStorage.Transactions.Where(t => t.SrcAccount == accountNumber || t.DstAccount == accountNumber).ToList();
+
+                List<Transaction> transactions = DataStorage.Transactions
+                    .Where(t => t.SrcAccount == accountNumber || t.DstAccount == accountNumber)
+                    .ToList();
 
                 if (transactions.Any())
                 {

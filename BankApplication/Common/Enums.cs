@@ -10,6 +10,24 @@
             Exit
         }
 
+        public enum AdminOption
+        {
+            CreateEmployee,
+            UpdateEmployee,
+            DeleteEmployee,
+            GetEmployees,
+            CreateAccountHolder,
+            UpdateAccountHolder,
+            DeleteAccountHolder,
+            ShowAllAccountHolders,
+            AddCurrency,
+            UpdateServiceChargesForSameBank,
+            UpdateServiceChargesForOtherBank,
+            ShowAccountHolderTransactions,
+            RevertTransaction,
+            Logout
+        }
+
         public enum BankStaffOption
         {
             CreateAccountHolder,

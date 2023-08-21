@@ -20,10 +20,14 @@ namespace BankApplication.Common
 
         public static string Deposited = "Deposit";
 
+        public static string DepositFailed = "Deposit Failed";
+
         //Withdrawal
         public static string WithdrawalSuccess = "Withdrawal successful";
 
         public static string Withdrawal = "Withdrawal";
+
+        public static string WithdrawalFailed = "Withdrawal failed";
 
         public static string InsufficientFunds = "Insufficient balance. You cannot withdraw more than the available balance";
 
@@ -31,6 +35,8 @@ namespace BankApplication.Common
         public static string TransferFundsSuccess = "Transferred Funds successfully";
 
         public static string TransferFunds = "Funds Transfer";
+
+        public static string TransferFundsFailed = "Transferred Funds failed";
 
         //Transaction
         public static string TransactionSuccess = "Transaction history retrieved successfully";
@@ -47,6 +53,16 @@ namespace BankApplication.Common
         public static string EmployeeCreationSuccess = "Employee created successfully";
 
         public static string EmployeeCreationFailure = "Employee not created";
+
+        public static string EmployeeUpdateSuccess = "Employee Updated successfully";
+
+        public static string EmployeeUpdateFailure = "Employee not updated";
+
+        public static string EmployeeDeletionSuccess = "Employee deleted successfully";
+
+        public static string EmployeeDeletionFailure = "Employee not deleted";
+
+        public static string EmployeeNotFound = "Employee not found";
 
         //Accounts 
         public static string AccountCreationSuccess = "Account created successfully";
@@ -93,16 +109,35 @@ namespace BankApplication.Common
         // Main Menu Options
         public static readonly List<string> MainMenu = new List<string>
         {
-        "Create New Bank",
-        "Login as Account Holder",
-        "Login as Bank Staff",
-        "Exit"
+            "Create New Bank",
+            "Login as Account Holder",
+            "Login as Bank Staff",
+            "Exit"
         };
 
 
         // Bank Staff Menu Options
         public static readonly List<string> BankStaffOption = new List<string>
         {
+            "Create Account Holder",
+            "Update Account Holder",
+            "Delete Account Holder",
+            "Show All Account Holders",
+            "Add Currency",
+            "Update Service Charges for Same Bank",
+            "Update Service Charges for Other Bank",
+            "Show Account Holder Transactions",
+            "Revert Transaction",
+            "Logout"
+        };
+
+        // Bank Staff Menu Options
+        public static readonly List<string> AdminOption = new List<string>
+        {
+            "Add Employee",
+            "Update Employee",
+            "Delete Employee",
+            "Get all Employees",
             "Create Account Holder",
             "Update Account Holder",
             "Delete Account Holder",

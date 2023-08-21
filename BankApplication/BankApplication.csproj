@@ -60,10 +60,10 @@
     <Compile Include="Services\EmployeeService.cs" />
     <Compile Include="Services\SecurityService.cs" />
     <Compile Include="Services\TransactionService.cs" />
-    <Compile Include="Views\AccountHolderView.cs" />
-    <Compile Include="Views\BankView.cs" />
+    <Compile Include="Views\AdminView.cs" />
     <Compile Include="Views\EmployeeView.cs" />
-    <Compile Include="Views\SecurityView.cs" />
+    <Compile Include="Views\BankView.cs" />
+    <Compile Include="Views\AccountHolderView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

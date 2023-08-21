@@ -12,13 +12,13 @@ namespace BankApplication.Models
 
         public string IFSC { get; set; }
 
-        public float IMPSforSameBank { get; set; }
+        public decimal IMPSforSameBank { get; set; }
 
-        public float IMPSforOtherBank { get; set; }
+        public decimal IMPSforOtherBank { get; set; }
 
-        public float RTGSforSameBank { get; set; }
+        public decimal RTGSforSameBank { get; set; }
 
-        public float RTGSforOtherBank { get; set; }
+        public decimal RTGSforOtherBank { get; set; }
 
         public string CreatedBy { get; set; }
 
