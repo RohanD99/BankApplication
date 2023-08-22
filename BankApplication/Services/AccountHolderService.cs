@@ -8,6 +8,13 @@ namespace BankApplication.Services
 {
     internal class AccountHolderService
     {
+        public User LoggedInUser { get; set; }
+
+        public AccountHolderService() 
+        {
+            this.LoggedInUser = new User();
+        }
+
         public Response<string> Create(AccountHolder accountHolder)
         {
             Response<string> response = new Response<string>();
@@ -36,14 +43,16 @@ namespace BankApplication.Services
 
             try
             {
-                AccountHolder oldAccountHolder = GetAccountHolderById(accountHolder.AccountNumber);
+                AccountHolder oldAccountHolder = GetAccountHolderById(accountHolder.Id);
 
                 if (oldAccountHolder != null)
                 {
-                    oldAccountHolder.UserName = Utility.GetStringInput(Constants.Username, false, accountHolder.UserName);
-                    oldAccountHolder.Password = Utility.GetStringInput(Constants.Password, false, accountHolder.Password);
-                    oldAccountHolder.Name = Utility.GetStringInput(Constants.AccountHolderName, false, accountHolder.Name);
-                    oldAccountHolder.AccountType = Utility.GetStringInput(Constants.AccountType, false, accountHolder.AccountType);
+                    oldAccountHolder.UserName = string.IsNullOrEmpty(oldAccountHolder.UserName) ? accountHolder.UserName : oldAccountHolder.UserName;
+                    oldAccountHolder.Password = string.IsNullOrEmpty(oldAccountHolder.Password) ? accountHolder.Password : oldAccountHolder.Password;
+                    oldAccountHolder.Name = string.IsNullOrEmpty(oldAccountHolder.Name) ? accountHolder.Name : oldAccountHolder.Name;
+                    oldAccountHolder.AccountType = string.IsNullOrEmpty(oldAccountHolder.AccountType) ? accountHolder.AccountType : oldAccountHolder.AccountType;
+                    oldAccountHolder.ModifiedBy = this.LoggedInUser.Id;
+                    oldAccountHolder.ModifiedOn = DateTime.Now;
 
                     int index = DataStorage.AccountHolders.IndexOf(oldAccountHolder);
                     if (index >= 0)

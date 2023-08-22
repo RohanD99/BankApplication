@@ -9,6 +9,8 @@ namespace BankApplication.Models
 
         public string SrcBankId { get; set; }
 
+        public string DstBankId { get; set; }
+
         public string SrcAccount { get; set; }
 
         public string DstAccount { get; set; }

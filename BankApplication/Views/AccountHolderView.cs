@@ -29,24 +29,24 @@ namespace BankApplication.Views
                 switch (option)
                 {
                     case UserAccountOption.Deposit:
-                        this.PerformDeposit();
+                        this.Deposit();
                         break;
 
                     case UserAccountOption.Withdraw:
-                        this.PerformWithdraw();
+                        this.Withdraw();
                         break;
 
                     case UserAccountOption.Transfer:
-                        this.PerformTransfer();
+                        this.Transfer();
                         break;
 
                     case UserAccountOption.CheckBalance:
-                        this.PerformCheckBalance();
+                        this.CheckBalance();
                         break;
 
                     case UserAccountOption.Transactions:
                         if (LoggedInUser is AccountHolder transactionAccountHolder)
-                            this.ProcessTransaction(transactionAccountHolder);
+                            this.GetTransaction(transactionAccountHolder);
                         break;
 
                     case UserAccountOption.Logout:
@@ -59,11 +59,12 @@ namespace BankApplication.Views
             } while (option != UserAccountOption.Logout);
         }
 
-        public void PerformTransfer()
+        public void Transfer()
         {
-            string sourceAccountHolderID = Utility.GetStringInput("Enter source account holder ID: ", true);
-            string destinationAccountHolderID = Utility.GetStringInput("Enter destination account holder ID: ", true);
+            string srcAccHolderID = Utility.GetStringInput("Enter source account holder ID: ", true);
+            string dstAccHolderID = Utility.GetStringInput("Enter destination account holder ID: ", true);
             decimal transferAmount = Utility.GetDecimalInput("Enter the amount to transfer: ", true);
+            string bankID = Utility.GetStringInput("Enter Bank ID", true);
 
             Console.WriteLine("Choose transfer type:\n1. IMPS\n2. RTGS");
             decimal transferTypeChoice = Utility.GetDecimalInput("Enter your choice: ", true);
@@ -74,11 +75,11 @@ namespace BankApplication.Views
             else
                 transferType = TransferOptions.IMPS;
             
-            Response<string> transferResponse = BankService.TransferFunds(sourceAccountHolderID, destinationAccountHolderID, transferAmount, transferType);
+            Response<string> transferResponse = BankService.TransferFunds(bankID, srcAccHolderID, dstAccHolderID, transferAmount, transferType);
             Console.WriteLine(transferResponse.Message);
         }
 
-        public void ProcessTransaction(AccountHolder accountHolder)
+        public void GetTransaction(AccountHolder accountHolder)
         {
             string accountNumber = accountHolder.AccountNumber;
             string bankId = accountHolder.BankId;
@@ -98,8 +99,7 @@ namespace BankApplication.Views
             }
         }
 
-
-        public void PerformDeposit()
+        public void Deposit()
         {
             string accountHolderID = Utility.GetStringInput("Enter your account holder ID: ", true);
             decimal depositAmount = Utility.GetDecimalInput("Enter amount to deposit", true);
@@ -107,7 +107,7 @@ namespace BankApplication.Views
             Console.WriteLine(depositResponse.Message);
         }
 
-        public void PerformWithdraw()
+        public void Withdraw()
         {
             string accountID = Utility.GetStringInput("Enter your account holder ID: ", true);
             decimal withdrawAmount = Utility.GetDecimalInput("Enter the amount to withdraw: ", true);
@@ -115,7 +115,7 @@ namespace BankApplication.Views
             Console.WriteLine(withdrawResponse.Message);
         }
 
-        public void PerformCheckBalance()
+        public void CheckBalance()
         {
             if (LoggedInUser is AccountHolder checkBalanceAccountHolder)
             {

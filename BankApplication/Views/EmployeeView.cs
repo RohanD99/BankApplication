@@ -111,22 +111,36 @@ namespace BankApplication.Views
             }
         }
 
+        public void UpdateAccountHolderDetails(AccountHolder accountHolder)
+        {
+            AccountHolderService AccountHolderService = new AccountHolderService();
+            if (accountHolder != null)
+            {
+                Console.WriteLine("Please enter the updated details:");
+                accountHolder.UserName = Utility.GetStringInput(Constants.Username, false, accountHolder.UserName);
+                accountHolder.Password = Utility.GetStringInput(Constants.Password, false, accountHolder.Password);
+                accountHolder.Name = Utility.GetStringInput(Constants.AccountHolderName, false, accountHolder.Name);
+                accountHolder.AccountType = Utility.GetStringInput(Constants.AccountType, false, accountHolder.AccountType);
+                Response<AccountHolder> updateResponse = AccountHolderService.Update(accountHolder);
+                if (updateResponse.IsSuccess)
+                {
+                    Console.WriteLine(updateResponse.Message);
+                }
+                else
+                {
+                    Console.WriteLine(updateResponse.Message);
+                }
+            }
+        }
+
         public void UpdateAccountHolder()
         {
             string accountToUpdate = Utility.GetStringInput("Enter Account ID to update account holder: ", true);
-            AccountHolder accountHolderToUpdate = AccountHolderService.GetAccountHolderById(accountToUpdate);
-            AccountHolderService accountHolderService = new AccountHolderService();
-
-            if (accountHolderToUpdate != null)
-            {
-                Response<AccountHolder> updateResponse = accountHolderService.Update(accountHolderToUpdate);
-                Console.WriteLine(updateResponse.IsSuccess ? updateResponse.Message : Constants.AccountUpdateFailure);
-            }
-            else
-            {
-                Console.WriteLine(Constants.AccountUpdateFailure);
-            }
+            AccountHolderService AccountService = new AccountHolderService();
+            AccountHolder accountHolderToUpdate = AccountService.GetAccountHolderById(accountToUpdate);
+            UpdateAccountHolderDetails(accountHolderToUpdate);
         }
+
 
         public void DeleteAccountHolder()
         {
@@ -200,9 +214,10 @@ namespace BankApplication.Views
 
         public void AddCurrency()
         {
+            string bankId = Utility.GetStringInput("Enter Bank ID: ", true);
             string currencyCode = Utility.GetStringInput("Enter Currency Code: ", true);
             decimal exchangeRate = Utility.GetDecimalInput("Enter Exchange Rate: ", true);
-            Response<string> response = this.BankService.AddAcceptedCurrency(currencyCode, exchangeRate);
+            Response<string> response = this.BankService.AddAcceptedCurrency(bankId, currencyCode, exchangeRate);
             Console.WriteLine(response.Message);
         }
 

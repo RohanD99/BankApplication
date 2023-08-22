@@ -63,7 +63,8 @@
         {
             Deposit,
             Withdraw,
-            Transfer
+            Transfer,
+            Revert
         }
 
         public enum TransferOptions

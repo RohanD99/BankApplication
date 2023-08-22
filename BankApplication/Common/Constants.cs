@@ -29,7 +29,7 @@ namespace BankApplication.Common
 
         public static string WithdrawalFailed = "Withdrawal failed";
 
-        public static string InsufficientFunds = "Insufficient balance. You cannot withdraw more than the available balance";
+        public static string InsufficientFunds = "Insufficient balance";
 
         //Transfer
         public static string TransferFundsSuccess = "Transferred Funds successfully";
@@ -41,7 +41,9 @@ namespace BankApplication.Common
         //Transaction
         public static string TransactionSuccess = "Transaction history retrieved successfully";
 
-        public static string TransactionFailure = "No transaction history found for this account.";
+        public static string TransactionNotFound = "No transaction history found for this account.";
+
+        public static string InvalidTransactionBalance = "Transaction balance is less than expected";
 
         public static string TransactionRevert = "Transaction reverted successfully.";
 
@@ -84,7 +86,7 @@ namespace BankApplication.Common
         public static string ModifiedBy = "Account Modified by";
 
         //Currency
-        public static string NewCurrency = "New currency added successfully";
+        public static string CurrencyAdded = "New currency added successfully";
 
         public static string InvalidRate = "Invalid exchange rate. Exchange rate should be greater than zero.";
 
@@ -161,16 +163,11 @@ namespace BankApplication.Common
             "Logout"
         };
 
-
-
-        //Styles
-        public static string Style = "-----------------------------";
-
-        public static Dictionary<string, decimal> acceptedCurrencies = new Dictionary<string, decimal>()
+        public static List<(string Currency, decimal ConversionRate)> acceptedCurrencies = new List<(string, decimal)>()
         {
-            { "INR", 1 },
-            { "USD", 0.014m },
-            { "EUR", 0.012m },
+            ("INR", 1),
+            ("USD", 0.014m),
+            ("EUR", 0.012m),
         };
     }
 }

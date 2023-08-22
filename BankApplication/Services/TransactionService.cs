@@ -39,19 +39,10 @@ namespace BankApplication.Services
                     .Where(t => t.SrcAccount == accountNumber || t.DstAccount == accountNumber)
                     .ToList();
 
-                if (transactions.Any())
-                {
-                    
-                    response.IsSuccess = true;
-                    response.Message = Constants.TransactionSuccess;
-                    response.Data = transactions;
-                }
-                else
-                {
-                    response.IsSuccess = false;
-                    response.Message = Constants.TransactionFailure;
-                    response.Data = new List<Transaction>();
-                }
+                response.IsSuccess = transactions.Any();
+                response.Message = response.IsSuccess ? Constants.TransactionSuccess : Constants.TransactionNotFound;
+                response.Data = response.IsSuccess ? transactions : new List<Transaction>();
+
             }
             catch (Exception ex)
             {

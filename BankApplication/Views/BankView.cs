@@ -26,8 +26,8 @@ namespace BankApplication.Views
                     option = (MainMenu)Convert.ToInt32(Console.ReadLine());
                     switch (option)
                     {
-                        case MainMenu.CreateNewBank:             
-                            this.SetupBank();                          
+                        case MainMenu.CreateNewBank:
+                            this.SetupBank();
                             break;
 
                         case MainMenu.LoginAsAccountHolder:
@@ -117,7 +117,6 @@ namespace BankApplication.Views
                 Console.WriteLine(response.Message);
                 Console.WriteLine($"Admin's ID : {admin.Id}");
                 Console.WriteLine($"Admin's Password : {admin.Password}");
-                this.Login(UserType.Admin);
             }
             catch (Exception ex)
             {
@@ -135,11 +134,14 @@ namespace BankApplication.Views
             if (loggedinUser != null)
             {
                 if (userType == UserType.Employee && loggedinUser is Employee employee)
-                    new EmployeeView(employee).Initiate();
+                {
+                    if (employee.Type == UserType.Admin) 
+                        new AdminView(employee).Initiate();
+                    else
+                        new EmployeeView(employee).Initiate();
+                }
                 else if (userType == UserType.AccountHolder && loggedinUser is AccountHolder accountHolder)
                     new AccountHolderView(accountHolder).Initiate();
-                else if (userType == UserType.Admin && loggedinUser is Employee admin)
-                    new AdminView(admin).Initiate(); 
             }
             else
             {
